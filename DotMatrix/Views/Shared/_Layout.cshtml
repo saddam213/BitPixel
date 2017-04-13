@@ -42,13 +42,66 @@
 	@Scripts.Render("~/signalr/hubs")
 	@RenderSection("scripts", required: false)
 	<script>
+		var canvas = document.getElementById('mainCanvas');
+		var context = canvas.getContext('2d');
+		var image = context.createImageData(1, 1);
+		var imageData = image.data;
+
 		var pixelHub = $.connection.pixelHub;
 		pixelHub.client.SendPixelData = function (x, y, color) {
-			alert(x + "-" + y + "-" + color);
+			//alert(x + "-" + y + "-" + color);
+
+			imageData[0] = 255;
+			imageData[1] = 0;
+			imageData[2] = 0;
+			imageData[3] = 255;
+			context.putImageData(image, x, y);
 		};
 		$.connection.hub.start().done(function () {
-			pixelHub.server.sendPixelData(x, y, 'red');
+			//for (var i = 0; i < 10000; i++) {
+			//	var x = getRandomInt(0, 1000);
+			//	var y = getRandomInt(0, 1000);
+			//	pixelHub.server.sendPixelData(x, y, 'red');
+			//}
+			//alert("done")
 		});
+
+
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+
+		function getMousePos(canvas, evt) {
+			var rect = canvas.getBoundingClientRect();
+			return {
+				x: evt.clientX - rect.left,
+				y: evt.clientY - rect.top
+			};
+		}
+
+		canvas.addEventListener('click', function (evt) {
+			var mousePos = getMousePos(canvas, evt);
+			var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+			//alert(message)
+			pixelHub.server.sendPixelData(parseInt(mousePos.x), parseInt(mousePos.y), 'red');
+		}, false);
+
+		function test() {
+			alert()
+			var scale = 2;
+			var newWidth = 1000 * scale;
+			var newHeight = 1000 * scale;
+
+			var imageData2 = context.getImageData(0, 0, 1000, 1000);
+			var copiedCanvas = $("<canvas>").attr("width", 1000).attr("height", 1000)[0];
+			copiedCanvas.getContext("2d").putImageData(imageData2, 0, 0);
+			context.save();
+			context.translate(-((newWidth - 1000) / 2), -((newHeight - 1000) / 2));
+			context.scale(scale, scale);
+			context.clearRect(0, 0, 1000, 1000);
+			context.drawImage(copiedCanvas, 0, 0);
+			context.restore();
+		}
 	</script>
 </body>
 </html>
