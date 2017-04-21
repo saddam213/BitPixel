@@ -20,6 +20,8 @@ namespace DotMatrix.Data.DataContext
 		}
 
 		public DbSet<User> Users { get; set; }
+		public DbSet<Pixel> Pixel { get; set; }
+		public DbSet<PixelHistory> PixelHistory { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
@@ -28,6 +30,9 @@ namespace DotMatrix.Data.DataContext
 			modelBuilder.Conventions.Add(new DecimalPropertyConvention(38, 8));
 
 			modelBuilder.Entity<User>().ToTable("AspNetUsers");
+
+			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.User);
+			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.Pixel).WithMany(x => x.History);
 		}
 	}
 }

@@ -1,7 +1,84 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+	ViewBag.Title = "Home Page";
 }
-<button onclick="test();">Derp</button>
+
+<div>
+	<input id="pixel-x" type="number" />
+</div>
+<div>
+	<input id="pixel-y" type="number" />
+</div>
+<div>
+	<input id="pixel-r" type="number" />
+</div>
+<div>
+	<input id="pixel-g" type="number" />
+</div>
+<div>
+	<input id="pixel-b" type="number" />
+</div>
+<div>
+	<input id="pixel-submit" type="button" value="Add Pixel"/>
+</div>
+
 <div class="row" style="margin-top:10px">
 	<canvas id="mainCanvas" width="1000" height="1000" style="border:solid 1px red"></canvas>
 </div>
+
+@section Scripts {
+<script>
+	$("#pixel-submit").on("click", function () {
+		var data = {
+			x: $("#pixel-x").val(),
+			y: $("#pixel-y").val(),
+			r: $("#pixel-r").val(),
+			g: $("#pixel-g").val(),
+			b: $("#pixel-b").val()
+		}
+		postJson('@Url.Action("AddPixel", "Home")', data, function (result) {
+			alert(JSON.stringify(result));
+		});
+	});
+
+
+	var canvas = document.getElementById('mainCanvas');
+	var context = canvas.getContext('2d');
+	var image = context.createImageData(1, 1);
+	var imageData = image.data;
+
+	var pixelHub = $.connection.pixelHub;
+	pixelHub.client.SendPixelData = function (x, y, r,g,b) {
+		imageData[0] = r;
+		imageData[1] = g;
+		imageData[2] = b;
+		imageData[3] = 255;
+		context.putImageData(image, x, y);
+	};
+	$.connection.hub.start().done(function () {
+
+	});
+
+
+	//function getRandomInt(min, max) {
+	//	return Math.floor(Math.random() * (max - min + 1)) + min;
+	//}
+
+	//function getMousePos(canvas, evt) {
+	//	var rect = canvas.getBoundingClientRect();
+	//	return {
+	//		x: evt.clientX - rect.left,
+	//		y: evt.clientY - rect.top
+	//	};
+	//}
+
+	//canvas.addEventListener('click', function (evt) {
+	//	var mousePos = getMousePos(canvas, evt);
+	//	var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+	//	//alert(message)
+	//	pixelHub.server.sendPixelData(parseInt(mousePos.x), parseInt(mousePos.y), 'red');
+	//}, false);
+
+
+
+</script>
+	}

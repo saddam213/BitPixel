@@ -9,9 +9,9 @@ namespace DotMatrix
 {
 	public class PixelHub : Hub
 	{
-		public async Task SendPixelData(int x, int y, string color)
+		public async Task SendPixelData(int x, int y, byte r, byte g, byte b)
 		{
-			await Clients.All.SendPixelData(x, y, color);
+			await Clients.All.SendPixelData(x, y, r, g, b);
 		}
 	}
 }

@@ -15,5 +15,7 @@ namespace DotMatrix.Common.DataContext
 		Task<int> SaveChangesAsync();
 
 		DbSet<User> Users { get; set; }
+		DbSet<Entity.Pixel> Pixel { get; set; }
+		DbSet<PixelHistory> PixelHistory { get; set; }
 	}
 }
