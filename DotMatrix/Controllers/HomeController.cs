@@ -15,6 +15,7 @@ namespace DotMatrix.Controllers
 	public class HomeController : Controller
 	{
 		public IPixelWriter PixelWriter { get; set; }
+		public IPixelReader PixelReader { get; set; }
 		public async Task<ActionResult> Index()
 		{
 			return View();
@@ -34,23 +35,15 @@ namespace DotMatrix.Controllers
 			var notificationHub = GlobalHost.ConnectionManager.GetHubContext<PixelHub>();
 			if (notificationHub != null)
 			{
-				await notificationHub.Clients.All.SendPixelData(model.X, model.Y, model.R, model.G, model.B);
+				await notificationHub.Clients.All.SendPixelData(model.X, model.Y, model.Color);
 			}
 			return Json(new { Success = true });
 		}
 
-		public ActionResult About()
+		[HttpGet]
+		public async Task<ActionResult> GetPixels()
 		{
-			ViewBag.Message = "Your application description page.";
-
-			return View();
-		}
-
-		public ActionResult Contact()
-		{
-			ViewBag.Message = "Your contact page.";
-
-			return View();
+			return Json(await PixelReader.GetPixels(),  JsonRequestBehavior.AllowGet);
 		}
 	}
 }

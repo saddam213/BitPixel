@@ -3,6 +3,8 @@ using DotMatrix.Common.Pixel;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,15 +26,14 @@ namespace DotMatrix.Core.Pixel
 					{
 						X = model.X,
 						Y = model.Y,
-						Price = 0.000000005m
+						Price = 0.000000005m,
+						Color = "#FFFFFF"
 					};
 					context.Pixel.Add(existingPixel);
 					await context.SaveChangesAsync();
 				}
 
-				existingPixel.R = model.R;
-				existingPixel.G = model.G;
-				existingPixel.B = model.B;
+				existingPixel.Color = model.Color;
 				existingPixel.Price *= 2;
 				existingPixel.LastUpdate = DateTime.UtcNow;
 
@@ -40,9 +41,7 @@ namespace DotMatrix.Core.Pixel
 				{
 					UserId = userId,
 					PixelId = existingPixel.Id,
-					R = existingPixel.R,
-					G = existingPixel.G,
-					B = existingPixel.B,
+					Color = existingPixel.Color,
 					Price = existingPixel.Price
 				};
 				context.PixelHistory.Add(history);

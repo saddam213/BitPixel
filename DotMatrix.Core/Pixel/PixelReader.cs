@@ -19,9 +19,7 @@ namespace DotMatrix.Core.Pixel
 			{
 				return await context.Pixel.Select(x => new PixelModel
 				{
-					B = x.B,
-					G = x.G,
-					R = x.R,
+					Color = x.Color,
 					X = x.X,
 					Y = x.Y
 				}).ToListAsync();

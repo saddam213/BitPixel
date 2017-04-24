@@ -8,9 +8,7 @@ namespace DotMatrix.Common.Pixel
 {
 	public class PixelModel
 	{
-		public byte B { get; set; }
-		public byte G { get; set; }
-		public byte R { get; set; }
+		public string Color { get; set; }
 		public int X { get; set; }
 		public int Y { get; set; }
 	}

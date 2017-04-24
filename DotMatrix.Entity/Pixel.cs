@@ -16,9 +16,7 @@ namespace DotMatrix.Entity
 		public int X { get; set; }
 		public int Y { get; set; }
 
-		public byte R { get; set; }
-		public byte G { get; set; }
-		public byte B { get; set; }
+		public string Color { get; set; }
 
 		public decimal Price { get; set; }
 		public DateTime LastUpdate { get; set; }
