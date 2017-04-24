@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using DotMatrix.Models;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
+using DotMatrix.Api;
+using DotMatrix.Common.Api;
+using DotMatrix.Common.Users;
 
 namespace DotMatrix.Controllers
 {
@@ -49,26 +52,27 @@ namespace DotMatrix.Controllers
 			}
 		}
 
-		public ActionResult Index()
+		public async Task<ActionResult> Index()
 		{
-			return View();
+			var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+			return View(new UserSettingsModel
+			{
+				ApiModel = new UpdateApiModel
+				{
+					ApiKey = user.ApiKey,
+					ApiSecret = user.ApiSecret,
+					IsApiEnabled = user.IsApiEnabled
+				}
+			});
 		}
 
-		// GET: /Manage/ChangePassword
-		public ActionResult ChangePassword()
-		{
-			return View();
-		}
-
-		//
-		// POST: /Manage/ChangePassword
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View(model);
+				return PartialView("_UpdatePassword", model);
 			}
 
 			var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
@@ -79,11 +83,49 @@ namespace DotMatrix.Controllers
 				{
 					await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 				}
-				return RedirectToAction("Index");
+
+				ModelState.AddModelError("Success", "Successfully updated password.");
+				return PartialView("_UpdatePassword", model);
 			}
 			AddErrors(result);
-			return View(model);
+			return PartialView("_UpdatePassword", model);
 		}
+
+
+		[HttpPost]
+		[Authorize]
+		public async Task<ActionResult> UpdateApiSettings(UpdateApiModel model)
+		{
+			if (!ModelState.IsValid)
+				return PartialView("_UpdateApi", model);
+
+			var result = await ApiKeyStore.UpdateApiAuthKey(User.Identity.GetUserId(), model);
+			if (!result)
+			{
+				ModelState.AddModelError("Error", "Failed to update API key.");
+				return PartialView("_UpdateApi", model);
+			}
+
+			ModelState.AddModelError("Success", "Successfully updated API key.");
+			return PartialView("_UpdateApi", model);
+		}
+
+		[HttpPost]
+		[Authorize]
+		public ActionResult GenerateApiKey()
+		{
+			var result = ApiKeyStore.GenerateApiKeyPair();
+			if (!result.IsValid)
+				return Json(new { Success = false, Meaage = "Failed to generate API key, if problem persists please contact Cryptopia Support." });
+
+			return Json(new
+			{
+				Success = true,
+				Key = result.Key,
+				Secret = result.Secret
+			});
+		}
+
 
 		private void AddErrors(IdentityResult result)
 		{

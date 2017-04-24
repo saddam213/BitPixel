@@ -1,0 +1,38 @@
+﻿@using DotMatrix.Helpers
+@model DotMatrix.Common.Api.UpdateApiModel
+
+<h4>Api Settings</h4>
+<hr />
+@using (Ajax.BeginForm("UpdateApiSettings", "User", new AjaxOptions { HttpMethod = "POST", InsertionMode = InsertionMode.Replace, UpdateTargetId = "apiTarget" }, new { @class = "form-horizontal" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.WriterValidationSummary()
+	<div id="apialert" class="alert alert-danger text-center" style="display: none">
+		<p></p>
+	</div>
+	<div class="form-group">
+		<div class="col-md-offset-3  col-md-9">
+			<div>@Html.CheckBox("IsApiEnabled") Enable API   </div>
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.Label("Api Key", new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
+				@Html.TextBox("ApiKey", Model.ApiKey, new { @class = "form-control  input-sm", @readonly = "readonly" })
+		</div>
+	</div>
+	<div class="form-group">
+		@Html.Label("Api Secret", new { @class = "col-md-3 control-label" })
+		<div class="col-md-9">
+			@Html.TextBox("ApiSecret", Model.ApiSecret, new { @class = "form-control  input-sm", @readonly = "readonly" })
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-md-offset-3 col-md-8">
+			<button type="button" id="generateKey" class="btn btn-sm btn-default button-180" data-action="@Url.Action("GenerateApiKey", "User")">New Key</button>
+			<input type="submit" value="Save Changes" class="btn btn-default btn-sm button-180" />
+		</div>
+	</div>
+}
+

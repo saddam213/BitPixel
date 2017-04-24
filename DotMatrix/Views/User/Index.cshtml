@@ -1,11 +1,35 @@
-﻿@{
+﻿@model DotMatrix.Common.Users.UserSettingsModel
+@{
 	ViewBag.Title = "Account";
 }
 
 <div class="row">
 	<div class="col-md-12">
-		<div style="padding-top:25px">
-			<a class="btn btn-info" href="@Url.Action("ChangePassword","User")">Change Password</a>
+		<div id="passwordTarget" class="col-md-4">
+			@{ Html.RenderPartial("_UpdatePassword", new DotMatrix.Models.ChangePasswordViewModel());}
+		</div>
+		<div id="apiTarget" class="col-md-4">
+			@{ Html.RenderPartial("_UpdateApi", Model.ApiModel);}
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+	<script>
+		$("#apiTarget").on("click", " #generateKey", function () {
+			var action = $(this).data('action');
+			postJson(action, {}, function (data) {
+				if (data.Success) {
+					$("#ApiKey").val(data.Key);
+					$("#ApiSecret").val(data.Secret);
+				} else {
+					$("#apialert").show();
+					$("#apialert > p").html('Failed to generate API key, if problem persists please contact <a href="/UserSupport">Cryptopia Support.</a>');
+					$("#apialert").fadeTo(8000, 500).slideUp(500, function () {
+						$("#apialert").hide();
+					});
+				}
+			});
+		});
+	</script>
+}

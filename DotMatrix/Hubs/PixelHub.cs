@@ -7,11 +7,11 @@ using System.Web;
 
 namespace DotMatrix
 {
-	public class DataHub : Hub
+	public class PixelHub : Hub
 	{
-		public async Task SendData(object data)
+		public async Task SendPixelData(int x, int y, string color)
 		{
-			await Clients.All.SendData(data);
+			await Clients.All.SendPixelData(x, y, color);
 		}
 	}
 }

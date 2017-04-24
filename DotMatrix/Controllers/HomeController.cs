@@ -23,6 +23,7 @@ namespace DotMatrix.Controllers
 
 
 		[HttpPost]
+		[System.Web.Mvc.Authorize]
 		public async Task<ActionResult> AddPixel(PixelModel model)
 		{
 			if (!ModelState.IsValid)

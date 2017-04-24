@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotMatrix", "DotMatrix\DotMatrix.csproj", "{AACAA191-434F-4AE3-897E-885BBCE75DC4}"
 EndProject
@@ -28,6 +28,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotMatrix.WalletService", "DotMatrix.WalletService\DotMatrix.WalletService.csproj", "{5E2B5C17-A1FB-4F56-852A-3C9E4DC8F5FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotMatrix.TradeService", "DotMatrix.TradeService\DotMatrix.TradeService.csproj", "{046F9A01-D09C-4CEB-AAB9-C1D46C18B0B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DotMatrix.Tools", "DotMatrix.Tools", "{7B8C141E-296D-4742-96F1-AF4D6443A885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTest", "ApiTest\ApiTest.csproj", "{0CDEAB6E-E7A3-4AE1-B227-39DE99455590}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +79,10 @@ Global
 		{046F9A01-D09C-4CEB-AAB9-C1D46C18B0B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{046F9A01-D09C-4CEB-AAB9-C1D46C18B0B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{046F9A01-D09C-4CEB-AAB9-C1D46C18B0B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CDEAB6E-E7A3-4AE1-B227-39DE99455590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CDEAB6E-E7A3-4AE1-B227-39DE99455590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CDEAB6E-E7A3-4AE1-B227-39DE99455590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CDEAB6E-E7A3-4AE1-B227-39DE99455590}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,5 +98,6 @@ Global
 		{D5029E7C-EFD9-4C90-99AB-6FB08601ECCC} = {C8952272-BF53-4DDD-8FC8-5E46EB222DC6}
 		{5E2B5C17-A1FB-4F56-852A-3C9E4DC8F5FB} = {DBC82016-27CA-4151-A04D-9ACFB22EF214}
 		{046F9A01-D09C-4CEB-AAB9-C1D46C18B0B8} = {DBC82016-27CA-4151-A04D-9ACFB22EF214}
+		{0CDEAB6E-E7A3-4AE1-B227-39DE99455590} = {7B8C141E-296D-4742-96F1-AF4D6443A885}
 	EndGlobalSection
 EndGlobal

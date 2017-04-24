@@ -40,14 +40,5 @@
 	@Scripts.Render("~/signalr/hubs")
 	<script src="~/Scripts/jscolor.js"></script>
 	@RenderSection("scripts", required: false)
-	<script>
-		var dataHub = $.connection.dataHub;
-		dataHub.client.SendData = function (data) {
-			alert(data.Message);
-		};
-		$.connection.hub.start().done(function () {
-			dataHub.server.sendData({ Message: 'signalr test' });
-		});
-	</script>
 </body>
 </html>

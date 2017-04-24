@@ -4,17 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotMatrix.Common.Pixel
+namespace ApiTest
 {
-	public class PixelModel
+	public class AddPixelRequest
 	{
 		public string Color { get; set; }
 		public int X { get; set; }
 		public int Y { get; set; }
-
-		public bool IsValid()
-		{
-			return true;
-		}
 	}
 }
