@@ -53,6 +53,7 @@
     <Compile Include="DataContext\IDataContext.cs" />
     <Compile Include="DataContext\IDataContextFactory.cs" />
     <Compile Include="Pixel\IPixelWriter.cs" />
+    <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Pixel\IPixelReader.cs" />
     <Compile Include="Pixel\PixelModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

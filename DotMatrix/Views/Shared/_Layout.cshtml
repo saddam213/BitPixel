@@ -3,14 +3,14 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>@ViewBag.Title - My ASP.NET Application</title>
+	<title>@ViewBag.Title - My Cryptopia Application</title>
 	@Styles.Render("~/Content/css")
 	@Scripts.Render("~/bundles/modernizr")
 
 </head>
 <body>
 	<div class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
+		<div class="container-fluid">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="icon-bar"></span>
@@ -22,18 +22,16 @@
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li>@Html.ActionLink("Home", "Index", "Home")</li>
-					<li>@Html.ActionLink("About", "About", "Home")</li>
-					<li>@Html.ActionLink("Contact", "Contact", "Home")</li>
 				</ul>
 				@Html.Partial("_LoginPartial")
 			</div>
 		</div>
 	</div>
-	<div class="container body-content">
+	<div class="container-fluid body-content">
 		@RenderBody()
 		<hr />
 		<footer>
-			<p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+			<p>&copy; @DateTime.Now.Year - My Cryptopia Application</p>
 		</footer>
 	</div>
 
@@ -43,7 +41,13 @@
 	<script src="~/Scripts/jscolor.js"></script>
 	@RenderSection("scripts", required: false)
 	<script>
-
+		var dataHub = $.connection.dataHub;
+		dataHub.client.SendData = function (data) {
+			alert(data.Message);
+		};
+		$.connection.hub.start().done(function () {
+			dataHub.server.sendData({ Message: 'signalr test' });
+		});
 	</script>
 </body>
 </html>

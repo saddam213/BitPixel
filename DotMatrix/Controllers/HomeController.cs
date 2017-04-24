@@ -21,6 +21,7 @@ namespace DotMatrix.Controllers
 			return View();
 		}
 
+
 		[HttpPost]
 		public async Task<ActionResult> AddPixel(PixelModel model)
 		{
