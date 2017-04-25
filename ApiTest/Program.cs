@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,55 +20,75 @@ namespace ApiTest
 
 		static async Task MainAsync()
 		{
-			using (var apiClient = new ApiPrivate("4b9adfb45af94af78d94ce75d5881c7b", "Pw8B2Jj5P7p/7DO5e/CYwKAvelQQH2knXztQ5djaiF0=", "http://localhost:88"))
+			//for (int i = 0; i < 100; i++)
+			//{
+			//	foreach (var file in Directory.GetFiles(@"C:\Users\Dev\Downloads\test\"))
+			//	{
+			//		//using (var apiClient = new ApiPrivate("4b9adfb45af94af78d94ce75d5881c7b", "Pw8B2Jj5P7p/7DO5e/CYwKAvelQQH2knXztQ5djaiF0=", "http://localhost:88"))
+			//		using (var apiClient = new ApiPrivate("ee652448256d497e8256bdd9068297b2", "WTAzqs48uTBtBI3MFr9G7/NSVJxFRxe68JcpAckixDQ=", "http://www.dotmatrix.co.nz"))
+			//		using (var bitmap = new Bitmap(file))
+			//		{
+			//			var width = bitmap.Width;
+			//			var height = bitmap.Height;
+			//			var data = new List<AddPixelRequest>();
+			//			for (int x = 0; x < width; x++)
+			//			{
+
+			//				for (int y = 0; y < height; y++)
+			//				{
+			//					var pixel = bitmap.GetPixel(x, y);
+			//					var hex = HexConverter2(pixel);
+			//					data.Add(new AddPixelRequest
+			//					{
+			//						Color = hex,
+			//						X = 10 + x,
+			//						Y = 400 + y
+			//					});
+			//				}
+
+			//			}
+			//			var result = await apiClient.AddPixels(data);
+			//			Console.WriteLine(result.Message);
+			//		}
+			//	} 
+			//}
+
+
+			await DrawPicture(@"C:\Users\Dev\Pictures\stash.jpg", 600, 200);
+		}
+
+
+		private static async Task DrawPicture(string filename, int offsetX, int offsetY)
+		{
+			//using (var apiClient = new ApiPrivate("4b9adfb45af94af78d94ce75d5881c7b", "Pw8B2Jj5P7p/7DO5e/CYwKAvelQQH2knXztQ5djaiF0=", "http://localhost:88"))
+			using (var apiClient = new ApiPrivate("ee652448256d497e8256bdd9068297b2", "WTAzqs48uTBtBI3MFr9G7/NSVJxFRxe68JcpAckixDQ=", "http://www.dotmatrix.co.nz"))
+			using (var bitmap = new Bitmap(filename))
 			{
-				var data = new List<AddPixelRequest>();
-				//for (int i = 0; i < 100; i++)
-				//{
-				//	data.Add(new AddPixelRequest
-				//	{
-				//		Color = "#000000",
-				//		X = _rand.Next(500, 520),
-				//		Y = _rand.Next(200, 220)
-				//	});
-
-				//	//await Task.Delay(200);
-				//}
-
-				using (var bitmap = new Bitmap(@"E:\Shared\bigdick.bmp"))
+				var width = bitmap.Width;
+				var height = bitmap.Height;
+				for (int x = 0; x < width; x++)
 				{
-					var offsetX = 20;
-					var offsetY = 20;
-					var width = bitmap.Width;
-					var height = bitmap.Height;
-					for (int x = 0; x < width; x++)
+					var data = new List<AddPixelRequest>();
+					for (int y = 0; y < height; y++)
 					{
-						for (int y = 0; y < height; y++)
+						var pixel = bitmap.GetPixel(x, y);
+						var hex = HexConverter2(pixel);
+						data.Add(new AddPixelRequest
 						{
-							var pixel = bitmap.GetPixel(x, y);
-							var hex = HexConverter2(pixel);
-		
-								var result = await apiClient.AddPixel(new AddPixelRequest
-								{
-									Color = hex,
-									X = offsetX + x,
-									Y = offsetY + y
-								});
-								Console.WriteLine(result.Message);
-			
-
-						}
+							Color = hex,
+							X = offsetX + x,
+							Y = offsetY + y
+						});
 					}
+					var result = await apiClient.AddPixels(data);
+					Console.WriteLine(result.Message);
 				}
-
-				//	var result = await apiClient.AddPixel(data.First());
-			
 			}
 		}
 
 		private static string HexConverter(System.Drawing.Color c)
 		{
-			return "#"  + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+			return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
 		}
 
 		private static string HexConverter2(System.Drawing.Color c)
