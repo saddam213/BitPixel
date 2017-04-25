@@ -17,7 +17,7 @@ namespace DotMatrix.TradeService
 			ServiceBase[] ServicesToRun;
 			ServicesToRun = new ServiceBase[]
 			{
-								new Service1()
+								new TradeService()
 			};
 			ServiceBase.Run(ServicesToRun);
 		}

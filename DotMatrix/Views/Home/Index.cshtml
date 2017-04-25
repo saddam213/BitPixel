@@ -13,19 +13,20 @@
 
 @section Scripts {
 	<script>
+		var pixelData;
 		var canvas = document.getElementById('mainCanvas');
 		var context = canvas.getContext('2d');
 		var scale = 1;
 		$("#pixel-zoomin").on("click", function () {
 			scale = 10;
 			resetCanvas();
-			getPixels();
+			loadData();
 		});
 
 		$("#pixel-zoomout").on("click", function () {
 			scale = 1;
 			resetCanvas();
-			getPixels();
+			loadData();
 		});
 
 		function resetCanvas() {
@@ -41,8 +42,10 @@
 
 		var pixelHub = $.connection.pixelHub;
 		pixelHub.client.SendPixelData = function (x, y, color) {
-			context.fillStyle = color;
-			context.fillRect(x, y, 1, 1);
+				context.beginPath();
+				context.fillStyle = color;
+				context.fillRect(x, y, 1, 1);
+				context.closePath();
 		};
 		$.connection.hub.start().done(function () {
 
@@ -51,16 +54,21 @@
 		function getPixels() {
 			getJson('@Url.Action("GetPixels", "Home")', {}, function (data) {
 				if (data) {
-					for (var i = 0; i < data.length; i++) {
-						var pixel = data[i];
-						context.fillStyle = pixel.Color,
-						context.fillRect(pixel.X, pixel.Y, 1, 1);
-					}
+					pixelData = data;
+					loadData();
 				}
 			});
 		}
 
-
+		function loadData() {
+			for (var i = 0; i < pixelData.length; i++) {
+				var pixel = pixelData[i];
+				context.beginPath();
+				context.fillStyle = pixel.Color,
+				context.fillRect(pixel.X, pixel.Y, 1, 1);
+				context.closePath();
+			}
+		}
 
 		function getMousePos(canvas, evt) {
 			var rect = canvas.getBoundingClientRect();
