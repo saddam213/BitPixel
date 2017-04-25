@@ -17,10 +17,11 @@ namespace DotMatrix.Entity
 		public int Y { get; set; }
 
 		public string Color { get; set; }
-
+		public string UserId { get; set; }
 		public decimal Price { get; set; }
 		public DateTime LastUpdate { get; set; }
 
 		public virtual ICollection<PixelHistory> History { get; set; }
+
 	}
 }

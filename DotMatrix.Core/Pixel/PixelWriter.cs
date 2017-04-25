@@ -26,27 +26,66 @@ namespace DotMatrix.Core.Pixel
 					{
 						X = model.X,
 						Y = model.Y,
+					
 						Price = 0.000000005m,
-						Color = "#FFFFFF"
+						Color = "#FFFFFF",
+						History = new List<Entity.PixelHistory>()
 					};
 					context.Pixel.Add(existingPixel);
-					await context.SaveChangesAsync();
 				}
 
+				existingPixel.UserId = userId;
 				existingPixel.Color = model.Color;
 				existingPixel.Price *= 2;
 				existingPixel.LastUpdate = DateTime.UtcNow;
-
-				var history = new Entity.PixelHistory
+				existingPixel.History.Add(new Entity.PixelHistory
 				{
 					UserId = userId,
-					PixelId = existingPixel.Id,
 					Color = existingPixel.Color,
-					Price = existingPixel.Price
-				};
-				context.PixelHistory.Add(history);
-				await context.SaveChangesAsync();
+					Price = existingPixel.Price,
+					Timestamp = existingPixel.LastUpdate
+				});
 
+				await context.SaveChangesAsync();
+				return true;
+			}
+		}
+
+		public async Task<bool> AddOrUpdate(string userId, List<PixelModel> models)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				foreach (var model in models)
+				{
+					var existingPixel = await context.Pixel.Where(x => x.X == model.X && x.Y == model.Y).FirstOrDefaultAsync();
+					if (existingPixel == null)
+					{
+						existingPixel = new Entity.Pixel
+						{
+							X = model.X,
+							Y = model.Y,
+							Price = 0.000000005m,
+							Color = "#FFFFFF"
+						};
+						context.Pixel.Add(existingPixel);
+						await context.SaveChangesAsync();
+					}
+
+					existingPixel.Color = model.Color;
+					existingPixel.Price *= 2;
+					existingPixel.LastUpdate = DateTime.UtcNow;
+
+					var history = new Entity.PixelHistory
+					{
+						UserId = userId,
+						PixelId = existingPixel.Id,
+						Color = existingPixel.Color,
+						Price = existingPixel.Price
+					};
+					context.PixelHistory.Add(history);
+				}
+
+				await context.SaveChangesAsync();
 				return true;
 			}
 		}

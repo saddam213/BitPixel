@@ -20,7 +20,13 @@ namespace ApiTest
 
 		public async Task<AddPixelResponse> AddPixel(AddPixelRequest requestData)
 		{
-			var response = await _client.PostAsJsonAsync<AddPixelRequest>($"{_apiBaseAddress.TrimEnd('/')}/Api/ApiPrivate/AddPixel", requestData);
+			var response = await _client.PostAsJsonAsync<AddPixelRequest>($"{_apiBaseAddress.TrimEnd('/')}/Api/AddPixel", requestData);
+			return await response.Content.ReadAsAsync<AddPixelResponse>();
+		}
+
+		public async Task<AddPixelResponse> AddPixels(List<AddPixelRequest> requestData)
+		{
+			var response = await _client.PostAsJsonAsync($"{_apiBaseAddress.TrimEnd('/')}/Api/AddPixels", requestData);
 			return await response.Content.ReadAsAsync<AddPixelResponse>();
 		}
 
@@ -28,5 +34,10 @@ namespace ApiTest
 		{
 			_client.Dispose();
 		}
+	}
+
+	public class Test
+	{
+		public AddPixelRequest[] Data { get; set; }
 	}
 }
