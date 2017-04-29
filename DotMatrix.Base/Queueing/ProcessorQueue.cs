@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotMatrix.Base.Queueing
+namespace Cryptopia.Base.Queueing
 {
 	/// <summary>
 	/// A synchronous blocking queue for processing items in a FIFO scenario

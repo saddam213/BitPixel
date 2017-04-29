@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace DotMatrix.Base.Logging
+namespace Cryptopia.Base.Logging
 {
 	/// <summary>
 	/// Outputs messages to a file

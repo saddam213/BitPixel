@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DotMatrix.Base
+namespace Cryptopia.Base
 {
 	public static class LinqExtensions
 	{

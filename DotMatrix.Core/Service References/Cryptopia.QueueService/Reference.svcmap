@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="3dea829f-2428-4759-b4fb-453d12cf658c" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.Generic.List`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="net.tcp://localhost:8000/CryptopiaQueue/service/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="d43214e6-a402-443a-9770-27d05cf24a4d" SourceId="1" SourceUrl="net.tcp://localhost:8000/CryptopiaQueue/service/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="49c3c325-822b-4f1c-873f-dbc307e27d1d" SourceId="1" SourceUrl="net.tcp://localhost:8000/CryptopiaQueue/service/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="5ccbd1de-387b-4381-9a33-7912558558f4" SourceId="1" SourceUrl="net.tcp://localhost:8000/CryptopiaQueue/service/mex" />
+    <MetadataFile FileName="Cryptopia.QueueService.DataObjects.xsd" MetadataType="Schema" ID="48443682-ab6a-4b31-888c-cdfe9a19ca7f" SourceId="1" SourceUrl="net.tcp://localhost:8000/CryptopiaQueue/service/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

@@ -1,6 +1,6 @@
-﻿namespace DotMatrix.TradeService
+﻿namespace Cryptopia.QueueService
 {
-	partial class TradeService
+	partial class QueueService
 	{
 		/// <summary> 
 		/// Required designer variable.

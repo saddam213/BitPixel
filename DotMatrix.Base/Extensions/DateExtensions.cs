@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace DotMatrix.Base.Extensions
+namespace Cryptopia.Base.Extensions
 {
 	public static class DateExtensions
 	{

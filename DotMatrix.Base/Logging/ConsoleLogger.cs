@@ -1,6 +1,6 @@
 using System;
 
-namespace DotMatrix.Base.Logging
+namespace Cryptopia.Base.Logging
 {
 	/// <summary>
 	/// Outputs messages to the console

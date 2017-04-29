@@ -7,6 +7,7 @@ using Owin;
 using DotMatrix.Models;
 using DotMatrix.Identity;
 using Microsoft.AspNet.SignalR;
+using DotMatrix.Hubs;
 
 namespace DotMatrix
 {
@@ -74,7 +75,7 @@ namespace DotMatrix
 				EnableDetailedErrors = false
 #endif
 			};
-			//GlobalHost.DependencyResolver.Register(typeof(IUserIdProvider), () => new HubIdentityProvider());
+			GlobalHost.DependencyResolver.Register(typeof(IUserIdProvider), () => new HubIdentityProvider());
 			app.MapSignalR(hubConfiguration);
 		}
 	}

@@ -1,4 +1,4 @@
-namespace DotMatrix.Base.Logging
+namespace Cryptopia.Base.Logging
 {
 	/// <summary>
 	/// Message type
