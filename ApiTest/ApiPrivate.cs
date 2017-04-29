@@ -23,13 +23,7 @@ namespace ApiTest
 			var response = await _client.PostAsJsonAsync<AddPixelRequest>($"{_apiBaseAddress.TrimEnd('/')}/Api/AddPixel", requestData);
 			return await response.Content.ReadAsAsync<AddPixelResponse>();
 		}
-
-		public async Task<AddPixelResponse> AddPixels(List<AddPixelRequest> requestData)
-		{
-			var response = await _client.PostAsJsonAsync($"{_apiBaseAddress.TrimEnd('/')}/Api/AddPixels", requestData);
-			return await response.Content.ReadAsAsync<AddPixelResponse>();
-		}
-
+	
 		public void Dispose()
 		{
 			_client.Dispose();

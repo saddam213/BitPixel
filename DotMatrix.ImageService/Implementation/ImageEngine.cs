@@ -70,15 +70,14 @@ namespace DotMatrix.ImageService.Implementation
 
 						}
 						Log.Message(LogLevel.Info, "Processing complete, Saving Images..");
-						bitmapSmall.Save(@"D:\Repositories\DotMatrix\DotMatrix\Content\Images\test-small.png", System.Drawing.Imaging.ImageFormat.Png);
-						bitmapLarge.Save(@"D:\Repositories\DotMatrix\DotMatrix\Content\Images\test-large.png", System.Drawing.Imaging.ImageFormat.Png);
+						bitmapSmall.Save(@"E:\DOTMatrix\Content\Images\background-small.png", System.Drawing.Imaging.ImageFormat.Png);
+						bitmapLarge.Save(@"E:\DOTMatrix\Content\Images\background-large.png", System.Drawing.Imaging.ImageFormat.Png);
 						Log.Message(LogLevel.Info, "Images Saved.");
 					}
 				}
 				catch (Exception ex)
 				{
-
-
+					Log.Exception("", ex);
 				}
 			}
 		}

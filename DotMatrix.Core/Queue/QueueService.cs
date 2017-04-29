@@ -16,59 +16,55 @@ namespace DotMatrix.Core.Queue
 		private static readonly string QueueServicePassword = ConfigurationManager.AppSettings["QueueServicePassword"];
 		private static readonly string QueueServiceDomain = ConfigurationManager.AppSettings["QueueServiceDomain"];
 
-		public async Task<bool> SubmitPixel(string userId, PixelModel model, bool isApi)
+		public async Task<PixelResultModel> SubmitPixel(string userId, PixelModel model, bool isApi)
 		{
-			try
+			using (var queueService = CreateService())
 			{
-				using (var queueService = CreateService())
+				var response = await queueService.SubmitPixelAsync(new SubmitPixelRequest
 				{
-					var response = await queueService.SubmitPixelAsync(new SubmitPixelRequest
+					IsApi = isApi,
+					UserId = userId,
+					Pixel = new PixelItem
 					{
-						IsApi = isApi,
-						UserId = userId,
-						Pixel = new PixelItem
-						{
-							X = model.X,
-							Y = model.Y,
-							R = model.R,
-							G = model.G,
-							B = model.B
-						}
-					});
-					return true;
-				}
-			}
-			catch (Exception)
-			{
-				return false;
+						X = model.X,
+						Y = model.Y,
+						R = model.R,
+						G = model.G,
+						B = model.B
+					}
+				});
+				return new PixelResultModel
+				{
+					Success = response.Success,
+					Message = response.Message,
+					Balance = response.Balance
+				};
 			}
 		}
 
-		public async Task<bool> SubmitPixels(string userId, List<PixelModel> model, bool isApi)
+		public async Task<PixelResultModel> SubmitPixels(string userId, List<PixelModel> model, bool isApi)
 		{
-			try
+			using (var queueService = CreateService())
 			{
-				using (var queueService = CreateService())
+				var response = await queueService.SubmitPixelsAsync(new SubmitPixelsRequest
 				{
-					var response = await queueService.SubmitPixelsAsync(new SubmitPixelsRequest
+					IsApi = isApi,
+					UserId = userId,
+					Pixels = model.Select(x => new PixelItem
 					{
-						IsApi = isApi,
-						UserId = userId,
-						Pixels = model.Select(x => new PixelItem
-						{
-							X = x.X,
-							Y = x.Y,
-							R = x.R,
-							G = x.G,
-							B = x.B
-						}).ToList()
-					});
-					return true;
-				}
-			}
-			catch (Exception)
-			{
-				return false;
+						X = x.X,
+						Y = x.Y,
+						R = x.R,
+						G = x.G,
+						B = x.B
+					}).ToList()
+				});
+				return new PixelResultModel
+				{
+					Success = response.Success,
+					Message = response.Message,
+					Balance = response.Balance
+				};
 			}
 		}
 

@@ -14,6 +14,14 @@ namespace DotMatrix.Core.Users
 	{
 		public IDataContextFactory DataContextFactory { get; set; }
 
+		public async Task<User> GetUser(string userId)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				return await context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+			}
+		}
+
 		public async Task<List<User>> GetUsers()
 		{
 			using (var context = DataContextFactory.CreateContext())

@@ -9,7 +9,7 @@ namespace DotMatrix.Common.Queue
 {
 	public interface IQueueService
 	{
-		Task<bool> SubmitPixel(string userId, PixelModel model, bool isApi);
-		Task<bool> SubmitPixels(string userId, List<PixelModel> model, bool isApi);
+		Task<PixelResultModel> SubmitPixel(string userId, PixelModel model, bool isApi);
+		Task<PixelResultModel> SubmitPixels(string userId, List<PixelModel> model, bool isApi);
 	}
 }

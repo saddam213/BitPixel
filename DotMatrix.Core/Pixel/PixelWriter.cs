@@ -16,14 +16,26 @@ namespace DotMatrix.Core.Pixel
 	{
 		public IQueueService QueueService { get; set; }
 
-		public async Task<bool> AddOrUpdate(string userId, PixelModel model)
+		public async Task<PixelResultModel> AddOrUpdate(string userId, PixelModel model)
 		{
-			return await QueueService.SubmitPixel(userId, model, false);
-		}
-
-		public async Task<bool> AddOrUpdate(string userId, List<PixelModel> models)
-		{
-			return await QueueService.SubmitPixels(userId, models, false);
+			try
+			{
+				var result = await QueueService.SubmitPixel(userId, model, false);
+				return new PixelResultModel
+				{
+					Success = result.Success,
+					Message = result.Message,
+					Balance = result.Balance
+				};
+			}
+			catch (Exception)
+			{
+				return new PixelResultModel
+				{
+					Success = false,
+					Message = "Error: Failed to add new pixel"
+				};
+			}
 		}
 	}
 }

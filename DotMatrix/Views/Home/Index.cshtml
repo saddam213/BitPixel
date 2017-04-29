@@ -1,46 +1,62 @@
-﻿@{
-	ViewBag.Title = "Home Page";
+﻿@model DotMatrix.Common.Pixel.PixelViewlModel
+@{
+	ViewBag.Title = "Pixels";
 }
+
+<style>
+	.visible-t {
+		visibility: visible;
+		opacity: 1;
+	}
+	/* Fade-Out Effect */
+	.hidden-t {
+		visibility: hidden;
+		opacity: 0;
+		transition: visibility 0s 3s, opacity 2s ease-in;
+	}
+</style>
+
 <div>
-	<input id="pixel-zoomout" type="button" value="Zoom Out" />
+	<span>Balance: <b id="user-balance">@Model.Balance.ToString("F8")</b> DOT</span>
+	<input id="pixel-zoomout" type="button" value="Zoom Out" disabled="disabled" />
 	<input id="pixel-zoomin" type="button" value="Zoom In" disabled="disabled" />
 	<input id="pixel-color" value="#ff0000" />
+	<span id="user-message">
+	</span>
 </div>
 
 <div class="row" style="margin-top:10px;overflow:auto;max-width:1020px;max-height:600px">
-	<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent"></canvas>
+	<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent" width="1000" height="1000"></canvas>
 </div>
 
 @section Scripts {
 	<link href="~/Content/spectum.css" rel="stylesheet" />
 	<script src="~/Scripts/spectrum.js"></script>
 	<script>
-		var pixelData;
+		var scale = 1;
+		var pixelHistory = [];
 		var canvas = document.getElementById('mainCanvas');
 		var context = canvas.getContext('2d');
-		var scale = 1;
-		$("#pixel-zoomin").on("click", function () {
-			scale = 10;
-			resetCanvas(backgroundLarge);
-			loadData();
-		});
 
-		$("#pixel-zoomout").on("click", function () {
-			scale = 1;
-			resetCanvas(backgroundSmall);
-			loadData();
-		});
+		var pixelHub = $.connection.pixelHub;
+		pixelHub.client.SendPixelData = function (x, y, color) {
+			addPixel(x, y, color, true);
+		};
+		pixelHub.client.SendBalanceData = function (balance) {
+			$("#user-balance").text(balance.toFixed(8))
+		};
+		$.connection.hub.start();
 
-		var backgroundImage;
 		var backgroundSmall = new Image();
-		backgroundSmall.src = "../Content/Images/test-small.png";
+		backgroundSmall.src = "../Content/Images/background-small.png";
 		backgroundSmall.onload = function () {
+			$("#pixel-zoomout").removeAttr("disabled");
 			resetCanvas(backgroundSmall)
-			getPixels();
+			getDeltaUpdates();
 		};
 
 		var backgroundLarge = new Image();
-		backgroundLarge.src = "../Content/Images/test-large.png";
+		backgroundLarge.src = "../Content/Images/background-large.png";
 		backgroundLarge.onload = function () {
 			$("#pixel-zoomin").removeAttr("disabled");
 		};
@@ -51,92 +67,83 @@
 			context.setTransform(1, 0, 0, 1, 0, 0);
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			context.drawImage(background, 0, 0)
-			context.scale(scale, scale)
+			context.scale(scale, scale);
+			refreshDeltaUpdates();
 		}
 
-		var pixelHub = $.connection.pixelHub;
-		pixelHub.client.SendPixelData = function (x, y, color) {
-			addPixel(x, y, color);
-		};
-		$.connection.hub.start().done(function () {
-
-		});
-
-		function getPixels() {
+		function getDeltaUpdates() {
 			getJson('@Url.Action("GetPixels", "Home")', {}, function (data) {
-				if (data) {
-					pixelData = data;
-					loadData();
-				}
+				addDeltaUpdates(data);
 			});
 		}
 
-		function loadData() {
-			for (var i = 0; i < pixelData.length; i++) {
-				var pixel = pixelData[i];
+		function addDeltaUpdates(deltas) {
+			if (deltas) {
+				for (var i = 0; i < deltas.length; i++) {
+					var pixel = deltas[i];
+					addPixel(pixel.X, pixel.Y, pixel.Color, true);
+				}
+			}
+		}
+
+		function refreshDeltaUpdates() {
+			for (var i = 0; i < pixelHistory.length; i++) {
+				var pixel = pixelHistory[i];
 				addPixel(pixel.X, pixel.Y, pixel.Color);
 			}
 		}
 
-		function addPixel(x, y, color) {
+		function addPixel(x, y, color, addToHistory) {
 			context.beginPath();
 			context.fillStyle = "rgb(" + color + ")",
 			context.fillRect(x, y, 1, 1);
 			context.closePath();
+			if (addToHistory) {
+				pixelHistory.push({ X: x, Y: y, Color: color })
+			}
 		}
 
-		function getMousePos(canvas, evt) {
-			var rect = canvas.getBoundingClientRect();
-			return {
-				x: evt.clientX - rect.left,
-				y: evt.clientY - rect.top
-			};
+		function showMessage(message, error) {
+			$("#user-message").html('<span class="text-' + (error ? "success" : "danger") + ' visible-t"></span>')
+			$("#user-message > span").text(message).addClass("hidden-t");
 		}
 
 		canvas.addEventListener('click', function (evt) {
 			var mousePos = getMousePos(canvas, evt);
 			var color = $("#pixel-color").val();
 			var rgb = hex2rgb(color);
-			var data = {
-				x: parseInt(mousePos.x / scale),
-				y: parseInt(mousePos.y / scale),
-				r: rgb[0],
-				g: rgb[1],
-				b: rgb[2]
-			}
-			postJson('@Url.Action("AddPixel", "Home")', data);
+			var data = { x: parseInt(mousePos.x / scale), y: parseInt(mousePos.y / scale), r: rgb[0], g: rgb[1], b: rgb[2] }
+			postJson('@Url.Action("AddPixel", "Home")', data, function (result) {
+				showMessage(result.Message, result.Success);
+			});
 		}, false);
+
+		$("#pixel-zoomin").on("click", function () {
+			scale = 10;
+			resetCanvas(backgroundLarge);
+		});
+
+		$("#pixel-zoomout").on("click", function () {
+			scale = 1;
+			resetCanvas(backgroundSmall);
+		});
 
 		$(function () {
 			$("#pixel-color").spectrum({
 				showPalette: true,
 				preferredFormat: "hex",
 				hideAfterPaletteSelect: true,
+				clickoutFiresChange: false,
 				palette: [
-						['red', 'blue', 'green']
+						['white', 'black'],
+						['red', 'blue'],
+						['green', 'yellow'],
+						['grey', 'purple']
 				]
 			});
-
 		});
 
 
-		function rgb2hex(red, green, blue) {
-			var rgb = blue | (green << 8) | (red << 16);
-			return '#' + (0x1000000 + rgb).toString(16).slice(1)
-		}
 
-		function hex2rgb(hex) {
-			// long version
-			r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-			if (r) {
-				return r.slice(1, 4).map(function (x) { return parseInt(x, 16); });
-			}
-			// short version
-			r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
-			if (r) {
-				return r.slice(1, 4).map(function (x) { return 0x11 * parseInt(x, 16); });
-			}
-			return null;
-		}
 	</script>
 }

@@ -8,8 +8,10 @@ namespace ApiTest
 {
 	public class AddPixelRequest
 	{
-		public string Color { get; set; }
 		public int X { get; set; }
 		public int Y { get; set; }
+		public byte R { get; set; }
+		public byte G { get; set; }
+		public byte B { get; set; }
 	}
 }

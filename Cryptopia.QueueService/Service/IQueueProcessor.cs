@@ -9,8 +9,5 @@ namespace Cryptopia.QueueService.Service
 	{
 		[OperationContract]
 		Task<SubmitPixelResponse> SubmitPixel(SubmitPixelRequest request);
-
-		[OperationContract]
-		Task<SubmitPixelsResponse> SubmitPixels(SubmitPixelsRequest request);
 	}
 }

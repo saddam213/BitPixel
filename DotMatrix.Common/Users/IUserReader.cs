@@ -9,6 +9,7 @@ namespace DotMatrix.Common.Users
 {
 	public interface IUserReader
 	{
+		Task<User> GetUser(string id);
 		Task<List<User>> GetUsers();
 	}
 }

@@ -20,6 +20,7 @@
   <xs:element name="PixelItem" nillable="true" type="tns:PixelItem" />
   <xs:complexType name="SubmitPixelResponse">
     <xs:sequence>
+      <xs:element minOccurs="0" name="Balance" type="xs:decimal" />
       <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Success" type="xs:boolean" />
     </xs:sequence>
@@ -41,6 +42,7 @@
   <xs:element name="ArrayOfPixelItem" nillable="true" type="tns:ArrayOfPixelItem" />
   <xs:complexType name="SubmitPixelsResponse">
     <xs:sequence>
+      <xs:element minOccurs="0" name="Balance" type="xs:decimal" />
       <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Success" type="xs:boolean" />
     </xs:sequence>

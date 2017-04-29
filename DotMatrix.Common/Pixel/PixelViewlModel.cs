@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotMatrix.Entity
+namespace DotMatrix.Common.Pixel
 {
-	public class User
+	public class PixelViewlModel
 	{
-		public string Id { get; set; }
-		public string Email { get; set; }
-		public string UserName { get; set; }
 		public decimal Balance { get; set; }
 	}
 }

@@ -21,7 +21,7 @@ namespace Cryptopia.QueueService.Implementation
 		#region Fields
 		public static readonly ProcessorQueue<IQueueItem, IQueueResponse> QueueProcessor = new ProcessorQueue<IQueueItem, IQueueResponse>(new QueueEngine().ProcessQueueItem);
 		private readonly Log Log = LoggingManager.GetLog(typeof(QueueEngine));
-
+		private decimal _pixelPrice = 1.00000000m;
 
 		#endregion
 
@@ -51,10 +51,6 @@ namespace Cryptopia.QueueService.Implementation
 							if (queueItem is SubmitPixelRequest)
 							{
 								queueResponse = await ProcessSubmitPixelRequest(context, queueItem as SubmitPixelRequest).ConfigureAwait(false);
-							}
-							if (queueItem is SubmitPixelsRequest)
-							{
-								queueResponse = await ProcessSubmitPixelsRequest(context, queueItem as SubmitPixelsRequest).ConfigureAwait(false);
 							}
 
 							// commit the transaction
@@ -93,6 +89,10 @@ namespace Cryptopia.QueueService.Implementation
 		{
 			var pixel = pixelRequest.Pixel;
 			var key = $"{pixel.X}-{pixel.Y}";
+			var user = await context.Users.Where(x => x.Id == pixelRequest.UserId).FirstOrDefaultAsync();
+			if (user == null || _pixelPrice > user.Balance)
+				return new ErrorResponse("Insufficient funds");
+
 			var existingPixel = await context.Pixel.Where(x => x.PixelKey == key).FirstOrDefaultAsync();
 			if (existingPixel == null)
 			{
@@ -101,7 +101,6 @@ namespace Cryptopia.QueueService.Implementation
 					X = pixel.X,
 					Y = pixel.Y,
 					PixelKey = key,
-					Price = 0.000000005m,
 					R = 255,
 					G = 255,
 					B = 255,
@@ -110,11 +109,11 @@ namespace Cryptopia.QueueService.Implementation
 				context.Pixel.Add(existingPixel);
 			}
 
+			user.Balance -= _pixelPrice;
 			existingPixel.UserId = pixelRequest.UserId;
 			existingPixel.R = pixel.R;
 			existingPixel.G = pixel.G;
 			existingPixel.B = pixel.B;
-			existingPixel.Price *= 2;
 			existingPixel.LastUpdate = DateTime.UtcNow;
 			existingPixel.History.Add(new PixelHistory
 			{
@@ -122,56 +121,18 @@ namespace Cryptopia.QueueService.Implementation
 				R = existingPixel.R,
 				G = existingPixel.G,
 				B = existingPixel.B,
-				Price = existingPixel.Price,
+				Price = _pixelPrice,
 				Timestamp = existingPixel.LastUpdate
 			});
 
 			await context.SaveChangesAsync();
 
-			return new SubmitPixelResponse();
-		}
-
-		private async Task<IQueueResponse> ProcessSubmitPixelsRequest(IDataContext context, SubmitPixelsRequest pixelsRequest)
-		{
-			foreach (var pixelRequest in pixelsRequest.Pixels)
-			{
-				var key = $"{pixelRequest.X}-{pixelRequest.Y}";
-				var existingPixel = await context.Pixel.Where(x => x.PixelKey == key).FirstOrDefaultAsync();
-				if (existingPixel == null)
-				{
-					existingPixel = new Pixel
-					{
-						X = pixelRequest.X,
-						Y = pixelRequest.Y,
-						PixelKey = key,
-						Price = 0.000000005m,
-						R = 255,
-						G = 255,
-						B = 255,
-						History = new List<PixelHistory>()
-					};
-					context.Pixel.Add(existingPixel);
-				}
-
-				existingPixel.UserId = pixelsRequest.UserId;
-				existingPixel.R = pixelRequest.R;
-				existingPixel.G = pixelRequest.G;
-				existingPixel.B = pixelRequest.B;
-				existingPixel.Price *= 2;
-				existingPixel.LastUpdate = DateTime.UtcNow;
-				existingPixel.History.Add(new PixelHistory
-				{
-					UserId = pixelsRequest.UserId,
-					R = existingPixel.R,
-					G = existingPixel.G,
-					B = existingPixel.B,
-					Price = existingPixel.Price,
-					Timestamp = existingPixel.LastUpdate
-				});
-			}
-			await context.SaveChangesAsync();
-
-			return new SubmitPixelsResponse();
+			return new SubmitPixelResponse 
+			{ 
+			Success = true, 
+			Balance = user.Balance,
+			 Message = $"Successfully added new pixel at X:{pixel.X}, Y:{pixel.Y}"
+			};
 		}
 	}
 }

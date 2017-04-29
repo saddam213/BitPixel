@@ -19,7 +19,6 @@ namespace DotMatrix
 			config.Routes.MapHttpRoute(name: "GetPixels", routeTemplate: "Api/GetPixels", defaults: new { controller = "ApiPublic", action = "GetPixels" });
 
 			config.Routes.MapHttpRoute(name: "AddPixel", routeTemplate: "Api/AddPixel", defaults: new { controller = "ApiPrivate", action = "AddPixel" });
-			config.Routes.MapHttpRoute(name: "AddPixels", routeTemplate: "Api/AddPixels", defaults: new { controller = "ApiPrivate", action = "AddPixels" });
 
 			//config.Routes.MapHttpRoute(
 			//					name: "DefaultApi",

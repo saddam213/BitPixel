@@ -21,7 +21,7 @@ namespace DotMatrix.Controllers
 				return new ApiResponse { Success = false, Message = "Invalid input data." };
 
 			var result = await PixelWriter.AddOrUpdate(User.Identity.Name, model);
-			if (!result)
+			if (!result.Success)
 				return new ApiResponse { Success = false, Message = "Failed to add pixel" };
 
 
@@ -29,28 +29,9 @@ namespace DotMatrix.Controllers
 			if (notificationHub != null)
 			{
 				await notificationHub.Clients.All.SendPixelData(model.X, model.Y, model.Color);
+				await notificationHub.Clients.User(User.Identity.Name).SendBalanceData(result.Balance);
 			}
 			return new ApiResponse { Success = true, Message = $"Added new {model.Color} pixel at X:{model.X} Y:{model.Y}" };
 		}
-
-		public async Task<ApiResponse> AddPixels(List<PixelModel> models)
-		{
-			
-			var result = await PixelWriter.AddOrUpdate(User.Identity.Name, models.ToList());
-			if (!result)
-				return new ApiResponse { Success = false, Message = "Failed to add pixels" };
-
-
-			var notificationHub = GlobalHost.ConnectionManager.GetHubContext<PixelHub>();
-			if (notificationHub != null)
-			{
-				foreach (var model in models)
-				{
-					await notificationHub.Clients.All.SendPixelData(model.X, model.Y, model.Color);
-				}
-
-			}
-			return new ApiResponse { Success = true, Message = $"Added {models.Count()} new pixels" };
 		}
-	}
 }

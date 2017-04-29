@@ -8,7 +8,6 @@ namespace DotMatrix.Common.Pixel
 {
 	public interface IPixelWriter
 	{
-		Task<bool> AddOrUpdate(string userId, PixelModel model);
-		Task<bool> AddOrUpdate(string userId, List<PixelModel> models);
+		Task<PixelResultModel> AddOrUpdate(string userId, PixelModel model);
 	}
 }

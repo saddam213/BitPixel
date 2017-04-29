@@ -31,23 +31,5 @@ namespace Cryptopia.QueueService.Service
 				return new SubmitPixelResponse { Success = false, Message = "An unknown error occurred processing QueueItem." };
 			}
 		}
-
-		public async Task<SubmitPixelsResponse> SubmitPixels(SubmitPixelsRequest request)
-		{
-			try
-			{
-				Log.Message(LogLevel.Verbose, "SubmitPixelsRequest received.");
-				var response = await QueueEngine.QueueProcessor.QueueItem(request).ConfigureAwait(false);
-				if (!response.Success)
-					return new SubmitPixelsResponse { Success = false, Message = response.Message };
-
-				return response as SubmitPixelsResponse;
-			}
-			catch (Exception ex)
-			{
-				Log.Exception("An unknown exception occurred processing SubmitPixelsRequest.", ex);
-				return new SubmitPixelsResponse { Success = false, Message = "An unknown error occurred processing QueueItem." };
-			}
-		}
 	}
 }

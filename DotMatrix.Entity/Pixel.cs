@@ -13,14 +13,14 @@ namespace DotMatrix.Entity
 		[Key]
 		public int Id { get; set; }
 		public string PixelKey { get; set; }
+		public string UserId { get; set; }
+
 		public int X { get; set; }
 		public int Y { get; set; }
-
 		public byte R { get; set; }
 		public byte G { get; set; }
 		public byte B { get; set; }
-		public string UserId { get; set; }
-		public decimal Price { get; set; }
+
 		public DateTime LastUpdate { get; set; }
 
 		public virtual ICollection<PixelHistory> History { get; set; }
