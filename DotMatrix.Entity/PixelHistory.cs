@@ -15,7 +15,9 @@ namespace DotMatrix.Entity
 
 		public int PixelId { get; set; }
 		public string UserId { get; set; }
-		public string Color { get; set; }
+		public byte R { get; set; }
+		public byte G { get; set; }
+		public byte B { get; set; }
 		public decimal Price { get; set; }
 
 		public DateTime Timestamp { get; set; }

@@ -17,9 +17,14 @@ namespace DotMatrix.Core.Pixel
 		{
 			using (var context = DataContextFactory.CreateContext())
 			{
-				return await context.Pixel.Select(x => new PixelModel
+				var lastdate = DateTime.UtcNow.AddMinutes(-4);
+				return await context.Pixel
+				.Where(x => x.LastUpdate > lastdate)
+				.Select(x => new PixelModel
 				{
-					Color = x.Color,
+					R = x.R,
+					G = x.G,
+					B = x.B,
 					X = x.X,
 					Y = x.Y
 				}).ToListAsync();

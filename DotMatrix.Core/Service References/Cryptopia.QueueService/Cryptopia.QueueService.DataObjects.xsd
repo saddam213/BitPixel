@@ -10,7 +10,9 @@
   <xs:element name="SubmitPixelRequest" nillable="true" type="tns:SubmitPixelRequest" />
   <xs:complexType name="PixelItem">
     <xs:sequence>
-      <xs:element minOccurs="0" name="Color" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="B" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="G" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="R" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="X" type="xs:int" />
       <xs:element minOccurs="0" name="Y" type="xs:int" />
     </xs:sequence>

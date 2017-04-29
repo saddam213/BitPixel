@@ -30,7 +30,9 @@ namespace DotMatrix.Core.Queue
 						{
 							X = model.X,
 							Y = model.Y,
-							Color = model.Color
+							R = model.R,
+							G = model.G,
+							B = model.B
 						}
 					});
 					return true;
@@ -56,7 +58,9 @@ namespace DotMatrix.Core.Queue
 						{
 							X = x.X,
 							Y = x.Y,
-							Color = x.Color
+							R = x.R,
+							G = x.G,
+							B = x.B
 						}).ToList()
 					});
 					return true;

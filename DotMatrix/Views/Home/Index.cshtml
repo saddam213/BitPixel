@@ -3,15 +3,17 @@
 }
 <div>
 	<input id="pixel-zoomout" type="button" value="Zoom Out" />
-	<input id="pixel-zoomin" type="button" value="Zoom In" />
-	<input id="pixel-color" class="jscolor" value="ff0000" />
+	<input id="pixel-zoomin" type="button" value="Zoom In" disabled="disabled" />
+	<input id="pixel-color" value="#ff0000" />
 </div>
 
 <div class="row" style="margin-top:10px;overflow:auto;max-width:1020px;max-height:600px">
-		<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent"></canvas>
+	<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent"></canvas>
 </div>
 
 @section Scripts {
+	<link href="~/Content/spectum.css" rel="stylesheet" />
+	<script src="~/Scripts/spectrum.js"></script>
 	<script>
 		var pixelData;
 		var canvas = document.getElementById('mainCanvas');
@@ -19,33 +21,42 @@
 		var scale = 1;
 		$("#pixel-zoomin").on("click", function () {
 			scale = 10;
-			resetCanvas();
+			resetCanvas(backgroundLarge);
 			loadData();
 		});
 
 		$("#pixel-zoomout").on("click", function () {
 			scale = 1;
-			resetCanvas();
+			resetCanvas(backgroundSmall);
 			loadData();
 		});
 
-		function resetCanvas() {
+		var backgroundImage;
+		var backgroundSmall = new Image();
+		backgroundSmall.src = "../Content/Images/test-small.png";
+		backgroundSmall.onload = function () {
+			resetCanvas(backgroundSmall)
+			getPixels();
+		};
+
+		var backgroundLarge = new Image();
+		backgroundLarge.src = "../Content/Images/test-large.png";
+		backgroundLarge.onload = function () {
+			$("#pixel-zoomin").removeAttr("disabled");
+		};
+
+		function resetCanvas(background) {
 			canvas.height = 1000 * scale;
 			canvas.width = 1000 * scale;
 			context.setTransform(1, 0, 0, 1, 0, 0);
 			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.drawImage(background, 0, 0)
 			context.scale(scale, scale)
 		}
-		resetCanvas();
-		getPixels()
-
 
 		var pixelHub = $.connection.pixelHub;
 		pixelHub.client.SendPixelData = function (x, y, color) {
-				context.beginPath();
-				context.fillStyle = color;
-				context.fillRect(x, y, 1, 1);
-				context.closePath();
+			addPixel(x, y, color);
 		};
 		$.connection.hub.start().done(function () {
 
@@ -63,11 +74,15 @@
 		function loadData() {
 			for (var i = 0; i < pixelData.length; i++) {
 				var pixel = pixelData[i];
-				context.beginPath();
-				context.fillStyle = pixel.Color,
-				context.fillRect(pixel.X, pixel.Y, 1, 1);
-				context.closePath();
+				addPixel(pixel.X, pixel.Y, pixel.Color);
 			}
+		}
+
+		function addPixel(x, y, color) {
+			context.beginPath();
+			context.fillStyle = "rgb(" + color + ")",
+			context.fillRect(x, y, 1, 1);
+			context.closePath();
 		}
 
 		function getMousePos(canvas, evt) {
@@ -78,19 +93,50 @@
 			};
 		}
 
-
 		canvas.addEventListener('click', function (evt) {
 			var mousePos = getMousePos(canvas, evt);
-			var color = "#" + $("#pixel-color").val();
+			var color = $("#pixel-color").val();
+			var rgb = hex2rgb(color);
 			var data = {
 				x: parseInt(mousePos.x / scale),
 				y: parseInt(mousePos.y / scale),
-				color: color,
+				r: rgb[0],
+				g: rgb[1],
+				b: rgb[2]
 			}
-			//alert($("#pixel-color").val())
 			postJson('@Url.Action("AddPixel", "Home")', data);
 		}, false);
 
+		$(function () {
+			$("#pixel-color").spectrum({
+				showPalette: true,
+				preferredFormat: "hex",
+				hideAfterPaletteSelect: true,
+				palette: [
+						['red', 'blue', 'green']
+				]
+			});
 
+		});
+
+
+		function rgb2hex(red, green, blue) {
+			var rgb = blue | (green << 8) | (red << 16);
+			return '#' + (0x1000000 + rgb).toString(16).slice(1)
+		}
+
+		function hex2rgb(hex) {
+			// long version
+			r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+			if (r) {
+				return r.slice(1, 4).map(function (x) { return parseInt(x, 16); });
+			}
+			// short version
+			r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
+			if (r) {
+				return r.slice(1, 4).map(function (x) { return 0x11 * parseInt(x, 16); });
+			}
+			return null;
+		}
 	</script>
 }

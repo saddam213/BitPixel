@@ -6,13 +6,19 @@ namespace Cryptopia.QueueService.DataObjects
 	public class PixelItem
 	{
 		[DataMember]
-		public int X { get; internal set; }
+		public int X { get; set; }
 
 		[DataMember]
-		public int Y { get; internal set; }
+		public int Y { get; set; }
 
 		[DataMember]
-		public string Color { get; internal set; }
+		public byte R { get; set; }
+
+		[DataMember]
+		public byte G { get; set; }
+
+		[DataMember]
+		public byte B { get; set; }
 	}
 }
 

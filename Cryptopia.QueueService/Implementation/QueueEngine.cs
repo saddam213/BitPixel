@@ -86,7 +86,7 @@ namespace Cryptopia.QueueService.Implementation
 			return new ErrorResponse("An unknown error occurred. If problems persists please contact support");
 		}
 
-	#endregion
+		#endregion
 
 
 		private async Task<IQueueResponse> ProcessSubmitPixelRequest(IDataContext context, SubmitPixelRequest pixelRequest)
@@ -102,20 +102,26 @@ namespace Cryptopia.QueueService.Implementation
 					Y = pixel.Y,
 					PixelKey = key,
 					Price = 0.000000005m,
-					Color = "#FFFFFF",
+					R = 255,
+					G = 255,
+					B = 255,
 					History = new List<PixelHistory>()
 				};
 				context.Pixel.Add(existingPixel);
 			}
 
 			existingPixel.UserId = pixelRequest.UserId;
-			existingPixel.Color = pixel.Color;
+			existingPixel.R = pixel.R;
+			existingPixel.G = pixel.G;
+			existingPixel.B = pixel.B;
 			existingPixel.Price *= 2;
 			existingPixel.LastUpdate = DateTime.UtcNow;
 			existingPixel.History.Add(new PixelHistory
 			{
 				UserId = pixelRequest.UserId,
-				Color = existingPixel.Color,
+				R = existingPixel.R,
+				G = existingPixel.G,
+				B = existingPixel.B,
 				Price = existingPixel.Price,
 				Timestamp = existingPixel.LastUpdate
 			});
@@ -139,20 +145,26 @@ namespace Cryptopia.QueueService.Implementation
 						Y = pixelRequest.Y,
 						PixelKey = key,
 						Price = 0.000000005m,
-						Color = "#FFFFFF",
+						R = 255,
+						G = 255,
+						B = 255,
 						History = new List<PixelHistory>()
 					};
 					context.Pixel.Add(existingPixel);
 				}
 
 				existingPixel.UserId = pixelsRequest.UserId;
-				existingPixel.Color = pixelRequest.Color;
+				existingPixel.R = pixelRequest.R;
+				existingPixel.G = pixelRequest.G;
+				existingPixel.B = pixelRequest.B;
 				existingPixel.Price *= 2;
 				existingPixel.LastUpdate = DateTime.UtcNow;
 				existingPixel.History.Add(new PixelHistory
 				{
 					UserId = pixelsRequest.UserId,
-					Color = existingPixel.Color,
+					R = existingPixel.R,
+					G = existingPixel.G,
+					B = existingPixel.B,
 					Price = existingPixel.Price,
 					Timestamp = existingPixel.LastUpdate
 				});

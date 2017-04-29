@@ -100,7 +100,13 @@ namespace DotMatrix.Core.Cryptopia.QueueService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ColorField;
+        private byte BField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte GField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte RField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int XField;
@@ -119,14 +125,40 @@ namespace DotMatrix.Core.Cryptopia.QueueService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Color {
+        public byte B {
             get {
-                return this.ColorField;
+                return this.BField;
             }
             set {
-                if ((object.ReferenceEquals(this.ColorField, value) != true)) {
-                    this.ColorField = value;
-                    this.RaisePropertyChanged("Color");
+                if ((this.BField.Equals(value) != true)) {
+                    this.BField = value;
+                    this.RaisePropertyChanged("B");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte G {
+            get {
+                return this.GField;
+            }
+            set {
+                if ((this.GField.Equals(value) != true)) {
+                    this.GField = value;
+                    this.RaisePropertyChanged("G");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte R {
+            get {
+                return this.RField;
+            }
+            set {
+                if ((this.RField.Equals(value) != true)) {
+                    this.RField = value;
+                    this.RaisePropertyChanged("R");
                 }
             }
         }
