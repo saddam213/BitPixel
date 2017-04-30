@@ -1,149 +1,18 @@
 ﻿@model DotMatrix.Common.Pixel.PixelViewlModel
 @{
-	ViewBag.Title = "Pixels";
+	ViewBag.Title = "Home";
 }
 
-<style>
-	.visible-t {
-		visibility: visible;
-		opacity: 1;
-	}
-	/* Fade-Out Effect */
-	.hidden-t {
-		visibility: hidden;
-		opacity: 0;
-		transition: visibility 0s 3s, opacity 2s ease-in;
-	}
-</style>
-
-<div>
-	<span>Balance: <b id="user-balance">@Model.Balance.ToString("F8")</b> DOT</span>
-	<input id="pixel-zoomout" type="button" value="Zoom Out" disabled="disabled" />
-	<input id="pixel-zoomin" type="button" value="Zoom In" disabled="disabled" />
-	<input id="pixel-color" value="#ff0000" />
-	<span id="user-message">
-	</span>
+<div class="row text-center">
+	<img src="~/Content/Images/background-small.png" width="1000" height="1000" style="border:solid 1px black;margin-top:15px"/>
 </div>
 
-<div class="row" style="margin-top:10px;overflow:auto;max-width:1020px;max-height:600px">
-	<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent" width="1000" height="1000"></canvas>
+<div class="row text-center">
+	<img src="~/Content/Images/background-large.png" width="10000" height="10000" style="border:solid 1px black;margin-top:15px" />
 </div>
-
 @section Scripts {
-	<link href="~/Content/spectum.css" rel="stylesheet" />
-	<script src="~/Scripts/spectrum.js"></script>
+	
 	<script>
-		var scale = 1;
-		var pixelHistory = [];
-		var canvas = document.getElementById('mainCanvas');
-		var context = canvas.getContext('2d');
-
-		var pixelHub = $.connection.pixelHub;
-		pixelHub.client.SendPixelData = function (x, y, color) {
-			addPixel(x, y, color, true);
-		};
-		pixelHub.client.SendBalanceData = function (balance) {
-			$("#user-balance").text(balance.toFixed(8))
-		};
-		$.connection.hub.start();
-
-		var backgroundSmall = new Image();
-		backgroundSmall.src = "../Content/Images/background-small.png";
-		backgroundSmall.onload = function () {
-			$("#pixel-zoomout").removeAttr("disabled");
-			resetCanvas(backgroundSmall)
-			getDeltaUpdates();
-		};
-
-		var backgroundLarge = new Image();
-		backgroundLarge.src = "../Content/Images/background-large.png";
-		backgroundLarge.onload = function () {
-			$("#pixel-zoomin").removeAttr("disabled");
-		};
-
-		function resetCanvas(background) {
-			canvas.height = 1000 * scale;
-			canvas.width = 1000 * scale;
-			context.setTransform(1, 0, 0, 1, 0, 0);
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.drawImage(background, 0, 0)
-			context.scale(scale, scale);
-			refreshDeltaUpdates();
-		}
-
-		function getDeltaUpdates() {
-			getJson('@Url.Action("GetPixels", "Home")', {}, function (data) {
-				addDeltaUpdates(data);
-			});
-		}
-
-		function addDeltaUpdates(deltas) {
-			if (deltas) {
-				for (var i = 0; i < deltas.length; i++) {
-					var pixel = deltas[i];
-					addPixel(pixel.X, pixel.Y, pixel.Color, true);
-				}
-			}
-		}
-
-		function refreshDeltaUpdates() {
-			for (var i = 0; i < pixelHistory.length; i++) {
-				var pixel = pixelHistory[i];
-				addPixel(pixel.X, pixel.Y, pixel.Color);
-			}
-		}
-
-		function addPixel(x, y, color, addToHistory) {
-			context.beginPath();
-			context.fillStyle = "rgb(" + color + ")",
-			context.fillRect(x, y, 1, 1);
-			context.closePath();
-			if (addToHistory) {
-				pixelHistory.push({ X: x, Y: y, Color: color })
-			}
-		}
-
-		function showMessage(message, error) {
-			$("#user-message").html('<span class="text-' + (error ? "success" : "danger") + ' visible-t"></span>')
-			$("#user-message > span").text(message).addClass("hidden-t");
-		}
-
-		canvas.addEventListener('click', function (evt) {
-			var mousePos = getMousePos(canvas, evt);
-			var color = $("#pixel-color").val();
-			var rgb = hex2rgb(color);
-			var data = { x: parseInt(mousePos.x / scale), y: parseInt(mousePos.y / scale), r: rgb[0], g: rgb[1], b: rgb[2] }
-			postJson('@Url.Action("AddPixel", "Home")', data, function (result) {
-				showMessage(result.Message, result.Success);
-			});
-		}, false);
-
-		$("#pixel-zoomin").on("click", function () {
-			scale = 10;
-			resetCanvas(backgroundLarge);
-		});
-
-		$("#pixel-zoomout").on("click", function () {
-			scale = 1;
-			resetCanvas(backgroundSmall);
-		});
-
-		$(function () {
-			$("#pixel-color").spectrum({
-				showPalette: true,
-				preferredFormat: "hex",
-				hideAfterPaletteSelect: true,
-				clickoutFiresChange: false,
-				palette: [
-						['white', 'black'],
-						['red', 'blue'],
-						['green', 'yellow'],
-						['grey', 'purple']
-				]
-			});
-		});
-
-
 
 	</script>
 }

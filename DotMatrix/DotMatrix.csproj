@@ -189,6 +189,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiPrivateController.cs" />
     <Compile Include="Controllers\ApiPublicController.cs" />
+    <Compile Include="Controllers\PixelController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
@@ -208,8 +209,8 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\Images\test-large.png" />
-    <Content Include="Content\Images\test-small.png" />
+    <Content Include="Content\Images\background-large.png" />
+    <Content Include="Content\Images\background-small.png" />
     <Content Include="Content\spectum.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -272,6 +273,7 @@
     <Content Include="Views\Account\ConfirmEmailConfirmation.cshtml" />
     <Content Include="Views\User\_UpdateApi.cshtml" />
     <Content Include="Views\User\_UpdatePassword.cshtml" />
+    <Content Include="Views\Pixel\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
