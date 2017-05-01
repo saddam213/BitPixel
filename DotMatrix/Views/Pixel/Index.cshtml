@@ -18,8 +18,8 @@
 
 <div>
 	<span>Balance: <b id="user-balance">@Model.Balance.ToString("F8")</b> DOT</span>
-	<input id="pixel-zoomout" type="button" value="Zoom Out" disabled="disabled" />
-	<input id="pixel-zoomin" type="button" value="Zoom In" disabled="disabled" />
+	<input id="pixel-zoomout" type="button" value="Zoom Out"  disabled="disabled"/>
+	<input id="pixel-zoomin" type="button" value="Zoom In"  disabled="disabled"/>
 	<input id="pixel-color" value="#ff0000" />
 	<span id="user-message">
 	</span>
@@ -47,26 +47,47 @@
 		};
 		$.connection.hub.start();
 
-		var backgroundSmall = new Image();
-		backgroundSmall.src = "../Content/Images/background-small.png";
-		backgroundSmall.onload = function () {
-			$("#pixel-zoomout").removeAttr("disabled");
-			resetCanvas(backgroundSmall)
-			getDeltaUpdates();
-		};
+		var smallLoaded = 0;
+		var largeLoaded = 0;
+		var backgroundSmall = []
+		var backgroundLarge = []
+		for (var i = 0; i < 16; i++) {
+			var bgs = new Image();
+			var bgl = new Image();
+			bgs.src = "../Content/Images/background-small-" + i + ".png";
+			bgl.src = "../Content/Images/background-large-" + i + ".png";
+			bgs.onload = function () {
+				smallLoaded++;
+				if (smallLoaded == 16) {
+					$("#pixel-zoomout").removeAttr("disabled");
+				}
+			}
+			bgl.onload = function () {
+				largeLoaded++;
+				if (largeLoaded == 16) {
+					$("#pixel-zoomin").removeAttr("disabled");
+					resetCanvas(backgroundSmall)
+					getDeltaUpdates();
+				}
+			}
+			backgroundSmall.push(bgs);
+			backgroundLarge.push(bgl);
+		}
 
-		var backgroundLarge = new Image();
-		backgroundLarge.src = "../Content/Images/background-large.png";
-		backgroundLarge.onload = function () {
-			$("#pixel-zoomin").removeAttr("disabled");
-		};
-
-		function resetCanvas(background) {
+		function resetCanvas(backgrounds) {
 			canvas.height = 1000 * scale;
 			canvas.width = 1000 * scale;
 			context.setTransform(1, 0, 0, 1, 0, 0);
 			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.drawImage(background, 0, 0)
+			var index = 0;
+			var size = (1000 * scale) / 4;
+			for (var y = 0; y < 4; y++) {
+				for (var x = 0; x < 4; x++) {
+					var background = backgrounds[index];
+					context.drawImage(background, x * size, y * size)
+					index++;
+				}
+			}
 			context.scale(scale, scale);
 			refreshDeltaUpdates();
 		}

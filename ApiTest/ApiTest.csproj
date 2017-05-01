@@ -73,6 +73,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GetPixelRequest.cs" />
+    <Compile Include="GetPixelResponse.cs" />
     <Compile Include="AddPixelResponse.cs" />
     <Compile Include="AddPixelRequest.cs" />
     <Compile Include="AuthDelegatingHandler.cs" />

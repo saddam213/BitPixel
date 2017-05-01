@@ -4,22 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DotMatrix.Common.Pixel
+namespace ApiTest
 {
-	public class PixelModel
+	public class GetPixelResponse
+	{
+		public bool Success { get; set; }
+		public string Message { get; set; }
+		public Pixel Data { get; set; }
+	}
+	public class Pixel
 	{
 		public int X { get; set; }
 		public int Y { get; set; }
 		public byte R { get; set; }
 		public byte G { get; set; }
 		public byte B { get; set; }
-		public string Color
-		{
-			get { return $"{R},{G},{B}"; }
-		}
-		public bool IsValid()
-		{
-			return (X >= 0 && X <= 999) && (Y >= 0 && Y <= 999);
-		}
 	}
 }

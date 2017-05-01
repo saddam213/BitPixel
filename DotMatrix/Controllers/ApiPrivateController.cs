@@ -15,6 +15,8 @@ namespace DotMatrix.Controllers
 	public class ApiPrivateController : ApiController
 	{
 		public IPixelWriter PixelWriter { get; set; }
+		public IPixelReader PixelReader { get; set; }
+
 		public async Task<ApiResponse> AddPixel(PixelModel model)
 		{
 			if (!model.IsValid())
@@ -22,7 +24,7 @@ namespace DotMatrix.Controllers
 
 			var result = await PixelWriter.AddOrUpdate(User.Identity.Name, model);
 			if (!result.Success)
-				return new ApiResponse { Success = false, Message = "Failed to add pixel" };
+				return new ApiResponse { Success = false, Message = result.Message };
 
 
 			var notificationHub = GlobalHost.ConnectionManager.GetHubContext<PixelHub>();
@@ -33,5 +35,19 @@ namespace DotMatrix.Controllers
 			}
 			return new ApiResponse { Success = true, Message = $"Added new {model.Color} pixel at X:{model.X} Y:{model.Y}" };
 		}
+
+		[HttpPost]
+		public async Task<ApiResponse> GetPixel(PixelModel model)
+		{
+			if (!model.IsValid())
+				return new ApiResponse { Success = false, Message = "Invalid input data." };
+
+			return new ApiResponse
+			{
+				Success = true,
+				Data = await PixelReader.GetPixel(model.X, model.Y)
+			};
 		}
+
+	}
 }

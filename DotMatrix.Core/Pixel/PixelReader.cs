@@ -30,5 +30,22 @@ namespace DotMatrix.Core.Pixel
 				}).ToListAsync();
 			}
 		}
+
+		public async Task<PixelModel> GetPixel(int x, int y)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				return await context.Pixel
+					.Where(p => p.X == x && p.Y == y)
+					.Select(p => new PixelModel
+					{
+						R = p.R,
+						G = p.G,
+						B = p.B,
+						X = p.X,
+						Y = p.Y
+					}).FirstOrDefaultAsync() ?? new PixelModel { X = x, Y = y, R = 255, G = 255, B = 255 };
+			}
+		}
 	}
 }

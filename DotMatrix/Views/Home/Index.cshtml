@@ -4,11 +4,34 @@
 }
 
 <div class="row text-center">
-	<img src="~/Content/Images/background-small.png" width="1000" height="1000" style="border:solid 1px black;margin-top:15px"/>
+	<table style="border:solid 1px black;margin: 10px auto;">
+		@for (int y = 0; y < 4; y++)
+		{
+			<tr>
+				<td><img src="@string.Format("../Content/Images/background-small-{0}.png", 0 + (y * 4))" width="250" height="250"  /></td>
+				<td><img src="@string.Format("../Content/Images/background-small-{0}.png", 1 + (y * 4))" width="250" height="250"  /></td>
+				<td><img src="@string.Format("../Content/Images/background-small-{0}.png", 2 + (y * 4))" width="250" height="250"  /></td>
+				<td><img src="@string.Format("../Content/Images/background-small-{0}.png", 3 + (y * 4))" width="250" height="250"  /></td>
+			</tr>
+		}
+	</table>
+
+	
 </div>
 
 <div class="row text-center">
-	<img src="~/Content/Images/background-large.png" width="10000" height="10000" style="border:solid 1px black;margin-top:15px" />
+	<table style="border:solid 1px black;margin: 10px auto;">
+		@for (int y = 0; y < 4; y++)
+		{
+			<tr>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 0 + (y * 4))" width="2500" height="2500" /></td>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 1 + (y * 4))" width="2500" height="2500" /></td>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 2 + (y * 4))" width="2500" height="2500" /></td>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 3 + (y * 4))" width="2500" height="2500" /></td>
+			</tr>
+		}
+	</table>
+	
 </div>
 @section Scripts {
 	

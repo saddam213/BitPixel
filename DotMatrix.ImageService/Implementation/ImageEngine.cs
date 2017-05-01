@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 
 namespace DotMatrix.ImageService.Implementation
 {
@@ -54,7 +55,9 @@ namespace DotMatrix.ImageService.Implementation
 			{
 				try
 				{
+					var path = @"E:\DOTMatrix\Content\Images";
 					var pixels = await context.Pixel.ToListAsync();
+
 					using (var bitmapSmall = new System.Drawing.Bitmap(1000, 1000))
 					using (var bitmapLarge = new System.Drawing.Bitmap(10000, 10000))
 					{
@@ -70,8 +73,27 @@ namespace DotMatrix.ImageService.Implementation
 
 						}
 						Log.Message(LogLevel.Info, "Processing complete, Saving Images..");
-						bitmapSmall.Save(@"E:\DOTMatrix\Content\Images\background-small.png", System.Drawing.Imaging.ImageFormat.Png);
-						bitmapLarge.Save(@"E:\DOTMatrix\Content\Images\background-large.png", System.Drawing.Imaging.ImageFormat.Png);
+						bitmapSmall.Save(Path.Combine(path, "background-small.png"), System.Drawing.Imaging.ImageFormat.Png);
+						bitmapLarge.Save(Path.Combine(path, "background-large.png"), System.Drawing.Imaging.ImageFormat.Png);
+
+						var index = 0;
+						var quadrantSmallSize = 1000 / 4;
+						var quadrantLargeSize = 10000 / 4;
+						for (int y = 0; y < 4; y++)
+						{
+							for (int x = 0; x < 4; x++)
+							{
+								var smallQuadrantRect = new Rectangle(x * quadrantSmallSize, y * quadrantSmallSize, quadrantSmallSize, quadrantSmallSize);
+								using (var smallQuadrant = bitmapSmall.Clone(smallQuadrantRect, bitmapSmall.PixelFormat))
+									smallQuadrant.Save(Path.Combine(path, $"background-small-{index}.png"), System.Drawing.Imaging.ImageFormat.Png);
+
+								var largeQuadranttRect = new Rectangle(x * quadrantLargeSize, y * quadrantLargeSize, quadrantLargeSize, quadrantLargeSize);
+								using (var largeQuadrant = bitmapLarge.Clone(largeQuadranttRect, bitmapLarge.PixelFormat))
+									largeQuadrant.Save(Path.Combine(path, $"background-large-{index}.png"), System.Drawing.Imaging.ImageFormat.Png);
+
+								index++;
+							}
+						}
 						Log.Message(LogLevel.Info, "Images Saved.");
 					}
 				}
@@ -81,6 +103,6 @@ namespace DotMatrix.ImageService.Implementation
 				}
 			}
 		}
-		
+
 	}
 }

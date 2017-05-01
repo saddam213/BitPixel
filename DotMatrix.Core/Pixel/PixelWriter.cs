@@ -20,6 +20,13 @@ namespace DotMatrix.Core.Pixel
 		{
 			try
 			{
+				if(!model.IsValid())
+					return new PixelResultModel
+					{
+						Success = false,
+						Message = "Failed to add new pixel, Pixel X,Y must be within range 0-999"
+					};
+
 				var result = await QueueService.SubmitPixel(userId, model, false);
 				return new PixelResultModel
 				{
@@ -33,7 +40,7 @@ namespace DotMatrix.Core.Pixel
 				return new PixelResultModel
 				{
 					Success = false,
-					Message = "Error: Failed to add new pixel"
+					Message = "Failed to add new pixel, unknown error"
 				};
 			}
 		}
