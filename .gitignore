@@ -1,6 +1,6 @@
 bin/
 obj/
-Web.Site/Web.Site/Content/Images
+DotMatrix/Content/Images
 #ignore thumbnails created by windows
 Thumbs.db
 #Ignore files build by Visual Studio
