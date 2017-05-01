@@ -25,9 +25,9 @@ namespace DotMatrix.ImageService
 			serviceProcessInstaller.Account = ServiceAccount.LocalService;
 
 			//# Service Information
-			serviceInstaller.DisplayName = "Cryptopia.ImageService";
+			serviceInstaller.DisplayName = "DotMatrix.ImageService";
 			serviceInstaller.StartType = ServiceStartMode.Manual;
-			serviceInstaller.Description = "Cryptopia.ImageService";
+			serviceInstaller.Description = "DotMatrix.ImageService";
 			//# This must be identical to the WindowsService.ServiceBase name
 			//# set in the constructor of WindowsService.cs
 			serviceInstaller.ServiceName = "DotMatrix.ImageService";

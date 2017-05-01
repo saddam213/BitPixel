@@ -26,26 +26,4 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SubmitPixelResponse" nillable="true" type="tns:SubmitPixelResponse" />
-  <xs:complexType name="SubmitPixelsRequest">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="IsApi" type="xs:boolean" />
-      <xs:element minOccurs="0" name="Pixels" nillable="true" type="tns:ArrayOfPixelItem" />
-      <xs:element minOccurs="0" name="UserId" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="SubmitPixelsRequest" nillable="true" type="tns:SubmitPixelsRequest" />
-  <xs:complexType name="ArrayOfPixelItem">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="PixelItem" nillable="true" type="tns:PixelItem" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfPixelItem" nillable="true" type="tns:ArrayOfPixelItem" />
-  <xs:complexType name="SubmitPixelsResponse">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Balance" type="xs:decimal" />
-      <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Success" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="SubmitPixelsResponse" nillable="true" type="tns:SubmitPixelsResponse" />
 </xs:schema>

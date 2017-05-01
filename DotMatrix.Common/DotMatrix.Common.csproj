@@ -74,6 +74,9 @@
     <Compile Include="Common.cs" />
     <Compile Include="DataContext\IDataContext.cs" />
     <Compile Include="DataContext\IDataContextFactory.cs" />
+    <Compile Include="Deposits\DepositsModel.cs" />
+    <Compile Include="Deposits\DepositModel.cs" />
+    <Compile Include="Deposits\IDepositReader.cs" />
     <Compile Include="Pixel\IPixelWriter.cs" />
     <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Pixel\IPixelReader.cs" />
@@ -84,6 +87,7 @@
     <Compile Include="Queue\IQueueService.cs" />
     <Compile Include="Users\IUserReader.cs" />
     <Compile Include="Users\UserSettingsModel.cs" />
+    <Compile Include="Wallet\IWalletService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -93,6 +97,10 @@
     <ProjectReference Include="..\DotMatrix.Entity\DotMatrix.Entity.csproj">
       <Project>{272067D0-DF82-4EA2-A8ED-187B7462DFCF}</Project>
       <Name>DotMatrix.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.Enums\DotMatrix.Enums.csproj">
+      <Project>{0748A30E-4CF8-4F2E-8369-76F8CB4F3467}</Project>
+      <Name>DotMatrix.Enums</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

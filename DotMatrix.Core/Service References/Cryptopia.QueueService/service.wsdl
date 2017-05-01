@@ -23,20 +23,10 @@
   <wsdl:message name="IQueueProcessor_SubmitPixel_OutputMessage">
     <wsdl:part name="parameters" element="tns:SubmitPixelResponse" />
   </wsdl:message>
-  <wsdl:message name="IQueueProcessor_SubmitPixels_InputMessage">
-    <wsdl:part name="parameters" element="tns:SubmitPixels" />
-  </wsdl:message>
-  <wsdl:message name="IQueueProcessor_SubmitPixels_OutputMessage">
-    <wsdl:part name="parameters" element="tns:SubmitPixelsResponse" />
-  </wsdl:message>
   <wsdl:portType name="IQueueProcessor">
     <wsdl:operation name="SubmitPixel">
       <wsdl:input wsaw:Action="http://tempuri.org/IQueueProcessor/SubmitPixel" message="tns:IQueueProcessor_SubmitPixel_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IQueueProcessor/SubmitPixelResponse" message="tns:IQueueProcessor_SubmitPixel_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="SubmitPixels">
-      <wsdl:input wsaw:Action="http://tempuri.org/IQueueProcessor/SubmitPixels" message="tns:IQueueProcessor_SubmitPixels_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IQueueProcessor/SubmitPixelsResponse" message="tns:IQueueProcessor_SubmitPixels_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBindingEndpoint" type="tns:IQueueProcessor">
@@ -45,15 +35,6 @@
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
     <wsdl:operation name="SubmitPixel">
       <soap12:operation soapAction="http://tempuri.org/IQueueProcessor/SubmitPixel" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="SubmitPixels">
-      <soap12:operation soapAction="http://tempuri.org/IQueueProcessor/SubmitPixels" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

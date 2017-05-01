@@ -59,11 +59,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseGeneratedAttribute.cs" />
+    <Compile Include="Deposit.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="PixelHistory.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotMatrix.Enums\DotMatrix.Enums.csproj">
+      <Project>{0748A30E-4CF8-4F2E-8369-76F8CB4F3467}</Project>
+      <Name>DotMatrix.Enums</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

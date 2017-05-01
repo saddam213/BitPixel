@@ -15,18 +15,4 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SubmitPixels">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Cryptopia.QueueService.DataObjects" minOccurs="0" name="request" nillable="true" type="q3:SubmitPixelsRequest" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SubmitPixelsResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Cryptopia.QueueService.DataObjects" minOccurs="0" name="SubmitPixelsResult" nillable="true" type="q4:SubmitPixelsResponse" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
 </xs:schema>

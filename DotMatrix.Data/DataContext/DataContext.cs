@@ -22,6 +22,7 @@ namespace DotMatrix.Data.DataContext
 		public DbSet<User> Users { get; set; }
 		public DbSet<Pixel> Pixel { get; set; }
 		public DbSet<PixelHistory> PixelHistory { get; set; }
+		public DbSet<Deposit> Deposit { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
@@ -33,6 +34,8 @@ namespace DotMatrix.Data.DataContext
 
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.User);
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.Pixel).WithMany(x => x.History);
+
+			modelBuilder.Entity<Deposit>().HasRequired(x => x.User).WithMany(x => x.Deposits);
 		}
 	}
 }

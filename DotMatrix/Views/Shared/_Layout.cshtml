@@ -23,6 +23,7 @@
 				<ul class="nav navbar-nav">
 					<li>@Html.ActionLink("Home", "Index", "Home")</li>
 					<li>@Html.ActionLink("Pixel", "Index", "Pixel")</li>
+					<li>@Html.ActionLink("Explore", "Index", "Explore")</li>
 				</ul>
 				@Html.Partial("_LoginPartial")
 			</div>
@@ -30,10 +31,6 @@
 	</div>
 	<div class="container-fluid body-content">
 		@RenderBody()
-		<hr />
-		<footer>
-			<p>&copy; @DateTime.Now.Year - My Cryptopia Application</p>
-		</footer>
 	</div>
 
 	@Scripts.Render("~/bundles/jquery")

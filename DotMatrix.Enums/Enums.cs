@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DotMatrix.Enums
 {
-	public class Enums
+	public enum DepositStatus : byte
 	{
+		Unconfirmed = 0,
+		Confirmed = 1
 	}
 }

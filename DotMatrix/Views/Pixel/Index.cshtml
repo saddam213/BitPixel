@@ -14,21 +14,45 @@
 		opacity: 0;
 		transition: visibility 0s 3s, opacity 2s ease-in;
 	}
+
+	.sp-replacer {
+		vertical-align: bottom !important;
+	}
+
+	.tool-btn {
+		padding: 4px 14px;
+	}
 </style>
 
-<div>
-	<span>Balance: <b id="user-balance">@Model.Balance.ToString("F8")</b> DOT</span>
-	<input id="pixel-zoomout" type="button" value="Zoom Out"  disabled="disabled"/>
-	<input id="pixel-zoomin" type="button" value="Zoom In"  disabled="disabled"/>
-	<input id="pixel-color" value="#ff0000" />
-	<span id="user-message">
-	</span>
+<div class="text-center">
+
+	<div style="margin: 10px auto;">
+		<button id="pixel-zoomout" disabled="disabled" class="tool-btn">
+			<span class="glyphicon glyphicon-zoom-out"></span>
+		</button>
+		<button id="pixel-zoomin" disabled="disabled" class="tool-btn">
+			<span class="glyphicon glyphicon-zoom-in"></span>
+		</button>
+		<input id="pixel-color" value="#ff0000" style="" />
+		<button id="pixel-dropper" class="tool-btn" style="padding:4px">
+			<span class="glyphicon glyphicon-tint"></span>
+		</button>
+		<div style="display:inline-block;vertical-align:middle">
+			<span>Balance: <b id="user-balance">@Model.Balance.ToString("F8")</b> DOT</span>
+		</div>
+
+		<span id="user-message">
+		</span>
+	</div>
 </div>
 
-<div class="row" style="margin-top:10px;overflow:auto;max-width:1020px;max-height:600px">
-	<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent" width="1000" height="1000"></canvas>
+<div class="text-center" style="position:absolute;top:100px;left:0;right:0;bottom:0;overflow:auto">
+	<div style="margin: 0px auto;">
+		<canvas id="mainCanvas" style="border:solid 1px #c8c8c8;background:transparent" width="1000" height="1000"></canvas>
+	</div>
 </div>
 
+<div class="clearfix"></div>
 @section Scripts {
 	<link href="~/Content/spectum.css" rel="stylesheet" />
 	<script src="~/Scripts/spectrum.js"></script>
@@ -129,7 +153,16 @@
 			$("#user-message > span").text(message).addClass("hidden-t");
 		}
 
+		var dropperEnabled = false;
+		$("#pixel-dropper").on("click", function () {
+			dropperEnabled = !dropperEnabled;
+		});
+
 		canvas.addEventListener('click', function (evt) {
+			if (dropperEnabled) {
+				dropperEnabled = false;
+				return;
+			}
 			var mousePos = getMousePos(canvas, evt);
 			var color = $("#pixel-color").val();
 			var rgb = hex2rgb(color);
@@ -138,6 +171,33 @@
 				showMessage(result.Message, result.Success);
 			});
 		}, false);
+
+		canvas.addEventListener('mousemove', function (evt) {
+			if (dropperEnabled) {
+				var mousePos = getMousePos(canvas, evt);
+				var pxData = context.getImageData(mousePos.x, mousePos.y, 1, 1);
+				if (pxData) {
+					var color = pxData.data[3] > 0 ? "rgb(" + pxData.data[0] + "," + pxData.data[1] + "," + pxData.data[2] + ")" : "rgb(255,255,255)";
+					$("#pixel-color").spectrum("set", color);
+				}
+			}
+		}, false);
+
+		//function handleMouseMove(e) {
+
+		//	if (!eyedropperIsActive) {
+		//		return;
+		//	}
+
+		//	mouseX = parseInt(e.clientX - offsetX);
+		//	mouseY = parseInt(e.clientY - offsetY);
+
+		//	// Put your mousemove stuff here
+		//	var eyedropColor = getPixelColor(mouseX, mouseY);
+		//	$("#results").css("backgroundColor", getPixelColor(mouseX, mouseY));
+
+		//}
+
 
 		$("#pixel-zoomin").on("click", function () {
 			scale = 10;

@@ -17,5 +17,6 @@ namespace DotMatrix.Common.DataContext
 		DbSet<User> Users { get; set; }
 		DbSet<Entity.Pixel> Pixel { get; set; }
 		DbSet<PixelHistory> PixelHistory { get; set; }
+		DbSet<Deposit> Deposit { get; set; }
 	}
 }

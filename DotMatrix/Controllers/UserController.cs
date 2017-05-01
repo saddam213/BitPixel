@@ -10,6 +10,8 @@ using Microsoft.AspNet.Identity;
 using DotMatrix.Api;
 using DotMatrix.Common.Api;
 using DotMatrix.Common.Users;
+using DotMatrix.Common.Deposits;
+using DotMatrix.Common.Wallet;
 
 namespace DotMatrix.Controllers
 {
@@ -52,9 +54,11 @@ namespace DotMatrix.Controllers
 			}
 		}
 
+		public IUserReader UserReader { get; set; }
+
 		public async Task<ActionResult> Index()
 		{
-			var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+			var user = await UserReader.GetUser(User.Identity.GetUserId());
 			return View(new UserSettingsModel
 			{
 				ApiModel = new UpdateApiModel
@@ -116,7 +120,7 @@ namespace DotMatrix.Controllers
 		{
 			var result = ApiKeyStore.GenerateApiKeyPair();
 			if (!result.IsValid)
-				return Json(new { Success = false, Meaage = "Failed to generate API key, if problem persists please contact Cryptopia Support." });
+				return Json(new { Success = false, Meaage = "Failed to generate API key, if problem persists please contact Support." });
 
 			return Json(new
 			{
@@ -125,6 +129,7 @@ namespace DotMatrix.Controllers
 				Secret = result.Secret
 			});
 		}
+
 
 
 		private void AddErrors(IdentityResult result)

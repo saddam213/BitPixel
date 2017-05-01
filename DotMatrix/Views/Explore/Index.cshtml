@@ -1,0 +1,21 @@
+﻿@{
+	ViewBag.Title = "Explore";
+}
+
+<div class="row text-center">
+	<table style="border:solid 1px black;margin: 10px auto;">
+		@for (int y = 0; y < 4; y++)
+		{
+			<tr>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 0 + (y * 4))" width="2500" height="2500" /></td>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 1 + (y * 4))" width="2500" height="2500" /></td>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 2 + (y * 4))" width="2500" height="2500" /></td>
+				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 3 + (y * 4))" width="2500" height="2500" /></td>
+			</tr>
+		}
+	</table>
+</div>
+@section Scripts {
+	<script>
+	</script>
+}

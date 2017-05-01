@@ -188,6 +188,8 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApiPrivateController.cs" />
+    <Compile Include="Controllers\DepositController.cs" />
+    <Compile Include="Controllers\ExploreController.cs" />
     <Compile Include="Controllers\PixelController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\UserController.cs" />
@@ -273,6 +275,8 @@
     <Content Include="Views\User\_UpdateApi.cshtml" />
     <Content Include="Views\User\_UpdatePassword.cshtml" />
     <Content Include="Views\Pixel\Index.cshtml" />
+    <Content Include="Views\Deposit\Index.cshtml" />
+    <Content Include="Views\Explore\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -293,6 +297,10 @@
     <ProjectReference Include="..\DotMatrix.Entity\DotMatrix.Entity.csproj">
       <Project>{272067d0-df82-4ea2-a8ed-187b7462dfcf}</Project>
       <Name>DotMatrix.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.Enums\DotMatrix.Enums.csproj">
+      <Project>{0748a30e-4cf8-4f2e-8369-76f8cb4f3467}</Project>
+      <Name>DotMatrix.Enums</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
@@ -331,7 +339,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>51641</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:88/DotMatrix</IISUrl>
+          <IISUrl>http://localhost:88/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

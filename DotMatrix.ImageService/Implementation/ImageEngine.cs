@@ -55,7 +55,7 @@ namespace DotMatrix.ImageService.Implementation
 			{
 				try
 				{
-					var path = @"E:\DOTMatrix\Content\Images";
+					var path = @"D:\Repositories\DotMatrix\DotMatrix\Content\Images";
 					var pixels = await context.Pixel.ToListAsync();
 
 					using (var bitmapSmall = new System.Drawing.Bitmap(1000, 1000))

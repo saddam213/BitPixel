@@ -1,6 +1,6 @@
 ﻿namespace DotMatrix.WalletService
 {
-	partial class Service1
+	partial class DepositService
 	{
 		/// <summary> 
 		/// Required designer variable.

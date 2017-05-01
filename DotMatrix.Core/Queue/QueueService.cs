@@ -42,35 +42,9 @@ namespace DotMatrix.Core.Queue
 			}
 		}
 
-		public async Task<PixelResultModel> SubmitPixels(string userId, List<PixelModel> model, bool isApi)
+		public Cryptopia.QueueService.QueueProcessorClient CreateService()
 		{
-			using (var queueService = CreateService())
-			{
-				var response = await queueService.SubmitPixelsAsync(new SubmitPixelsRequest
-				{
-					IsApi = isApi,
-					UserId = userId,
-					Pixels = model.Select(x => new PixelItem
-					{
-						X = x.X,
-						Y = x.Y,
-						R = x.R,
-						G = x.G,
-						B = x.B
-					}).ToList()
-				});
-				return new PixelResultModel
-				{
-					Success = response.Success,
-					Message = response.Message,
-					Balance = response.Balance
-				};
-			}
-		}
-
-		public QueueProcessorClient CreateService()
-		{
-			var client = new QueueProcessorClient();
+			var client = new Cryptopia.QueueService.QueueProcessorClient();
 #if !DEBUG
 			client.ClientCredentials.Windows.ClientCredential.UserName = QueueServiceUsername;
 			client.ClientCredentials.Windows.ClientCredential.Password = QueueServicePassword;

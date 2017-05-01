@@ -276,160 +276,6 @@ namespace DotMatrix.Core.Cryptopia.QueueService {
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="SubmitPixelsRequest", Namespace="http://schemas.datacontract.org/2004/07/Cryptopia.QueueService.DataObjects")]
-    [System.SerializableAttribute()]
-    public partial class SubmitPixelsRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool IsApiField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Collections.Generic.List<DotMatrix.Core.Cryptopia.QueueService.PixelItem> PixelsField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string UserIdField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool IsApi {
-            get {
-                return this.IsApiField;
-            }
-            set {
-                if ((this.IsApiField.Equals(value) != true)) {
-                    this.IsApiField = value;
-                    this.RaisePropertyChanged("IsApi");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Collections.Generic.List<DotMatrix.Core.Cryptopia.QueueService.PixelItem> Pixels {
-            get {
-                return this.PixelsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.PixelsField, value) != true)) {
-                    this.PixelsField = value;
-                    this.RaisePropertyChanged("Pixels");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string UserId {
-            get {
-                return this.UserIdField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.UserIdField, value) != true)) {
-                    this.UserIdField = value;
-                    this.RaisePropertyChanged("UserId");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="SubmitPixelsResponse", Namespace="http://schemas.datacontract.org/2004/07/Cryptopia.QueueService.DataObjects")]
-    [System.SerializableAttribute()]
-    public partial class SubmitPixelsResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal BalanceField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string MessageField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool SuccessField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public decimal Balance {
-            get {
-                return this.BalanceField;
-            }
-            set {
-                if ((this.BalanceField.Equals(value) != true)) {
-                    this.BalanceField = value;
-                    this.RaisePropertyChanged("Balance");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Message {
-            get {
-                return this.MessageField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.MessageField, value) != true)) {
-                    this.MessageField = value;
-                    this.RaisePropertyChanged("Message");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool Success {
-            get {
-                return this.SuccessField;
-            }
-            set {
-                if ((this.SuccessField.Equals(value) != true)) {
-                    this.SuccessField = value;
-                    this.RaisePropertyChanged("Success");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="Cryptopia.QueueService.IQueueProcessor")]
     public interface IQueueProcessor {
@@ -439,12 +285,6 @@ namespace DotMatrix.Core.Cryptopia.QueueService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IQueueProcessor/SubmitPixel", ReplyAction="http://tempuri.org/IQueueProcessor/SubmitPixelResponse")]
         System.Threading.Tasks.Task<DotMatrix.Core.Cryptopia.QueueService.SubmitPixelResponse> SubmitPixelAsync(DotMatrix.Core.Cryptopia.QueueService.SubmitPixelRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IQueueProcessor/SubmitPixels", ReplyAction="http://tempuri.org/IQueueProcessor/SubmitPixelsResponse")]
-        DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsResponse SubmitPixels(DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IQueueProcessor/SubmitPixels", ReplyAction="http://tempuri.org/IQueueProcessor/SubmitPixelsResponse")]
-        System.Threading.Tasks.Task<DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsResponse> SubmitPixelsAsync(DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -480,14 +320,6 @@ namespace DotMatrix.Core.Cryptopia.QueueService {
         
         public System.Threading.Tasks.Task<DotMatrix.Core.Cryptopia.QueueService.SubmitPixelResponse> SubmitPixelAsync(DotMatrix.Core.Cryptopia.QueueService.SubmitPixelRequest request) {
             return base.Channel.SubmitPixelAsync(request);
-        }
-        
-        public DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsResponse SubmitPixels(DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsRequest request) {
-            return base.Channel.SubmitPixels(request);
-        }
-        
-        public System.Threading.Tasks.Task<DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsResponse> SubmitPixelsAsync(DotMatrix.Core.Cryptopia.QueueService.SubmitPixelsRequest request) {
-            return base.Channel.SubmitPixelsAsync(request);
         }
     }
 }
