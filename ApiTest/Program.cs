@@ -18,48 +18,36 @@ namespace ApiTest
 
 		private static Random _rand = new Random();
 
+		//public class PixelData
+		//{
+		//	public int X { get; set; }
+		//	public int Y { get; set; }
+		//}
+
 		static async Task MainAsync()
 		{
 			using (var apiClient = new ApiPrivate("ee652448256d497e8256bdd9068297b2", "WTAzqs48uTBtBI3MFr9G7/NSVJxFRxe68JcpAckixDQ=", "http://www.dotmatrix.co.nz"))
 			{
-				for (int i = 0; i < 600; i++)
+				var pixelMap = new List<AddPixelRequest>();
+				pixelMap.Add(new AddPixelRequest { X = 10, Y = 800, R = 255 });
+				pixelMap.Add(new AddPixelRequest { X = 10, Y = 801, G = 255 });
+				pixelMap.Add(new AddPixelRequest { X = 10, Y = 802, B = 255 });
+
+
+				for (int i = 0; i < 100000; i++)
 				{
-					await apiClient.AddPixel(new AddPixelRequest { X = i, Y = i + 100, R = 255, G = 0, B = 0 }); //R
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 1, Y = i + 100, R = 255, G = 0, B = 0 }); //R
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 2, Y = i + 100, R = 255, G = 0, B = 0 }); //R
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 3, Y = i + 100, R = 255, G = 0, B = 0 }); //R
+					foreach (var pixel in pixelMap)
+					{
+						var existingPixel = await apiClient.GetPixel(new GetPixelRequest { X = pixel.X, Y = pixel.Y });
+						if (existingPixel.Success)
+						{
+							if (existingPixel.Data.R == pixel.R && existingPixel.Data.G == pixel.G && existingPixel.Data.B == pixel.B)
+								continue;
 
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 4, Y = i + 100, R = 255, G = 165, B = 0 }); //O
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 5, Y = i + 100, R = 255, G = 165, B = 0 }); //O
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 6, Y = i + 100, R = 255, G = 165, B = 0 }); //O
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 7, Y = i + 100, R = 255, G = 165, B = 0 }); //O
-
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 8, Y = i + 100, R = 255, G = 255, B = 0 }); //Y
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 9, Y = i + 100, R = 255, G = 255, B = 0 }); //Y
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 10, Y = i + 100, R = 255, G = 255, B = 0 }); //Y
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 11, Y = i + 100, R = 255, G = 255, B = 0 }); //Y
-
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 12, Y = i + 100, R = 0, G = 255, B = 0 }); //G
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 13, Y = i + 100, R = 0, G = 255, B = 0 }); //G
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 14, Y = i + 100, R = 0, G = 255, B = 0 }); //G
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 15, Y = i + 100, R = 0, G = 255, B = 0 }); //G
-
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 16, Y = i + 100, R = 0, G = 0, B = 255 }); //B
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 17, Y = i + 100, R = 0, G = 0, B = 255 }); //B
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 18, Y = i + 100, R = 0, G = 0, B = 255 }); //B
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 19, Y = i + 100, R = 0, G = 0, B = 255 }); //B
-
-
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 20, Y = i + 100, R = 9, G = 0, B = 9 }); //I
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 21, Y = i + 100, R = 9, G = 0, B = 9 }); //I
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 22, Y = i + 100, R = 9, G = 0, B = 9 }); //I
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 23, Y = i + 100, R = 9, G = 0, B = 9 }); //I
-
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 24, Y = i + 100, R = 128, G = 0, B = 128 }); //V
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 25, Y = i + 100, R = 128, G = 0, B = 128 }); //V
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 26, Y = i + 100, R = 128, G = 0, B = 128 }); //V
-					await apiClient.AddPixel(new AddPixelRequest { X = i + 27, Y = i + 100, R = 128, G = 0, B = 128 }); //V
-																																																							//Console.WriteLine(result.Message);
+							await apiClient.AddPixel(pixel);
+						}
+					}
+					await Task.Delay(1000);
 				}
 			}
 
