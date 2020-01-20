@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Cryptopia.Base
+namespace DotMatrix.Base
 {
 	public static class ObjectExtensions
 	{

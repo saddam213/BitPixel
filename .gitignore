@@ -29,7 +29,9 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
-.vs/config/*.*
-
+.vs*/
 *.dbmdl
+packages/
+*.jfm
+*.refactorlog
 WE-settings.xml

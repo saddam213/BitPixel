@@ -1,20 +1,20 @@
-﻿using Cryptopia.Base.Logging;
-using DotMatrix.Data.DataContext;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Drawing;
-using System.IO;
-using System.Configuration;
-using Cryptopia.WalletAPI.Base;
-using Cryptopia.Base;
-using DotMatrix.Enums;
 
-namespace DotMatrix.DepositService.Implementation
+using DotMatrix.Base.Logging;
+using DotMatrix.Data.DataContext;
+using DotMatrix.Entity;
+using DotMatrix.Enums;
+using DotMatrix.WalletService.Connector.Base;
+using DotMatrix.WalletService.Connector.DataObjects;
+using Dapper;
+using DotMatrix.Common.DataContext;
+
+namespace DotMatrix.WalletService.Implementation
 {
 	public class DepositEngine
 	{
@@ -23,8 +23,7 @@ namespace DotMatrix.DepositService.Implementation
 
 		private bool _isRunning = false;
 		private CancellationToken _cancelToken;
-		private WalletConnector _walletConnector;
-		private int _minConfirmations = 6;
+
 
 		public DataContextFactory DataContextFactory { get; set; }
 
@@ -32,13 +31,6 @@ namespace DotMatrix.DepositService.Implementation
 		{
 			_cancelToken = cancelToken;
 			DataContextFactory = new DataContextFactory();
-			_walletConnector = new WalletConnector
-			(
-				ConfigurationManager.AppSettings["WalletHost"],
-				int.Parse(ConfigurationManager.AppSettings["WalletPort"]),
-				ConfigurationManager.AppSettings["WalletUser"],
-				ConfigurationManager.AppSettings["WalletPass"]
-			);
 		}
 
 		public void Start()
@@ -47,7 +39,7 @@ namespace DotMatrix.DepositService.Implementation
 				return;
 
 			_isRunning = true;
-			Task.Factory.StartNew(async () => await ProcessLoop().ConfigureAwait(false), _cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default).ConfigureAwait(false);
+			Task.Factory.StartNew(ProcessLoop, _cancelToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 		}
 
 
@@ -60,8 +52,17 @@ namespace DotMatrix.DepositService.Implementation
 		{
 			while (_isRunning)
 			{
-				await ProcessDeposits();
-				await Task.Delay(TimeSpan.FromMinutes(5));
+				try
+				{
+					await ProcessAddresses();
+					await ProcessDeposits();
+				}
+				catch (Exception ex)
+				{
+
+					Log.Exception("ProcessLoop", ex);
+				}
+				await Task.Delay(TimeSpan.FromMinutes(1));
 			}
 		}
 
@@ -70,72 +71,149 @@ namespace DotMatrix.DepositService.Implementation
 			Log.Message(LogLevel.Info, "Processing Deposits..");
 			using (var context = DataContextFactory.CreateContext())
 			{
-				var lastConfirmedDeposit = await context.Deposit
-					.Where(x => x.Status == DepositStatus.Confirmed)
-					.OrderByDescending(x => x.Timestamp)
-					.FirstOrDefaultAsync();
-
-				var walletDeposits = await _walletConnector.GetDepositsAsync(lastConfirmedDeposit?.BlockHash);
-				if (!walletDeposits.Any())
-				{
-					Log.Message(LogLevel.Info, "No new deposits found.");
-					return;
-				}
-
-				Log.Message(LogLevel.Info, $"{walletDeposits.Count()} new deposits found.");
-				var unconfirmedDeposits = await context.Deposit
-					.Include(x => x.User)
-					.Where(x => x.Status == DepositStatus.Unconfirmed)
+				var paymentMethods = await context.PaymentMethod
+					.Where(x => x.Status == PaymentMethodStatus.Ok && x.Type == PaymentMethodType.Crypto)
 					.ToListAsync();
-				foreach (var walletDeposit in walletDeposits.OrderBy(x => x.Time))
+				foreach (var paymentMethod in paymentMethods)
 				{
-					var exists = unconfirmedDeposits.FirstOrDefault(x => x.TxId == walletDeposit.Txid && x.UserId == walletDeposit.Account && x.Status == DepositStatus.Unconfirmed);
-					if (exists != null)
+					Log.Message(LogLevel.Info, $"Processing {paymentMethod.Name}");
+					var walletDeposits = await GetWalletDeposits(paymentMethod);
+					if (!walletDeposits.Any())
 					{
-						if (exists.Confirmations == walletDeposit.Confirmations)
-							continue;
+						Log.Message(LogLevel.Info, "No new deposits found.");
+						Log.Message(LogLevel.Info, $"Processing {paymentMethod.Name} complete.");
+						continue;
+					}
 
-						Log.Message(LogLevel.Info, $"Updating deposit #{exists.Id} confirmations.");
-						exists.Confirmations = walletDeposit.Confirmations;
-						exists.Status = exists.Confirmations >= _minConfirmations
-							? DepositStatus.Confirmed
-							: DepositStatus.Unconfirmed;
-						if (exists.Status == DepositStatus.Confirmed)
+					var minConfirmations = int.Parse(paymentMethod.Data4);
+					Log.Message(LogLevel.Info, $"{walletDeposits.Count()} new deposits found.");
+					var unconfirmedDeposits = await context.PaymentReceipt
+						.Include(x => x.User)
+						.Where(x => x.PaymentMethodId == paymentMethod.Id && x.Status == PaymentReceiptStatus.Pending)
+						.ToListAsync();
+
+					foreach (var walletDeposit in walletDeposits.OrderBy(x => x.Time))
+					{
+						var exists = unconfirmedDeposits.FirstOrDefault(x => x.Data == walletDeposit.Address && x.Data2 == walletDeposit.Txid);
+						if (exists != null)
 						{
-							var newBalance = exists.User.Balance + exists.Amount;
-							Log.Message(LogLevel.Info, $"Deposit #{exists.Id} confirmed, updating user balance from {exists.User.Balance} to {newBalance}.");
-							exists.User.Balance = newBalance;
+							int confirmations = int.Parse(exists.Data3);
+							if (confirmations == walletDeposit.Confirmations)
+								continue;
+
+							Log.Message(LogLevel.Info, $"Updating deposit #{exists.Id} confirmations.");
+							exists.Data3 = Math.Min(walletDeposit.Confirmations, minConfirmations).ToString();
+							exists.Status = confirmations >= minConfirmations
+								? PaymentReceiptStatus.Complete
+								: PaymentReceiptStatus.Pending;
+							await context.SaveChangesAsync();
+							if (exists.Status == PaymentReceiptStatus.Complete)
+							{
+								Log.Message(LogLevel.Info, $"Deposit #{exists.Id} confirmed, auditing user points...");
+								await context.Database.Connection.ExecuteAsync(StoredProcedure.AuditPoints, new { UserId = exists.UserId }, commandType: System.Data.CommandType.StoredProcedure);
+								Log.Message(LogLevel.Info, $"Deposit #{exists.Id} audit complete.");
+								paymentMethod.Data5 = walletDeposit.Blockhash;
+							}
+						}
+						else
+						{
+							var paymentUserMethod = await context.PaymentUserMethod.FirstOrDefaultAsync(x => x.PaymentMethodId == paymentMethod.Id && x.Data == walletDeposit.Address);
+							if (paymentUserMethod == null)
+								continue;
+
+							if (await context.PaymentReceipt.AnyAsync(x => x.PaymentUserMethodId == paymentUserMethod.Id && x.Data == walletDeposit.Address && x.Data2 == walletDeposit.Txid))
+								continue;
+
+							var points = (int)(walletDeposit.Amount / paymentMethod.Rate);
+							var newDeposit = new Entity.PaymentReceipt
+							{
+								UserId = paymentUserMethod.UserId,
+								Data = paymentUserMethod.Data,
+								Data2 = walletDeposit.Txid,
+								Data3 = Math.Min(walletDeposit.Confirmations, minConfirmations).ToString(),
+								Data4 = walletDeposit.Blockhash,
+								Amount = walletDeposit.Amount,
+								PaymentMethodId = paymentMethod.Id,
+								PaymentUserMethodId = paymentUserMethod.Id,
+								Rate = paymentMethod.Rate,
+								Status = PaymentReceiptStatus.Pending,
+								Updated = DateTime.UtcNow,
+								Timestamp = DateTime.UtcNow,
+								Points = points
+							};
+							context.PaymentReceipt.Add(newDeposit);
+							await context.SaveChangesAsync();
+							Log.Message(LogLevel.Info, $"Added new deposit, TxId: {walletDeposit.Txid}.");
 						}
 					}
-					else
-					{
-						if (!await context.Users.AnyAsync(x => x.Id == walletDeposit.Account))
-							continue;
 
-						if (await context.Deposit.AnyAsync(x => x.TxId == walletDeposit.Txid && x.UserId == walletDeposit.Account))
-							continue;
-
-						var newDeposit = new Entity.Deposit
-						{
-							Amount = walletDeposit.Amount,
-							BlockHash = walletDeposit.Blockhash,
-							Confirmations = walletDeposit.Confirmations,
-							Status = DepositStatus.Unconfirmed,
-							Timestamp = walletDeposit.Time.ToDateTime(),
-							TxId = walletDeposit.Txid,
-							UserId = walletDeposit.Account
-						};
-						context.Deposit.Add(newDeposit);
-						Log.Message(LogLevel.Info, $"Added new deposit, TxId: {walletDeposit.Txid}.");
-					}
+					Log.Message(LogLevel.Info, $"Processing {paymentMethod.Name} complete");
 				}
 
-				Log.Message(LogLevel.Info, $"Saving database changes...");
-				await context.SaveChangesAsync();
-				Log.Message(LogLevel.Info, $"Changes saved.");
+
 			}
 			Log.Message(LogLevel.Info, "Processing Deposits complete.");
 		}
 
+		private static int _addressCreationCount = 25;
+		private async Task ProcessAddresses()
+		{
+			Log.Message(LogLevel.Info, "Processing Addresses..");
+			using (var context = DataContextFactory.CreateContext())
+			{
+				var paymentMethods = await context.PaymentMethod
+					.Where(x => x.Status == PaymentMethodStatus.Ok && x.Type == PaymentMethodType.Crypto)
+					.ToListAsync();
+				foreach (var paymentMethod in paymentMethods)
+				{
+					Log.Message(LogLevel.Info, $"Processing {paymentMethod.Name}");
+					var addressCount = await context.PaymentAddress
+						.Where(x => x.PaymentMethodId == paymentMethod.Id && x.UserId == null)
+						.CountAsync();
+					if (addressCount < _addressCreationCount)
+					{
+						for (int i = 0; i < _addressCreationCount; i++)
+						{
+							var address = await CreateAddress(paymentMethod);
+							if (string.IsNullOrEmpty(address))
+								throw new Exception("Null address returnd from wallet connector");
+
+							context.PaymentAddress.Add(new PaymentAddress
+							{
+								Address = address,
+								PaymentMethodId = paymentMethod.Id,
+								Updated = DateTime.UtcNow,
+								Timestamp = DateTime.UtcNow
+							});
+						}
+					}
+					await context.SaveChangesAsync();
+					Log.Message(LogLevel.Info, $"Processing {paymentMethod.Name} complete");
+				}
+			}
+			Log.Message(LogLevel.Info, "Processing Addresses complete.");
+		}
+
+		private Task<IEnumerable<TransactionData>> GetWalletDeposits(PaymentMethod paymentMethod)
+		{
+			var connector = new WalletConnector
+			(
+				paymentMethod.Data,
+				paymentMethod.Data2,
+				paymentMethod.Data3
+			);
+			return connector.GetDepositsAsync(paymentMethod.Data5);
+		}
+
+		private Task<string> CreateAddress(PaymentMethod paymentMethod)
+		{
+			var connector = new WalletConnector
+			(
+				paymentMethod.Data,
+				paymentMethod.Data2,
+				paymentMethod.Data3
+			);
+			return connector.GenerateAddressAsync("", true);
+		}
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-namespace Cryptopia.Base.Logging
+namespace DotMatrix.Base.Logging
 {
 	/// <summary>
 	/// Base class for logs

@@ -1,0 +1,60 @@
+﻿@model DotMatrix.Common.Award.AwardViewModel
+@{
+	ViewBag.Title = "Awards";
+}
+
+	<div class="d-flex justify-content-center pt-4">
+
+		<div class="card" style="min-width:300px;max-width:1000px">
+			<div class="card-body">
+				<h5 class="card-title">Awards</h5>
+				<h6 class="card-subtitle mb-2 text-muted">You can win awards of points while playing BitPixel, listed below are some of the awards you can win</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="40%">Name</th>
+								<th width="60%">Points</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.Awards.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active awards at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.Awards)
+								{
+									<tr>
+										<td class="cell-elipsis" title="@prize.Name">@prize.Name</td>
+										<td class="cell-elipsis" >@prize.Points</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+
+					<div>
+						<div class="d-flex justify-content-between">
+							<div class="w-25">
+								<a href="/Pixel" class="btn btn-block btn-sm btn-success">Play Now!</a>
+							</div>
+							<div class="w-25">
+								<a href="/Prizes" class="btn btn-block btn-sm btn-warning">Get Prizes!</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+		@section Scripts {
+			<script>
+
+			</script>
+		}

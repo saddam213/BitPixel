@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Web.Http;
 
 namespace DotMatrix
@@ -18,12 +15,6 @@ namespace DotMatrix
 
 			config.Routes.MapHttpRoute(name: "AddPixel", routeTemplate: "Api/AddPixel", defaults: new { controller = "ApiPrivate", action = "AddPixel" });
 			config.Routes.MapHttpRoute(name: "GetPixel", routeTemplate: "Api/GetPixel", defaults: new { controller = "ApiPrivate", action = "GetPixel" });
-
-			//config.Routes.MapHttpRoute(
-			//					name: "DefaultApi",
-			//					routeTemplate: "api/{controller}/{id}",
-			//					defaults: new { id = RouteParameter.Optional }
-			//			);
 		}
 	}
 }

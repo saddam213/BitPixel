@@ -1,13 +1,9 @@
-﻿using DotMatrix.Common.DataContext;
-using DotMatrix.Entity;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using DotMatrix.Common.DataContext;
+using DotMatrix.Entity;
 
 namespace DotMatrix.Data.DataContext
 {
@@ -20,9 +16,24 @@ namespace DotMatrix.Data.DataContext
 		}
 
 		public DbSet<User> Users { get; set; }
+
+		public DbSet<EmailTemplate> EmailTemplate { get; set; }
+		public DbSet<EmailOutbox> EmailOutbox { get; set; }
+
+		public DbSet<Team> Teams { get; set; }
 		public DbSet<Pixel> Pixel { get; set; }
 		public DbSet<PixelHistory> PixelHistory { get; set; }
-		public DbSet<Deposit> Deposit { get; set; }
+
+		public DbSet<Click> Click { get; set; }
+		public DbSet<Prize> Prize { get; set; }
+
+		public DbSet<Award> Award { get; set; }
+		public DbSet<AwardHistory> AwardHistory { get; set; }
+
+		public DbSet<PaymentAddress> PaymentAddress { get; set; }
+		public DbSet<PaymentMethod> PaymentMethod { get; set; }
+		public DbSet<PaymentUserMethod> PaymentUserMethod { get; set; }
+		public DbSet<PaymentReceipt> PaymentReceipt { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
@@ -30,12 +41,15 @@ namespace DotMatrix.Data.DataContext
 			modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 			modelBuilder.Conventions.Add(new DecimalPropertyConvention(38, 8));
 
-			modelBuilder.Entity<User>().ToTable("AspNetUsers");
+			modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+
+			modelBuilder.Entity<User>().ToTable("Users");
+			modelBuilder.Entity<User>().HasRequired(x => x.Team).WithMany(x => x.Users);
 
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.User);
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.Pixel).WithMany(x => x.History);
 
-			modelBuilder.Entity<Deposit>().HasRequired(x => x.User).WithMany(x => x.Deposits);
+			modelBuilder.Entity<PaymentReceipt>().HasRequired(x => x.User).WithMany(x => x.Deposits);
 		}
 	}
 }

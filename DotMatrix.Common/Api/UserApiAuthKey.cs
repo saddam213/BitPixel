@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DotMatrix.Common.Api
+﻿namespace DotMatrix.Common.Api
 {
 	public class UserApiAuthKey
 	{
@@ -12,7 +6,7 @@ namespace DotMatrix.Common.Api
 		{
 		}
 
-		public UserApiAuthKey(string userId, string key, string secret, bool isenabled)
+		public UserApiAuthKey(int userId, string key, string secret, bool isenabled)
 		{
 			Key = key;
 			UserId = userId;
@@ -20,14 +14,14 @@ namespace DotMatrix.Common.Api
 			IsEnabled = isenabled;
 		}
 
-		public string UserId { get; set; }
+		public int UserId { get; set; }
 		public string Secret { get; set; }
 		public string Key { get; set; }
 		public bool IsEnabled { get; set; }
 
 		public bool IsValid
 		{
-			get { return !string.IsNullOrEmpty(UserId) && !string.IsNullOrEmpty(Secret) && !string.IsNullOrEmpty(Key); }
+			get { return !string.IsNullOrEmpty(Secret) && !string.IsNullOrEmpty(Key); }
 		}
 	}
 }

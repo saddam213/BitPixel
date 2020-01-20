@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +10,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotMatrix.Common</RootNamespace>
     <AssemblyName>DotMatrix.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,15 +53,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -67,27 +70,67 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Account\ChangePasswordViewModel.cs" />
+    <Compile Include="Account\ForgotPasswordViewModel.cs" />
+    <Compile Include="Account\ForgotViewModel.cs" />
+    <Compile Include="Account\LoginViewModel.cs" />
+    <Compile Include="Account\RegisterViewModel.cs" />
+    <Compile Include="Account\ResetPasswordViewModel.cs" />
+    <Compile Include="Admin\CreatePrizePoolModel.cs" />
+    <Compile Include="Admin\CreatePrizePoolResult.cs" />
+    <Compile Include="Admin\IAdminReader.cs" />
+    <Compile Include="Admin\IAdminWriter.cs" />
     <Compile Include="Api\ApiResponse.cs" />
     <Compile Include="Api\UpdateApiModel.cs" />
     <Compile Include="Api\UserApiAuthKey.cs" />
     <Compile Include="Api\UserApiKeyPair.cs" />
+    <Compile Include="Award\AddUserAwardModel.cs" />
+    <Compile Include="Award\AddUserAwardResult.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="DataContext\ConnectionString.cs" />
     <Compile Include="DataContext\IDataContext.cs" />
     <Compile Include="DataContext\IDataContextFactory.cs" />
-    <Compile Include="Deposits\DepositsModel.cs" />
-    <Compile Include="Deposits\DepositModel.cs" />
-    <Compile Include="Deposits\IDepositReader.cs" />
+    <Compile Include="DataContext\StoredProcedure.cs" />
+    <Compile Include="Payment\IPaymentWriter.cs" />
+    <Compile Include="Payment\PaymentHistoryModel.cs" />
+    <Compile Include="Payment\PaymentMethodModel.cs" />
+    <Compile Include="Payment\PaymentModel.cs" />
+    <Compile Include="Payment\PaymentReceiptModel.cs" />
+    <Compile Include="Payment\IPaymentReader.cs" />
+    <Compile Include="Payment\PaymentUserMethodModel.cs" />
+    <Compile Include="Pixel\AddClickRequest.cs" />
+    <Compile Include="Pixel\AddPixelRequest.cs" />
+    <Compile Include="Pixel\AddClickResponse.cs" />
+    <Compile Include="Pixel\GetPixelRequest.cs" />
     <Compile Include="Pixel\IPixelWriter.cs" />
     <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Pixel\IPixelReader.cs" />
-    <Compile Include="Pixel\PixelResultModel.cs" />
+    <Compile Include="Pixel\AddPixelResponse.cs" />
     <Compile Include="Pixel\PixelModel.cs" />
     <Compile Include="Pixel\PixelViewlModel.cs" />
+    <Compile Include="Points\PointModel.cs" />
+    <Compile Include="Award\IAwardReader.cs" />
+    <Compile Include="Award\IAwardWriter.cs" />
+    <Compile Include="Award\AwardHistoryItemModel.cs" />
+    <Compile Include="Award\AwardHistoryViewModel.cs" />
+    <Compile Include="Award\AwardItemModel.cs" />
+    <Compile Include="Award\AwardUserHistoryItemModel.cs" />
+    <Compile Include="Award\AwardUserHistoryViewModel.cs" />
+    <Compile Include="Award\AwardViewModel.cs" />
+    <Compile Include="Prize\PrizeHistoryItemModel.cs" />
+    <Compile Include="Prize\PrizeHistoryViewModel.cs" />
+    <Compile Include="Prize\PrizeItemModel.cs" />
+    <Compile Include="Prize\PrizeUserHistoryViewModel.cs" />
+    <Compile Include="Prize\IPrizeWriter.cs" />
+    <Compile Include="Prize\IPrizeReader.cs" />
+    <Compile Include="Prize\PrizeUserHistoryItemModel.cs" />
+    <Compile Include="Prize\PrizeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queue\IQueueService.cs" />
+    <Compile Include="Score\ScoreViewItemModel.cs" />
+    <Compile Include="Score\IScoreReader.cs" />
+    <Compile Include="Score\ScoreViewModel.cs" />
     <Compile Include="Users\IUserReader.cs" />
     <Compile Include="Users\UserSettingsModel.cs" />
-    <Compile Include="Wallet\IWalletService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -104,6 +147,14 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,0 +1,229 @@
+﻿@model DotMatrix.Common.Score.ScoreViewModel
+@{
+	ViewBag.Title = "Scoreboard";
+}
+
+	<div class="d-flex justify-content-center flex-wrap">
+
+		<div class="card m-3" style="min-width:300px;max-width:700px">
+			<div class="card-body">
+				<h5 class="card-title">Pixel Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Pixel Leaderboard description</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">UserName</th>
+								<th class="text-right" width="120">Pixel Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.PixelBoard.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active socres at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.PixelBoard)
+								{
+									<tr>
+										<td class="cell-elipsis" title="@prize.UserName">@prize.UserName</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="card m-3" style="min-width:300px;max-width:700px">
+			<div class="card-body">
+				<h5 class="card-title">Click Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Click Leaderboard description</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">UserName</th>
+								<th class="text-right" width="120">Click Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.ClickBoard.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active socres at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.ClickBoard)
+								{
+									<tr>
+										<td class="cell-elipsis">@prize.UserName</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="card m-3" style="min-width:300px;max-width:700px">
+			<div class="card-body">
+				<h5 class="card-title">Points Won Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Points Won Leaderboard description</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">UserName</th>
+								<th class="text-right" width="120">Total Points</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.PointsWonBoard.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active socres at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.PointsWonBoard)
+								{
+									<tr>
+										<td class="cell-elipsis">@prize.UserName</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="card m-3" style="min-width:300px;max-width:700px">
+			<div class="card-body">
+				<h5 class="card-title">Points Lost Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Points Lost Leaderboard description</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">UserName</th>
+								<th class="text-right" width="120">Total Points</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.PointsLostBoard.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active socres at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.PointsLostBoard)
+								{
+									<tr>
+										<td class="cell-elipsis">@prize.UserName</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="card m-3" style="min-width:300px;max-width:700px">
+			<div class="card-body">
+				<h5 class="card-title">Prize Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Prize Leaderboard description</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">UserName</th>
+								<th class="text-right" width="120">Prize Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.PrizeBoard.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active socres at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.PrizeBoard)
+								{
+									<tr>
+										<td class="cell-elipsis">@prize.UserName</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="card m-3" style="min-width:300px;max-width:700px">
+			<div class="card-body">
+				<h5 class="card-title">Award Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Award Leaderboard description</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">UserName</th>
+								<th class="text-right" width="120">Award Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.AwardBoard.Any())
+							{
+								<tr>
+									<td colspan="2">There are no active socres at this time.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.AwardBoard)
+								{
+									<tr>
+										<td class="cell-elipsis">@prize.UserName</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+
+
+	</div>
+
+@section Scripts {
+	<script>
+
+	</script>
+}

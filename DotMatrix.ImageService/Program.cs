@@ -1,4 +1,4 @@
-﻿using Cryptopia.Base.Logging;
+﻿using DotMatrix.Base.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

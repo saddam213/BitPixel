@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using DotMatrix.Enums;
 
 namespace DotMatrix.Common.Pixel
 {
 	public interface IPixelWriter
 	{
-		Task<PixelResultModel> AddOrUpdate(string userId, PixelModel model);
+		Task<AddClickResponse> AddClick(int userId, AddClickRequest request);
+		Task<AddPixelResponse> AddPixel(int userId, AddPixelRequest request);
 	}
 }

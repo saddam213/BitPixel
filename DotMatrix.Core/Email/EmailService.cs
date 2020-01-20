@@ -1,37 +1,37 @@
-﻿using DotMatrix.Common.Email;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using DotMatrix.Common.DataContext;
+using DotMatrix.Common.Email;
+using DotMatrix.Entity;
+using DotMatrix.Enums;
+
+using Newtonsoft.Json;
 
 namespace DotMatrix.Core.Email
 {
 	public class EmailService : IEmailService
 	{
-		private readonly string Email_Name = ConfigurationManager.AppSettings["Email_Name"];
-		private readonly string Email_User = ConfigurationManager.AppSettings["Email_User"];
-		private readonly string Email_Password = ConfigurationManager.AppSettings["Email_Pass"];
-		private readonly string Email_From = ConfigurationManager.AppSettings["Email_From"];
-		private readonly string Email_Server = ConfigurationManager.AppSettings["Email_Server"];
-		private readonly int Email_Port = int.Parse(ConfigurationManager.AppSettings["Email_Port"]);
+		public IDataContextFactory DataContextFactory { get; set; }
 
-		public async Task SendEmail(string email, string subject, string body, bool isHtml = true)
+		public async Task<bool> SendEmail(EmailTemplateType type, int userId, string destination, params object[] emailParameters)
 		{
-			using (var mailMessage = new MailMessage(new MailAddress(Email_From, Email_Name), new MailAddress(email)))
+			using (var context = DataContextFactory.CreateContext())
 			{
-				mailMessage.Subject = subject;
-				mailMessage.Body = body;
-				mailMessage.IsBodyHtml = isHtml;
-				using (var mailClient = new SmtpClient(Email_Server, Email_Port))
+				context.EmailOutbox.Add(new EmailOutbox
 				{
-					mailClient.Credentials = new NetworkCredential(Email_User, Email_Password);
-					mailClient.EnableSsl = true;
-					await mailClient.SendMailAsync(mailMessage);
-				}
+					UserId = userId,
+					Type = type,
+					Created = DateTime.UtcNow,
+					Updated = DateTime.UtcNow,
+					Status = EmailStatus.Pending,
+					Destination = destination,
+					Parameters = JsonConvert.SerializeObject(emailParameters),
+					UserCulture = Thread.CurrentThread.CurrentUICulture.Name
+				});
+				await context.SaveChangesAsync();
+				return true;
 			}
 		}
 	}

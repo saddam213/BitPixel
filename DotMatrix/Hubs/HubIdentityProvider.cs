@@ -1,11 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace DotMatrix.Hubs
 {
@@ -17,7 +11,7 @@ namespace DotMatrix.Hubs
 			{
 				return request.User.Identity.GetUserId();
 			}
-			return Guid.Empty.ToString();
+			return "0";
 		}
 	}
 

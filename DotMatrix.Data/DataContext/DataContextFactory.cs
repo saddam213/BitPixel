@@ -1,9 +1,7 @@
-﻿using DotMatrix.Common.DataContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
+using System.Data.SqlClient;
+
+using DotMatrix.Common.DataContext;
 
 namespace DotMatrix.Data.DataContext
 {
@@ -12,6 +10,20 @@ namespace DotMatrix.Data.DataContext
 		public IDataContext CreateContext()
 		{
 			return new DataContext();
+		}
+
+		public IDbConnection CreateConnection()
+		{
+			return new SqlConnection(ConnectionString.DefaultConnection);
+		}
+
+		public IDataContext CreateReadOnlyContext()
+		{
+			var context = new DataContext();
+			context.Configuration.AutoDetectChangesEnabled = false;
+			context.Configuration.LazyLoadingEnabled = false;
+			context.Configuration.ProxyCreationEnabled = false;
+			return context;
 		}
 	}
 }

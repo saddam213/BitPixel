@@ -1,6 +1,6 @@
 using System;
 
-namespace Cryptopia.Base.Logging
+namespace DotMatrix.Base.Logging
 {
 	public class Log
 	{

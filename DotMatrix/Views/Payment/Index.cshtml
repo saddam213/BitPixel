@@ -1,0 +1,40 @@
+﻿@model DotMatrix.Common.Payment.PaymentModel
+@{
+	ViewBag.Title = "Payments";
+}
+
+<div class="d-flex justify-content-center pt-4">
+
+	<div class="d-flex flex-column">
+		<div class="d-flex align-items-center">
+			@*<a href="/Points">
+				<i class="fa fa-2x fa-arrow-circle-left mt-4 mb-4 mr-2"></i>
+			</a>*@
+			<h3>Payment Methods</h3>
+		</div>
+		<div class="d-flex justify-content-center align-items-center flex-wrap">
+			@foreach (var method in Model.Methods)
+			{
+				<div class="card mr-4" style="width:300px;">
+					<div class="d-flex justify-content-center align-items-center">
+						<img class="mt-4" src="~/Content/Images/Payment/@(method.Name).png" alt="" width="200">
+					</div>
+					<div class="card-body">
+						<h5 class="card-title"><b>@method.Name</b></h5>
+						<p class="">@method.Description</p>
+						<div class="text-center mb-3">
+							<b>1 Point = @method.Rate.ToString("F8") @method.Symbol</b>
+						</div>
+						<a href="/Payment/Method?id=@method.Id" class="btn btn-block btn-warning">Get Points With @method.Name</a>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+
+	</script>
+}

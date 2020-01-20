@@ -1,12 +1,10 @@
-﻿using DotMatrix.Common.DataContext;
-using DotMatrix.Common.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DotMatrix.Entity;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Threading.Tasks;
+
+using DotMatrix.Common.DataContext;
+using DotMatrix.Common.Users;
+using DotMatrix.Entity;
 
 namespace DotMatrix.Core.Users
 {
@@ -14,7 +12,7 @@ namespace DotMatrix.Core.Users
 	{
 		public IDataContextFactory DataContextFactory { get; set; }
 
-		public async Task<User> GetUser(string userId)
+		public async Task<User> GetUser(int userId)
 		{
 			using (var context = DataContextFactory.CreateContext())
 			{

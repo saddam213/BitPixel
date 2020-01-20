@@ -1,21 +1,113 @@
-﻿@{
+﻿@using DotMatrix.Base.Extensions
+@{
 	ViewBag.Title = "Explore";
+	var cacheBreak = DateTime.UtcNow.ToUnixTime();
+	var width = DotMatrix.Enums.Constant.Width;
+	var height = DotMatrix.Enums.Constant.Height;
 }
+<style>
 
-<div class="row text-center">
-	<table style="border:solid 1px black;margin: 10px auto;">
-		@for (int y = 0; y < 4; y++)
-		{
-			<tr>
-				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 0 + (y * 4))" width="2500" height="2500" /></td>
-				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 1 + (y * 4))" width="2500" height="2500" /></td>
-				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 2 + (y * 4))" width="2500" height="2500" /></td>
-				<td><img src="@string.Format("../Content/Images/background-large-{0}.png", 3 + (y * 4))" width="2500" height="2500" /></td>
-			</tr>
+	.magnifier-thumb-wrapper {
+		position: relative;
+		display: block;
+		top: 0;
+		left: 0;
+		border-left: solid 1px black;
+		border-top: solid 1px black;
+		border-bottom: solid 1px black;
+	}
+
+	.magnifier-lens {
+		position: absolute;
+		border: solid 1px green;
+		z-index: 1000;
+		top: 0;
+		left: 0;
+		overflow: hidden
+	}
+
+	.magnifier-loader {
+		position: absolute;
+		top: 0;
+		left: 0;
+		border: solid 1px #ccc;
+		color: #fff;
+		text-align: center;
+		background: transparent;
+		background: rgba(50, 50, 50, 0.5);
+		z-index: 1000;
+		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F323232,endColorstr=#7F323232)";
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F323232,endColorstr=#7F323232)
+	}
+
+	.magnifier-loader-text {
+		font: 13px Arial;
+		margin-top: 10px
+	}
+
+	.magnifier-large {
+		position: absolute;
+		z-index: 100
+	}
+
+	.magnifier-preview {
+		padding: 0;
+		width: 100%;
+		position: relative;
+		overflow: hidden;
+		max-width: calc(@(width)px + 2px);
+		max-height: calc(@(height)px + 2px);
+		border: solid 1px black;
+	}
+
+		.magnifier-preview img {
+			position: absolute;
+			top: 0;
+			left: 0;
 		}
-	</table>
+
+	.magnifier-thumb-wrapper .opaque {
+		opacity: .5;
+		filter: alpha(opacity=50);
+		-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50)
+	}
+
+	.magnifier-thumb-wrapper .hidden {
+		display: none
+	}
+</style>
+
+<div class="d-flex flex-column mt-4">
+	<div class="d-flex justify-content-center">
+		<div class="magnifier-thumb-wrapper">
+			<img id="background-small" src="@string.Format("/Content/Images/Pixel/background-small.png?v={0}", cacheBreak)">
+		</div>
+		<div class="magnifier-preview" id="background-large">
+		</div>
+	</div>
 </div>
+
 @section Scripts {
+	<script src="~/Scripts/Event.js"></script>
+	<script src="~/Scripts/Magnifier.js"></script>
 	<script>
+		(async ($) => {
+
+			$( document ).ready(function() {
+				const evt = new Event();
+				const m = new Magnifier(evt);
+				m.attach({
+					zoom: 10,
+					zoomable: true,
+					thumb: '#background-small',
+					largeWrapper: 'background-large',
+					large: '@string.Format("/Content/Images/Pixel/background-large.png?v={0}", cacheBreak)',
+				});
+
+			//m.setZoomIn()
+			//m.setZoomOut()
+			});
+
+		})(jQuery);
 	</script>
 }

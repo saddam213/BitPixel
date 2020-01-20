@@ -1,8 +1,9 @@
-﻿using Cryptopia.Base.Logging;
+﻿using DotMatrix.Base.Logging;
 using DotMatrix.ImageService.Implementation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
@@ -38,7 +39,8 @@ namespace DotMatrix.ImageService
 		{
 			Log.Message(LogLevel.Info, "[OnStart] - Starting service...");
 			_cancellationTokenSource = new CancellationTokenSource();
-			_imageEngine = new ImageEngine(_cancellationTokenSource.Token);
+			var outputPath = ConfigurationManager.AppSettings["OutputPath"];
+			_imageEngine = new ImageEngine(_cancellationTokenSource.Token, outputPath);
 			_imageEngine.Start();
 			Log.Message(LogLevel.Info, "[OnStart] - Started service.");
 		}

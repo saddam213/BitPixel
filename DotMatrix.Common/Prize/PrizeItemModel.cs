@@ -1,0 +1,14 @@
+﻿using DotMatrix.Enums;
+
+namespace DotMatrix.Common.Prize
+{
+	public class PrizeItemModel
+	{
+		public string Name { get; set; }
+		public string Description { get; set; }
+		public PrizeType Type { get; set; }
+
+		public int Count { get; set; }
+		public int Unclaimed { get; set; }
+	}
+}

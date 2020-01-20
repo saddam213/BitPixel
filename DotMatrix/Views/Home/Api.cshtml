@@ -1,0 +1,144 @@
+﻿@{
+	ViewBag.Title = "Api Documentation";
+}
+
+<style>
+	.table-bordered tr th,
+	.table-bordered tr td {
+		padding: 0px 5px;
+	}
+
+	.doc-container {
+		padding: 15px;
+		margin: 15px;
+		border: solid 1px rgba(0,0,0,0.3);
+	}
+</style>
+
+<div class="row">
+	<div style="padding:0px 15px;width:100%">
+		<h3>Api Documentation</h3>
+		<hr />
+	</div>
+
+	<div class="doc-container">
+		<h4>Introduction</h4>
+
+
+		Required Headers
+		<ul>
+			<li>ApiKey: Public ApiKey</li>
+			<li>Signature: Request body parameters signed HMAC512</li>
+		</ul>
+		<p style="white-space:pre-line">
+			Find the HMAC-SHA512 signature of your POST parameters using your secret key.
+			<code>echo -n "X=100&Y=100&Color=#FFFFFF" | openssl sha512 -hmac $API_SECRET</code>
+
+			You will use this signature as a header in your request.
+			<code>curl -X POST https://dotmatrix.chainstack.nz/Api/AddPixel -d "X=100&Y=100&Color=#FFFFFF" -H "ApiKey: 3c942142e88d8f50331a4cfeed5aea42" -H "Signature: 2a7849ecf...ae71161c8e9a364e21d9de9"</code>
+
+			Errors will be returnd in the following format
+			<code style="white-space:pre">{ "Success": false, "Message": "error message"}</code>
+		</p>
+	</div>
+
+	<hr />
+
+	<div class="doc-container">
+		<h4>AddPixel</h4>
+		<div>
+			<span><b>POST</b> <code>https://dotmatrix.chainstack.nz/Api/AddPixel</code></span>
+		</div>
+		<div>
+			<small>Parameters:</small>
+			<table style="font-size:12px" class="table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Required</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td>X</td>
+					<td>int</td>
+					<td>Yes</td>
+					<td>The X co-ordinate between 0 and 999</td>
+				</tr>
+				<tr>
+					<td>Y</td>
+					<td>int</td>
+					<td>Yes</td>
+					<td>The X co-ordinate between 0 and 999</td>
+				</tr>
+				<tr>
+					<td>Color</td>
+					<td>string</td>
+					<td>Yes</td>
+					<td>Hex color code (#000000 - #FFFFFF)</td>
+				</tr>
+			</table>
+		</div>
+
+		<div>
+			<p style="white-space:pre-line">
+				<small>Response:</small>
+				<code style="white-space:pre">{ "Success": true, "Message": Added new pixel at X: 100 Y: 100 }</code>
+			</p>
+		</div>
+
+		<div>
+			<p style="white-space:pre-line">
+				<small>Example:</small>
+				<code>curl -X POST https://dotmatrix.chainstack.nz/Api/AddPixel -d "X=100&Y=100&Color=#FFFFFF" -H "ApiKey: 3c942142e88d8f50331a4cfeed5aea42" -H "Signature: 2a7849ecf...ae71161c8e9a364e21d9de9"</code>
+			</p>
+		</div>
+	</div>
+
+	<div class="doc-container">
+		<h4>GetPixel</h4>
+		<div>
+			<span><b>POST</b> <code>https://dotmatrix.chainstack.nz/Api/GetPixel</code></span>
+		</div>
+		<div>
+			<small>Parameters:</small>
+			<table style="font-size:12px" class="table-bordered">
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Required</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td>X</td>
+					<td>int</td>
+					<td>Yes</td>
+					<td>The X co-ordinate between 0 and 999</td>
+				</tr>
+				<tr>
+					<td>Y</td>
+					<td>int</td>
+					<td>Yes</td>
+					<td>The X co-ordinate between 0 and 999</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<p style="white-space:pre-line">
+				<small>Response:</small>
+				<code style="white-space:pre">{ "Success": true, "Data": { "X": 584, "Y": 66, "Color": "#FFFFFF", "Type": 0, "Points": 0.00000001, "Owner": "Empty Pixel" } }</code>
+			</p>
+		</div>
+
+		<div>
+			<p style="white-space:pre-line">
+				<small>Example:</small>
+				<code>curl -X POST https://dotmatrix.chainstack.nz/Api/GetPixel -d "X=100&Y=100" -H "ApiKey: 3c942142e88d8f50331a4cfeed5aea42" -H "Signature: 2a7849ecf...ae71161c8e9a364e21d9de9"</code>
+			</p>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+	</script>
+}

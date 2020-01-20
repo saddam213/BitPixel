@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DotMatrix.Enums;
 
 namespace DotMatrix.Entity
 {
@@ -13,11 +10,11 @@ namespace DotMatrix.Entity
 		[Key]
 		public int Id { get; set; }
 		public int PixelId { get; set; }
-		public string UserId { get; set; }
-		public byte R { get; set; }
-		public byte G { get; set; }
-		public byte B { get; set; }
-		public decimal Price { get; set; }
+		public int UserId { get; set; }
+
+		public PixelType Type { get; set; }
+		public int Points { get; set; }
+
 		public DateTime Timestamp { get; set; }
 
 		[ForeignKey("PixelId")]

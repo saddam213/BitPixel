@@ -1,4 +1,4 @@
-namespace Cryptopia.Base.Logging
+namespace DotMatrix.Base.Logging
 {
 	/// <summary>
 	/// Outputs messages to the console

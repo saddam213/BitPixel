@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DotMatrix.Enums;
 
 namespace DotMatrix.Entity
 {
@@ -12,18 +10,17 @@ namespace DotMatrix.Entity
 	{
 		[Key]
 		public int Id { get; set; }
-		public string PixelKey { get; set; }
-		public string UserId { get; set; }
+		public int UserId { get; set; }
 
 		public int X { get; set; }
 		public int Y { get; set; }
-		public byte R { get; set; }
-		public byte G { get; set; }
-		public byte B { get; set; }
-
+		public string Color { get; set; }
+		public PixelType Type { get; set; }
+		public int Points { get; set; }
 		public DateTime LastUpdate { get; set; }
 
+		[ForeignKey("UserId")]
+		public virtual User User { get; set; }
 		public virtual ICollection<PixelHistory> History { get; set; }
-
 	}
 }

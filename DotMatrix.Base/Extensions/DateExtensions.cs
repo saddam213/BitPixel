@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Cryptopia.Base.Extensions
+namespace DotMatrix.Base.Extensions
 {
 	public static class DateExtensions
 	{
+		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 		public static string GetTimeToGo(this DateTime end)
 		{
 			if (end > DateTime.UtcNow)
@@ -86,7 +87,17 @@ namespace Cryptopia.Base.Extensions
 
 			return new DateTime(dt.Ticks + offset - delta, dt.Kind);
 		}
+		public static long ToUnixTime(this DateTime date)
+		{
+			var timeSpan = date - UnixEpoch;
+			return (long)timeSpan.TotalSeconds;
+		}
 
+		public static long ToJavaTime(this DateTime date)
+		{
+			var timeSpan = date - UnixEpoch;
+			return (long)timeSpan.TotalMilliseconds;
+		}
 	}
 
 

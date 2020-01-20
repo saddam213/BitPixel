@@ -18,6 +18,7 @@ namespace DotMatrix.DI.Installers
 			container.Register(Classes.FromAssemblyNamed("DotMatrix")
 				.BasedOn<IController>()
 				.LifestyleTransient()
+
 				);
 
 			container.Register(Classes.FromAssemblyNamed("DotMatrix")

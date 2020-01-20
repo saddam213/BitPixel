@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DotMatrix.Enums;
 
 namespace DotMatrix.Common.Pixel
 {
@@ -10,16 +6,10 @@ namespace DotMatrix.Common.Pixel
 	{
 		public int X { get; set; }
 		public int Y { get; set; }
-		public byte R { get; set; }
-		public byte G { get; set; }
-		public byte B { get; set; }
-		public string Color
-		{
-			get { return $"{R},{G},{B}"; }
-		}
-		public bool IsValid()
-		{
-			return (X >= 0 && X <= 999) && (Y >= 0 && Y <= 999);
-		}
+		public string Color { get; set; }
+		public PixelType Type { get; set; }
+		public int Points { get; set; }
+		public string Owner { get; set; }
+		public string Team { get; set; }
 	}
 }

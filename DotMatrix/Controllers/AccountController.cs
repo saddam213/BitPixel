@@ -1,60 +1,39 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+
+using DotMatrix.Api;
+using DotMatrix.Common.Account;
+using DotMatrix.Common.Award;
+using DotMatrix.Common.Email;
+using DotMatrix.Enums;
+using DotMatrix.Identity;
+
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using DotMatrix.Models;
-using DotMatrix.Common.Email;
 
 namespace DotMatrix.Controllers
 {
 	[Authorize]
 	public class AccountController : Controller
 	{
-		private ApplicationSignInManager _signInManager;
 		private ApplicationUserManager _userManager;
 
-		public AccountController()
-		{
-		}
-
-		public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+		public AccountController()		{		}
+		public AccountController(ApplicationUserManager userManager)
 		{
 			UserManager = userManager;
-			SignInManager = signInManager;
-		}
-
-		public ApplicationSignInManager SignInManager
-		{
-			get
-			{
-				return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-			}
-			private set
-			{
-				_signInManager = value;
-			}
 		}
 
 		public ApplicationUserManager UserManager
 		{
-			get
-			{
-				return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-			}
-			private set
-			{
-				_userManager = value;
-			}
+			get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
+			private set { _userManager = value; }
 		}
 
 		public IEmailService EmailService { get; set; }
-
+		public IAwardWriter AwardWriter { get; set; }
 		//
 		// GET: /Account/Login
 		[AllowAnonymous]
@@ -76,19 +55,63 @@ namespace DotMatrix.Controllers
 				return View(model);
 			}
 
-			var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-			switch (result)
+			// Check User
+			var user = await UserManager.FindByEmailAsync(model.Email);
+			if (user == null)
 			{
-				case SignInStatus.Success:
-					return RedirectToLocal(returnUrl);
-				case SignInStatus.LockedOut:
-					return View("Lockout");
-				case SignInStatus.Failure:
-				default:
-					ModelState.AddModelError("", "Invalid login attempt.");
-					return View(model);
+				ModelState.AddModelError("", "Incorrect Email or Password");
+				return View(model);
 			}
+
+			if (!await UserManager.IsEmailConfirmedAsync(user.Id))
+			{
+				ModelState.AddModelError("", "Email not activated, please check your email");
+				return View(model);
+			}
+
+			if (await UserManager.IsLockedOutAsync(user.Id))
+			{
+				ModelState.AddModelError("", "Account locked");
+				return View(model);
+			}
+
+			if (!await UserManager.CheckPasswordAsync(user, model.Password))
+			{
+				await IncrementAccessFailedCount(user, "Incorrect Email or Password");
+				return View(model);
+			}
+
+
+			// Reset failed attempts
+			await UserManager.ResetAccessFailedCountAsync(user.Id);
+
+			await SignInAsync(user);
+			if (string.IsNullOrEmpty(returnUrl))
+			{
+				return RedirectToAction("Index", "Home");
+			}
+			return RedirectToLocal(returnUrl);
 		}
+
+
+		private async Task SignInAsync(ApplicationUser user)
+		{
+			AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie, DefaultAuthenticationTypes.ApplicationCookie, DefaultAuthenticationTypes.TwoFactorCookie);
+			var identity = await user.GenerateUserIdentityAsync(UserManager);
+			AuthenticationManager.SignIn(new AuthenticationProperties { IsPersistent = true }, identity);
+		}
+
+		private async Task IncrementAccessFailedCount(ApplicationUser user, string message)
+		{
+			await UserManager.AccessFailedAsync(user.Id);
+			if (await UserManager.IsLockedOutAsync(user.Id))
+			{
+				ModelState.AddModelError("", "Account locked");
+				return;
+			}
+			ModelState.AddModelError("", message);
+		}
+
 
 		//
 		// GET: /Account/Register
@@ -107,15 +130,31 @@ namespace DotMatrix.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+				var apiKeyResult = ApiKeyStore.GenerateApiKeyPair();
+				var user = new ApplicationUser
+				{
+					UserName = model.UserName,
+					Email = model.Email,
+					EmailConfirmed = false,
+					Points = 0,
+					ApiKey = apiKeyResult.Key,
+					ApiSecret = apiKeyResult.Secret,
+					TeamId = Constant.DefaultTeamId,
+				};
+
 				var result = await UserManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
+					await AwardWriter.AddAward(new AddUserAwardModel
+					{
+						UserId = user.Id,
+						Type = AwardType.Registration,
+					});
+
 					var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-					var callbackUrl = Url.Action("EmailConfirmation", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-					var body = $"Please click the link below to activate your DOTMatrix account<br /> <a href=\"{callbackUrl}\">here</a>";
-					await EmailService.SendEmail(user.Email, "DOTMatrix Registration", body);
-					return RedirectToAction("ConfirmEmail");
+					var callbackUrl = Url.Action(nameof(ConfirmEmailAddress), "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+					await EmailService.SendEmail(Enums.EmailTemplateType.Registration, user.Id, user.Email, user.UserName, callbackUrl);
+					return RedirectToAction(nameof(ConfirmEmail));
 				}
 				AddErrors(result);
 			}
@@ -131,18 +170,29 @@ namespace DotMatrix.Controllers
 			return View();
 		}
 
-
 		//
 		// GET: /Account/ConfirmEmail
 		[AllowAnonymous]
-		public async Task<ActionResult> EmailConfirmation(string userId, string code)
+		public async Task<ActionResult> ConfirmEmailAddress(int userId, string code)
 		{
-			if (userId == null || code == null)
-			{
+			if (code == null)
 				return View("Error");
-			}
+
 			var result = await UserManager.ConfirmEmailAsync(userId, code);
-			return View(result.Succeeded ? "ConfirmEmailConfirmation" : "Error");
+			if (result.Succeeded)
+			{
+				await SignInAsync(await UserManager.FindByIdAsync(userId));
+				return RedirectToAction(nameof(ConfirmEmailSuccess));
+			}
+
+			return View("Error");
+		}
+
+		// GET: /Account/Register
+		[AllowAnonymous]
+		public ActionResult ConfirmEmailSuccess()
+		{
+			return View();
 		}
 
 		//
@@ -162,18 +212,17 @@ namespace DotMatrix.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = await UserManager.FindByNameAsync(model.Email);
+				var user = await UserManager.FindByEmailAsync(model.Email);
 				if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
 				{
 					// Don't reveal that the user does not exist or is not confirmed
-					return View("ForgotPasswordConfirmation");
+					return RedirectToAction(nameof(ForgotPasswordConfirmation));
 				}
 
 				string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-				var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-				var body = $"Please reset your password by clicking <a href=\"{callbackUrl}\">here</a>";
-				await EmailService.SendEmail(user.Email, "Reset Password", body);
-				return RedirectToAction("ForgotPasswordConfirmation");
+				var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+				await EmailService.SendEmail(Enums.EmailTemplateType.PasswordReset, user.Id, user.Email, user.UserName, callbackUrl);
+				return RedirectToAction(nameof(ForgotPasswordConfirmation));
 			}
 
 			return View(model);
@@ -192,7 +241,13 @@ namespace DotMatrix.Controllers
 		[AllowAnonymous]
 		public ActionResult ResetPassword(string code)
 		{
-			return code == null ? View("Error") : View();
+			if (string.IsNullOrEmpty(code))
+				return View("Error");
+
+			return View(new ResetPasswordViewModel
+			{
+				Code = code
+			});
 		}
 
 		//
@@ -206,16 +261,18 @@ namespace DotMatrix.Controllers
 			{
 				return View(model);
 			}
+
 			var user = await UserManager.FindByNameAsync(model.Email);
 			if (user == null)
 			{
 				// Don't reveal that the user does not exist
-				return RedirectToAction("ResetPasswordConfirmation", "Account");
+				return RedirectToAction(nameof(ResetPasswordConfirmation));
 			}
+
 			var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("ResetPasswordConfirmation", "Account");
+				return RedirectToAction(nameof(ResetPasswordConfirmation));
 			}
 			AddErrors(result);
 			return View();
@@ -253,14 +310,7 @@ namespace DotMatrix.Controllers
 					_userManager.Dispose();
 					_userManager = null;
 				}
-
-				if (_signInManager != null)
-				{
-					_signInManager.Dispose();
-					_signInManager = null;
-				}
 			}
-
 			base.Dispose(disposing);
 		}
 

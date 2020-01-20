@@ -1,25 +1,19 @@
-﻿@model DotMatrix.Common.Pixel.PixelViewlModel
+﻿@using DotMatrix.Base.Extensions
+@model DotMatrix.Common.Pixel.PixelViewlModel
 @{
 	ViewBag.Title = "Home";
+	
+	var width = DotMatrix.Enums.Constant.Width;
+	var height = DotMatrix.Enums.Constant.Height;
+	var cacheBreak = DateTime.UtcNow.ToUnixTime();
 }
 
-<div class="row text-center">
-	<table style="border:solid 1px black;margin: 10px auto;">
-		@for (int y = 0; y < 4; y++)
-		{
-			<tr>
-				<td><img src="@string.Format("~/Content/Images/background-small-{0}.png", 0 + (y * 4))" width="250" height="250"  /></td>
-				<td><img src="@string.Format("~/Content/Images/background-small-{0}.png", 1 + (y * 4))" width="250" height="250"  /></td>
-				<td><img src="@string.Format("~/Content/Images/background-small-{0}.png", 2 + (y * 4))" width="250" height="250"  /></td>
-				<td><img src="@string.Format("~/Content/Images/background-small-{0}.png", 3 + (y * 4))" width="250" height="250"  /></td>
-			</tr>
-		}
-	</table>
+<div class="d-flex flex-column mt-4">
+	<div style="display:flex;justify-content:center;">
+		<img src="@string.Format("Content/Images/Pixel/background-small.png?v={0}", cacheBreak)" width="@width" height="@height" style="border:solid 1px black"/>
+	</div>
 </div>
-<hr />
-<footer>
-	<p>&copy; @DateTime.Now.Year - My Cryptopia Application</p>
-</footer>
+
 @section Scripts {
 	<script>
 	</script>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
 
-namespace Cryptopia.Base.Logging
+namespace DotMatrix.Base.Logging
 {
 	/// <summary>
 	/// Logging manager class for easy handling of logs across classes

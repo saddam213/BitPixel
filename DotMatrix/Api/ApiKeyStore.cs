@@ -21,7 +21,7 @@ namespace DotMatrix.Api
 				{
 					using (var context = new ApplicationDbContext())
 					{
-						var users = context.Users.Where(x => x.IsApiEnabled && !string.IsNullOrEmpty(x.ApiKey));
+						var users = context.Users.Where(x => x.IsApiEnabled && !string.IsNullOrEmpty(x.ApiKey)).ToList();
 						if (users != null)
 						{
 							foreach (var user in users)
@@ -40,7 +40,7 @@ namespace DotMatrix.Api
 			}
 		}
 
-		public static async Task<bool> UpdateApiAuthKey(string userId, UpdateApiModel newKey)
+		public static async Task<bool> UpdateApiAuthKey(int userId, UpdateApiModel newKey)
 		{
 			using (var context = new ApplicationDbContext())
 			{

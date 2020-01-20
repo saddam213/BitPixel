@@ -1,0 +1,65 @@
+﻿@model DotMatrix.Common.Prize.PrizeUserHistoryViewModel
+@{
+	ViewBag.Title = "Prize History";
+}
+
+<div class="d-flex justify-content-center pt-4">
+
+	<div class="card" style="min-width:300px;max-width:1000px">
+		<div class="card-body">
+			<h5 class="card-title">Prize History</h5>
+			<h6 class="card-subtitle mb-2 text-muted">Prizes you have won playing BitPixel</h6>
+			<div>
+				<table class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+					<thead>
+						<tr>
+							<th width="160">Name</th>
+							<th>Description</th>
+							<th width="100">Points</th>
+							<th width="160">Timestamp</th>
+						</tr>
+					</thead>
+					<tbody>
+						@if (!Model.Prizes.Any())
+						{
+							<tr>
+								<td colspan="4">You have not won any prizes yet, to learn how please click here: <a href="/Points/Prizes" class=""><b>Get Prizes!</b></a></td>
+							</tr>
+						}
+						else
+						{
+							foreach (var prize in Model.Prizes)
+							{
+								<tr>
+									<td>@prize.Name</td>
+									<td>@prize.Description</td>
+									<td class="text-right">@prize.Points</td>
+									<td class="text-right">@prize.Timestamp.ToString("dd/MM/yyyy hh:mm tt")</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+
+				<div>
+					<div class="d-flex justify-content-between">
+						<div class="w-25">
+							<a href="/Prizes" class="btn btn-block btn-sm btn-warning">Get Prizes!</a>
+						</div>
+						<div class="w-25">
+							<a href="/Awards/UserHistory" class="btn btn-block btn-sm btn-outline-dark">Awards History</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+
+	</script>
+}

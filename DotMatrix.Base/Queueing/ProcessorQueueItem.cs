@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Cryptopia.Base.Queueing
+namespace DotMatrix.Base.Queueing
 {
 	/// <summary>
 	/// Class to encapsulate the item information to be proccesed and its completion task

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using DotMatrix.Enums;
 
 namespace DotMatrix.Common.Email
 {
 	public interface IEmailService
 	{
-		Task SendEmail(string email, string subject, string body, bool isHtml = true);
+		Task<bool> SendEmail(EmailTemplateType type, int userId, string destination, params object[] emailParameters);
 	}
 }
