@@ -10,6 +10,8 @@ using Dapper;
 
 using DotMatrix.Common.DataContext;
 using DotMatrix.Common.Pixel;
+using DotMatrix.Datatables;
+using DotMatrix.Datatables.Models;
 using DotMatrix.Enums;
 
 namespace DotMatrix.Core.Pixel
@@ -18,24 +20,24 @@ namespace DotMatrix.Core.Pixel
 	{
 		public IDataContextFactory DataContextFactory { get; set; }
 
-		public async Task<PixelModel> GetPixel(int x, int y)
+		public async Task<PixelModel> GetPixel(int gameId, int x, int y)
 		{
 			using (var context = DataContextFactory.CreateReadOnlyContext())
 			{
 				return await context.Pixel
-					.Where(p => p.X == x && p.Y == y)
+					.Where(p => p.GameId == gameId && p.X == x && p.Y == y)
 					.Select(MapPixel())
 					.FirstOrDefaultAsync() ?? MapDefaultPixel(x, y);
 			}
 		}
 
-		public async Task<List<PixelModel>> GetPixels()
+		public async Task<List<PixelModel>> GetPixels(int gameId)
 		{
 			using (var context = DataContextFactory.CreateReadOnlyContext())
 			{
 				var lastdate = DateTime.UtcNow.AddMinutes(-5);
 				return await context.Pixel
-					.Where(x => x.LastUpdate > lastdate)
+					.Where(x => x.GameId == gameId && x.LastUpdate > lastdate)
 					.Select(MapPixel())
 					.ToListAsync();
 			}
@@ -45,7 +47,7 @@ namespace DotMatrix.Core.Pixel
 		{
 			using (var context = DataContextFactory.CreateConnection())
 			{
-				return await context.QueryAsync<Entity.Pixel>(StoredProcedure.GetPixelRectangle, new
+				return await context.QueryAsync<Entity.Pixel>(StoredProcedure.Game_GetPixelRectangle, new
 				{
 					X = x,
 					Y = y,
@@ -81,6 +83,33 @@ namespace DotMatrix.Core.Pixel
 				Owner = "Empty Pixel",
 				Team = "Empty Pixel"
 			};
+		}
+
+		public async Task<DataTablesResponseData> GetUserHistory(DataTablesParam model, int userId, int? maxCount)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				var query = context.PixelHistory
+					.Where(x => x.UserId == userId)
+					.Select(x => new
+					{
+						Id = x.Id,
+						GameId = x.GameId,
+						Game = x.Game.Name,
+						X = x.Pixel.X,
+						Y = x.Pixel.Y,
+						Color = x.Color,
+						Points = x.Points,
+						Timestamp = x.Timestamp
+					});
+				if (maxCount.HasValue)
+				{
+					query = query
+						.OrderByDescending(x => x.Timestamp)
+						.Take(maxCount.Value);
+				}
+				return await query.GetDataTableResponseAsync(model);
+			}
 		}
 	}
 }

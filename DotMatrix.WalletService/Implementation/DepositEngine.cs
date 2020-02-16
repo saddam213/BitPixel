@@ -55,13 +55,31 @@ namespace DotMatrix.WalletService.Implementation
 				try
 				{
 					await ProcessAddresses();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception("ProcessAddresses", ex);
+				}
+
+				try
+				{
 					await ProcessDeposits();
 				}
 				catch (Exception ex)
 				{
-
-					Log.Exception("ProcessLoop", ex);
+					Log.Exception("ProcessDeposits", ex);
 				}
+
+
+				try
+				{
+					await ProcessWithdrawals();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception("ProcessWithdrawals", ex);
+				}
+
 				await Task.Delay(TimeSpan.FromMinutes(1));
 			}
 		}
@@ -110,7 +128,7 @@ namespace DotMatrix.WalletService.Implementation
 							if (exists.Status == PaymentReceiptStatus.Complete)
 							{
 								Log.Message(LogLevel.Info, $"Deposit #{exists.Id} confirmed, auditing user points...");
-								await context.Database.Connection.ExecuteAsync(StoredProcedure.AuditPoints, new { UserId = exists.UserId }, commandType: System.Data.CommandType.StoredProcedure);
+								await context.Database.Connection.ExecuteAsync(StoredProcedure.User_AuditPoints, new { UserId = exists.UserId }, commandType: System.Data.CommandType.StoredProcedure);
 								Log.Message(LogLevel.Info, $"Deposit #{exists.Id} audit complete.");
 								paymentMethod.Data5 = walletDeposit.Blockhash;
 							}
@@ -194,26 +212,102 @@ namespace DotMatrix.WalletService.Implementation
 			Log.Message(LogLevel.Info, "Processing Addresses complete.");
 		}
 
-		private Task<IEnumerable<TransactionData>> GetWalletDeposits(PaymentMethod paymentMethod)
+		private async Task ProcessWithdrawals()
 		{
-			var connector = new WalletConnector
-			(
-				paymentMethod.Data,
-				paymentMethod.Data2,
-				paymentMethod.Data3
-			);
-			return connector.GetDepositsAsync(paymentMethod.Data5);
+			Log.Message(LogLevel.Info, "Processing Withdrawals..");
+			using (var context = DataContextFactory.CreateConnection())
+			{
+				var pendingPrizes = await context.QueryAsync<PrizePayment>(StoredProcedure.WalletService_GetWithdrawals, commandType: System.Data.CommandType.StoredProcedure);
+				Log.Message(LogLevel.Info, $"{pendingPrizes.Count()} withdrawals found to process.");
+				foreach (var prize in pendingPrizes)
+				{
+					Log.Message(LogLevel.Info, $"Processing prize Id: {prize.PrizeId}, Symbol: {prize.Symbol}, Amount: {prize.Amount}, Destination: {prize.Destination}");
+					var transactionId = await SendTransaction(prize);
+					if (string.IsNullOrEmpty(transactionId))
+					{
+						continue;
+					}
+
+					Log.Message(LogLevel.Info, $"Transaction sent, TrasnactionId: {transactionId}");
+					await context.QueryAsync(StoredProcedure.WalletService_UpdateWithdraw, new
+					{
+						PrizeId = prize.PrizeId,
+						TransactionId = transactionId
+					}, commandType: System.Data.CommandType.StoredProcedure);
+					Log.Message(LogLevel.Info, $"Processing prize complete.");
+				}
+			}
+			Log.Message(LogLevel.Info, "Processing Withdrawals complete.");
 		}
 
-		private Task<string> CreateAddress(PaymentMethod paymentMethod)
+		private async Task<string> SendTransaction(PrizePayment prizePayment)
 		{
-			var connector = new WalletConnector
+			try
+			{
+				var connector = new WalletConnector
+				(
+					prizePayment.Host,
+					prizePayment.UserName,
+					prizePayment.Password
+				);
+				var result = await connector.SendToAddressAsync(prizePayment.Destination, decimal.Parse(prizePayment.Amount));
+				return result.Txid;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception("Failed to send transaction.", ex);
+				return null;
+			}
+		}
+
+		private async Task<IEnumerable<TransactionData>> GetWalletDeposits(PaymentMethod paymentMethod)
+		{
+			try
+			{
+				var connector = new WalletConnector
 			(
 				paymentMethod.Data,
 				paymentMethod.Data2,
 				paymentMethod.Data3
 			);
-			return connector.GenerateAddressAsync("", true);
+				return await connector.GetDepositsAsync(paymentMethod.Data5);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception("Failed to get transactions.", ex);
+				return Enumerable.Empty<TransactionData>();
+			}
 		}
+
+		private async Task<string> CreateAddress(PaymentMethod paymentMethod)
+		{
+			try
+			{
+				var connector = new WalletConnector
+				(
+					paymentMethod.Data,
+					paymentMethod.Data2,
+					paymentMethod.Data3
+				);
+				return await connector.GenerateAddressAsync("", true);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception("Failed to create address.", ex);
+				return null;
+			}
+		}
+	}
+
+	public class PrizePayment
+	{
+		public int PrizeId { get; set; }
+		public string Symbol { get; set; }
+		public string Amount { get; set; }
+		public string Destination { get; set; }
+
+		public string Host { get; set; }
+		public string UserName { get; set; }
+		public string Password { get; set; }
 	}
 }

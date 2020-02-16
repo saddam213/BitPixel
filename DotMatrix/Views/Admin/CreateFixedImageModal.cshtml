@@ -1,0 +1,87 @@
+﻿@model DotMatrix.Common.Image.CreateFixedImageModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+@using (Ajax.BeginForm("CreateFixedImageModal", "Admin", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "simplemodal-data", InsertionMode = InsertionMode.Replace, }, new { id = "create-form", enctype = "multipart/form-data" }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.GameId)
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Create Game</h5>
+				<a class="simplemodal-close" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">
+				@Html.ModelValidationSummary()
+				<div class="form-group">
+					<div class="custom-file">
+						<input type="file" accept="image/*" class="custom-file-input" id="imageFile" name="imageFile">
+						<label class="custom-file-label">Choose file</label>
+					</div>
+				</div>
+
+				<div class="d-flex">
+					<div class="form-group w-100 mr-1">
+						<small>X Position</small>
+						@Html.TextBoxFor(m => m.X, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.X, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group w-100 ml-1">
+						<small>Y Position</small>
+						@Html.TextBoxFor(m => m.Y, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Y, "", new { @class = "text-danger" })
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="checkbox">
+						<label>	@Html.CheckBoxFor(m => m.IsFixed) IsFixed Image</label>
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer btn-group">
+				<button id="submit" type="submit" class="btn btn-outline-success">Create</button>
+				<button type="button" class="simplemodal-close btn btn-outline-secondary">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script>
+	(async ($) => {
+
+		$('#create-form').submit(function (e) {
+			const form = this;
+			if ($(this).valid()) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				$("#submit").attr("disabled", "disabled");
+				if (form.getAttribute("enctype") === "multipart/form-data") {
+					const xhr = new XMLHttpRequest();
+					xhr.open(form.method, form.action);
+					xhr.onreadystatechange = function () {
+						if (xhr.readyState == 4 && xhr.status == 200) {
+							$(form.dataset.ajaxUpdate).html(xhr.responseText)
+						}
+					};
+					xhr.send(new FormData(form));
+				}
+			}
+		});
+
+
+		$("#imageFile").on("change", function () {
+			const fullfileName = $(this).val();
+			if (fullfileName) {
+				const filename = fullfileName.split('\\').pop();
+				$(".custom-file-label").text(filename);
+			}
+		});
+
+	})(jQuery);
+</script>

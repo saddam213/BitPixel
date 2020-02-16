@@ -87,18 +87,23 @@ namespace DotMatrix.Base.Extensions
 
 			return new DateTime(dt.Ticks + offset - delta, dt.Kind);
 		}
-		public static long ToUnixTime(this DateTime date)
+
+		public static long ToUnix(this DateTime date)
 		{
 			var timeSpan = date - UnixEpoch;
 			return (long)timeSpan.TotalSeconds;
 		}
 
-		public static long ToJavaTime(this DateTime date)
+		public static long ToUnixMs(this DateTime date)
 		{
 			var timeSpan = date - UnixEpoch;
 			return (long)timeSpan.TotalMilliseconds;
 		}
+
+		public static long ToUnixMin(this DateTime date)
+		{
+			var timeSpan = date - UnixEpoch;
+			return (long)timeSpan.TotalMinutes;
+		}
 	}
-
-
 }

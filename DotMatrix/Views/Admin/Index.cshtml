@@ -1,128 +1,24 @@
-﻿@model DotMatrix.Common.Admin.CreatePrizePoolModel
+﻿@model DotMatrix.Common.Admin.AdminViewModel
 @{
 	ViewBag.Title = "Admin";
 }
 
-<div class="d-flex flex-column justify-content-center">
+<div class="d-flex flex-column align-items-center">
 
-	<div class="d-flex justify-content-center flex-wrap">
-
-		<div class="d-flex w-50" style="min-height: 150px;min-width: 300px;">
-			<div class="card w-100 m-3">
-				<div class="card-body">
-					<h5 class="card-title">Prize Pool</h5>
-					<h6 class="card-subtitle mb-2 text-muted">Create and manage the prize pool</h6>
-					<div>
-
-						<div class="w-50">
-							@using (Html.BeginForm("CreatePrizePool", "Admin", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-							{
-								@Html.AntiForgeryToken()
-								@Html.ValidationSummary(true, "", new { @class = "text-danger" })
-								<div class="d-flex">
-									<div class="form-group w-100 mr-1">
-										<small>Prize Count</small>
-										@Html.TextBoxFor(m => m.Count, new { @class = "form-control form-control-sm" })
-										@Html.ValidationMessageFor(m => m.Count, "", new { @class = "text-danger" })
-									</div>
-									<div class="form-group w-100 ml-1">
-										<small>Max Points</small>
-										@Html.TextBoxFor(m => m.MaxPoints, new { @class = "form-control form-control-sm" })
-										@Html.ValidationMessageFor(m => m.MaxPoints, "", new { @class = "text-danger" })
-									</div>
-								</div>
-								<div class="d-flex">
-									<div class="form-group w-100 mr-1">
-										<small>Type</small>
-										@Html.EnumDropDownListFor(m => m.Type, new { @class = "form-control form-control-sm" })
-										@Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
-									</div>
-									<div class="form-group w-100 ml-1">
-										<small>Points</small>
-										@Html.TextBoxFor(m => m.Points, new { @class = "form-control form-control-sm" })
-										@Html.ValidationMessageFor(m => m.Points, "", new { @class = "text-danger" })
-									</div>
-								</div>
-								<div class="form-group">
-									<small>Name</small>
-									@Html.TextBoxFor(m => m.Name, new { @class = "form-control form-control-sm" })
-									@Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
-								</div>
-								<div class="form-group">
-									<small>Description</small>
-									@Html.TextBoxFor(m => m.Description, new { @class = "form-control form-control-sm" })
-									@Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
-								</div>
-
-
-								<div class="prize-options prize-options-1" style="display:none">
-									<div class="d-flex">
-										<div class="form-group w-100 mr-1">
-											<small>Symbol</small>
-											@Html.TextBoxFor(m => m.Data, new { @class = "form-control form-control-sm" })
-											@Html.ValidationMessageFor(m => m.Data, "", new { @class = "text-danger" })
-										</div>
-										<div class="form-group w-100 ml-1">
-											<small>Amount Each</small>
-											@Html.TextBoxFor(m => m.Data2, "0.00000000", new { @class = "form-control form-control-sm" })
-											@Html.ValidationMessageFor(m => m.Data2, "", new { @class = "text-danger" })
-										</div>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<input type="submit" value="Create Prize Pool" class="btn btn-primary w-100" />
-								</div>
-							}
-						</div>
-
-
-
+	<div class="d-flex" style="min-width:340px;max-width:500px">
+		<div class="card w-100 m-3">
+			<div class="card-body">
+				<h5 class="card-title text-primary">BitPixel Management</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Manage BitPixel game settings</h6>
+				<div>
+					<div class="d-flex flex-column">
+						<a href="/Admin/Users" class="btn btn-primary m-1">User Management</a>
+						<a href="/Admin/Game" class="btn btn-primary m-1">Game Management</a>
+						<a href="/Admin/Award" class="btn btn-primary m-1">Award Management</a>
+						<a href="/Admin/Payment" class="btn btn-primary m-1">Payment Management</a>
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class="d-flex w-50" style="min-height:150px; min-width:300px;">
-			<div class="card w-100 m-3">
-				<div class="card-body">
-					<h5 class="card-title">Section 2</h5>
-					<h6 class="card-subtitle mb-2 text-muted">Description of section 2</h6>
-					<div>
-
-					</div>
-				</div>
-			</div>
-		</div>
-
-	</div>
-
-	<div class="d-flex justify-content-center flex-wrap" style="min-height: 180px">
-
-		<div class="d-flex w-50" style="max-height:500px; min-width:500px;">
-			<div class="card w-100 m-3">
-				<div class="card-body">
-					<h5 class="card-title">Section 3</h5>
-					<h6 class="card-subtitle mb-2 text-muted">Description of section 3</h6>
-					<div></div>
-				</div>
-			</div>
-
-
-		</div>
-
-		<div class="d-flex w-50" style="max-height:500px; min-width:500px;">
-
-
-			<div class="card w-100 m-3">
-				<div class="card-body">
-					<h5 class="card-title">Section 4</h5>
-					<h6 class="card-subtitle mb-2 text-muted">Description of section 4</h6>
-					<div></div>
-				</div>
-			</div>
-
-
 		</div>
 	</div>
 
@@ -131,13 +27,9 @@
 
 @section Scripts {
 	<script>
+		(async ($) => {
 
-		$("#Type").on("change", function () {
-			const selection = $(this).val();
-			console.log(selection);
-			$(`.prize-options`).hide();
-			$(`.prize-options-${selection}`).show();
-		}).trigger("change");
 
+		})(jQuery);
 	</script>
 }

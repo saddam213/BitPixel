@@ -1,20 +1,59 @@
 ﻿@using DotMatrix.Base.Extensions
-@model DotMatrix.Common.Pixel.PixelViewlModel
+@model DotMatrix.Common.Home.HomeViewModel
 @{
 	ViewBag.Title = "Home";
-	
-	var width = DotMatrix.Enums.Constant.Width;
-	var height = DotMatrix.Enums.Constant.Height;
-	var cacheBreak = DateTime.UtcNow.ToUnixTime();
+	var cacheBreak = DateTime.UtcNow.ToUnixMin();
+	var gameList = Request.Browser.IsMobileDevice
+		? Model.Games.OrderByDescending(x => x.Platform)
+		: Model.Games.OrderBy(x => x.Platform);
 }
 
 <div class="d-flex flex-column mt-4">
-	<div style="display:flex;justify-content:center;">
-		<img src="@string.Format("Content/Images/Pixel/background-small.png?v={0}", cacheBreak)" width="@width" height="@height" style="border:solid 1px black"/>
+	<div class="d-flex flex-column align-items-center">
+		<h2 class="text-primary mb-0">Welcome to BitPixel</h2>
+		<span class="text-muted mb-2">Please choose a game below and join the fun</span>
+	</div>
+	<div class="d-flex justify-content-center flex-wrap">
+
+		@foreach (var game in gameList.ThenBy(x => x.Rank).ThenBy(x => x.Name))
+		{
+			<div class="card m-2 " style="min-width: 300px;width: 400px">
+				<div class="card-img-top  ">
+					<div class="d-flex justify-content-center align-items-center" style="height:300px">
+						<img src="@string.Format("/Content/Images/Games/{0}/background-thumb.png?v={1}", game.Id, cacheBreak)" class="img-fluid checker-board thumbnail" alt="" style="border:solid 1px rgba(0, 0, 0, 0.125);">
+					</div>
+					<div style="text-align:center;">
+						<i style="font-size:10px;vertical-align:text-top">Game Preview</i>
+					</div>
+				</div>
+				<div class="card-body pt-0">
+					<h4 class="card-title text-primary mb-0">@game.Name</h4>
+					<p class="card-text mb-2">@game.Description</p>
+					<div class="d-flex flex-column mb-3">
+						<div class="d-flex justify-content-between">
+							<small>Platform: <span class="text-primary">@game.Platform</span></small>
+							<small>Status: <span class="text-primary">@game.Status</span></small>
+						</div>
+						<div class="d-flex justify-content-between">
+							<small>Gameboard: <span class="text-primary">@game.Width x @game.Height</span></small>
+							<small>Pixels: <span class="text-primary">@((game.Width * game.Height).ToString("N0"))</span></small>
+						</div>
+						<div class="d-flex justify-content-between">
+							<small>Game Type: <span class="text-primary">@game.Type</span></small>
+							<small>Rate Limit: <span class="text-primary">@game.ClicksPerSecond clicks/second</span></small>
+						</div>
+					</div>
+					<a href="/Game?gameId=@game.Id" class="btn btn-warning w-100">Play Now!</a>
+				</div>
+			</div>
+		}
 	</div>
 </div>
 
 @section Scripts {
 	<script>
+		(async ($) => {
+
+		})(jQuery);
 	</script>
 }

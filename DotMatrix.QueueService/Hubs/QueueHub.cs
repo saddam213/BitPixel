@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using DotMatrix.Base.Logging;
 using DotMatrix.QueueService.Common;
 using DotMatrix.QueueService.Implementation;
+
 using Microsoft.AspNet.SignalR;
 
 namespace DotMatrix.QueueService.Hubs
@@ -28,12 +26,20 @@ namespace DotMatrix.QueueService.Hubs
 
 		public async Task<SubmitPixelResponse> SubmitPixel(SubmitPixelRequest request)
 		{
-			return await QueueEngine.PixelQueueProcessor.QueueItem(request);
+			var response = await QueueEngine.QueueProcessor.QueueItem(request);
+			if (!response.Success)
+				return new SubmitPixelResponse { Success = response.Success, Message = response.Message };
+
+			return response as SubmitPixelResponse;
 		}
 
 		public async Task<SubmitClickResponse> SubmitClick(SubmitClickRequest request)
 		{
-			return await QueueEngine.ClickQueueProcessor.QueueItem(request);
+			var response = await QueueEngine.QueueProcessor.QueueItem(request);
+			if (!response.Success)
+				return new SubmitClickResponse { Success = response.Success, Message = response.Message };
+
+			return response as SubmitClickResponse;
 		}
 	}
 }

@@ -5,12 +5,13 @@ using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading.Tasks;
-
+using System.Transactions;
 using Dapper;
 
 using DotMatrix.Base.Logging;
 using DotMatrix.Base.Queueing;
 using DotMatrix.Common.DataContext;
+using DotMatrix.Enums;
 using DotMatrix.QueueService.Common;
 
 
@@ -22,75 +23,51 @@ namespace DotMatrix.QueueService.Implementation
 
 		private readonly Log Log = LoggingManager.GetLog(typeof(QueueEngine));
 		private static readonly QueueEngine _queueEngine = new QueueEngine();
-		public static readonly ProcessorQueue<SubmitPixelRequest, SubmitPixelResponse> PixelQueueProcessor = new ProcessorQueue<SubmitPixelRequest, SubmitPixelResponse>(_queueEngine.ProcessPixelQueueItem);
-		public static readonly ProcessorQueue<SubmitClickRequest, SubmitClickResponse> ClickQueueProcessor = new ProcessorQueue<SubmitClickRequest, SubmitClickResponse>(_queueEngine.ProcessClickQueueItem);
+
+		public static readonly ProcessorQueue<IQueueRequest, IQueueResponse> QueueProcessor = new ProcessorQueue<IQueueRequest, IQueueResponse>(_queueEngine.ProcessQueueItem);
 
 		#endregion
 
 		#region Processor
 
-		public async Task<SubmitPixelResponse> ProcessPixelQueueItem(SubmitPixelRequest queueItem)
+		private async Task<IQueueResponse> ProcessQueueItem(IQueueRequest queueItem)
 		{
-			try
+			using (var transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
 			{
-				var stopwatch = new Stopwatch();
-				stopwatch.Start();
-				using (var connection = new SqlConnection(ConnectionString.DefaultConnection))
+				try
 				{
+					var stopwatch = new Stopwatch();
+					stopwatch.Start();
+					IQueueResponse queueResponse = null;
 					Log.Message(LogLevel.Info, $"ProcessQueueItem request received. Type: {queueItem.GetType().Name}, IsApi: {queueItem.IsApi}");
-					var queueResponse = await ProcessSubmitPixelRequest(connection, queueItem);
-					Log.Message(LogLevel.Info, $"ProcessQueueItem request complete. Type: {queueItem.GetType().Name}, IsApi: {queueItem.IsApi}, Elapsed: {stopwatch.ElapsedMilliseconds}ms");
-					if (queueResponse != null)
+					using (var connection = new SqlConnection(ConnectionString.DefaultConnection))
 					{
-						return queueResponse;
+						switch (queueItem)
+						{
+							case SubmitPixelRequest request:
+								queueResponse = await ProcessSubmitPixelRequest(connection, request);
+								break;
+							case SubmitClickRequest request:
+								queueResponse = await ProcessSubmitClickRequest(connection, request);
+								break;
+						}
+						transactionScope.Complete();
 					}
+					Log.Message(LogLevel.Info, $"ProcessQueueItem request complete. Type: {queueItem.GetType().Name}, IsApi: {queueItem.IsApi}, Elapsed: {stopwatch.ElapsedMilliseconds}ms");
+					return queueResponse;
+				}
+				catch (QueueException tex)
+				{
+					Log.Message(LogLevel.Error, $"A QueueException was thrown. Error: {tex.Message}");
+					return new QueueErrorResponse(tex.Message);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception("[ProcessServiceRequest] - An unknown exception occurred during processing.", ex);
+					return new QueueErrorResponse("Unknown Error");
 				}
 			}
-			catch (QueueException tex)
-			{
-				Log.Message(LogLevel.Error, $"A QueueException was thrown. Error: {tex.Message}");
-				return new SubmitPixelResponse { Success = false, Message = tex.Message };
-			}
-			catch (Exception ex)
-			{
-				Log.Exception("An unknown exception occurred during request processing.", ex);
-			}
-
-			return new SubmitPixelResponse { Success = false, Message = "An unknown error occurred. If problems persists please contact support" };
 		}
-
-		public async Task<SubmitClickResponse> ProcessClickQueueItem(SubmitClickRequest queueItem)
-		{
-			try
-			{
-				var stopwatch = new Stopwatch();
-				stopwatch.Start();
-				using (var connection = new SqlConnection(ConnectionString.DefaultConnection))
-				{
-					Log.Message(LogLevel.Info, $"ProcessQueueItem request received. Type: {queueItem.GetType().Name}, IsApi: {queueItem.IsApi}");
-					var queueResponse = await ProcessSubmitClickRequest(connection, queueItem);
-					Log.Message(LogLevel.Info, $"ProcessQueueItem request complete. Type: {queueItem.GetType().Name}, IsApi: {queueItem.IsApi}, Elapsed: {stopwatch.ElapsedMilliseconds}ms");
-					if (queueResponse != null)
-					{
-						return queueResponse;
-					}
-				}
-			}
-			catch (QueueException tex)
-			{
-				Log.Message(LogLevel.Error, $"A QueueException was thrown. Error: {tex.Message}");
-				return new SubmitClickResponse { Success = false, Message = tex.Message };
-			}
-			catch (Exception ex)
-			{
-				Log.Exception("An unknown exception occurred during request processing.", ex);
-			}
-
-			return new SubmitClickResponse { Success = false, Message = "An unknown error occurred. If problems persists please contact support" };
-		}
-
-
-
 
 		#endregion
 
@@ -98,8 +75,9 @@ namespace DotMatrix.QueueService.Implementation
 		{
 			try
 			{
-				var result = await connection.QueryFirstAsync<UpdatePixelResult>(StoredProcedure.AddPixel, new
+				var addPixelResult = await connection.QueryFirstAsync<AddPixelResult>(StoredProcedure.Game_AddPixel, new
 				{
+					GameId = pixelRequest.GameId,
 					UserId = pixelRequest.UserId,
 					X = pixelRequest.X,
 					Y = pixelRequest.Y,
@@ -109,24 +87,51 @@ namespace DotMatrix.QueueService.Implementation
 					MaxPoints = pixelRequest.MaxPoints
 				}, commandType: CommandType.StoredProcedure);
 
-				if (result == null)
+				if (addPixelResult == null)
 					throw new QueueException("Failed to update pixel");
 
-				if (!string.IsNullOrEmpty(result.Error))
-					throw new QueueException(result.Error);
+				if (!string.IsNullOrEmpty(addPixelResult.Error))
+					throw new QueueException(addPixelResult.Error);
+
+
+				var addClickResult = await connection.QueryFirstAsync<AddClickResult>(StoredProcedure.Game_AddClick, new
+				{
+					GameId = pixelRequest.GameId,
+					UserId = pixelRequest.UserId,
+					Type = ClickType.Pixel,
+					X = pixelRequest.X,
+					Y = pixelRequest.Y
+				}, commandType: CommandType.StoredProcedure);
+
+				if (addClickResult == null)
+					throw new QueueException("Failed to add click");
+
+				if (!string.IsNullOrEmpty(addClickResult.Error))
+					throw new QueueException(addClickResult.Error);
+
 
 				return new SubmitPixelResponse
 				{
 					Success = true,
 
-					PixelId = result.PixelId,
-					NewPoints = result.NewPoints,
+					PixelId = addPixelResult.PixelId,
+					NewPoints = addPixelResult.NewPoints,
 
-					TeamId = result.TeamId,
-					TeamName = result.TeamName,
-					UserId = result.UserId,
-					UserName = result.UserName,
-					UserPoints = result.UserPoints
+					TeamId = addPixelResult.TeamId,
+					TeamName = addPixelResult.TeamName,
+					UserId = addPixelResult.UserId,
+					UserName = addPixelResult.UserName,
+					UserPoints = addPixelResult.UserPoints,
+
+
+					IsPrizeWinner = addClickResult.PrizeId.HasValue,
+					PrizeId = addClickResult.PrizeId ?? 0,
+					PrizeName = addClickResult.PrizeName,
+					PrizePoints = addClickResult.PrizePoints,
+					PrizeDescription = addClickResult.PrizeDescription,
+
+					GameId = pixelRequest.GameId,
+					GameName = addPixelResult.GameName
 				};
 			}
 			catch (SqlException)
@@ -140,10 +145,11 @@ namespace DotMatrix.QueueService.Implementation
 		{
 			try
 			{
-				var result = await connection.QueryFirstAsync<AddClickResult>(StoredProcedure.AddClick, new
+				var result = await connection.QueryFirstAsync<AddClickResult>(StoredProcedure.Game_AddClick, new
 				{
+					GameId = clickRequest.GameId,
 					UserId = clickRequest.UserId,
-					Type = clickRequest.Type,
+					Type = ClickType.Click,
 					X = clickRequest.X,
 					Y = clickRequest.Y
 				}, commandType: CommandType.StoredProcedure);
@@ -157,12 +163,11 @@ namespace DotMatrix.QueueService.Implementation
 				return new SubmitClickResponse
 				{
 					Success = true,
-					IsPrizeWinner = result.PrizeId.HasValue,
-					PrizeId = result.PrizeId ?? 0,
-					PrizeName = result.PrizeName,
-					PrizePoints = result.PrizePoints,
-					PrizeDescription = result.PrizeDescription,
-					UserPoints = result.UserPoints
+
+					UserPoints = result.UserPoints,
+
+					GameId = clickRequest.GameId,
+					GameName = result.GameName
 				};
 			}
 			catch (SqlException)
@@ -172,7 +177,7 @@ namespace DotMatrix.QueueService.Implementation
 		}
 	}
 
-	public class UpdatePixelResult
+	public class AddPixelResult
 	{
 		public int PixelId { get; set; }
 		public int UserId { get; set; }
@@ -181,7 +186,7 @@ namespace DotMatrix.QueueService.Implementation
 		public int TeamId { get; set; }
 		public string TeamName { get; set; }
 		public int NewPoints { get; set; }
-
+		public string GameName { get; set; }
 		public string Error { get; set; }
 	}
 
@@ -193,7 +198,8 @@ namespace DotMatrix.QueueService.Implementation
 		public string PrizeDescription { get; set; }
 		public int PrizePoints { get; set; }
 		public int UserPoints { get; set; }
-
+		public int GameId { get; set; }
+		public string GameName { get; set; }
 		public string Error { get; set; }
 	}
 }

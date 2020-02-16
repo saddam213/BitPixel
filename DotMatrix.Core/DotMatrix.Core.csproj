@@ -69,6 +69,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
@@ -80,6 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Admin\AdminWriter.cs" />
+    <Compile Include="Click\ClickReader.cs" />
+    <Compile Include="Game\GameWriter.cs" />
+    <Compile Include="Game\GameReader.cs" />
+    <Compile Include="Image\ImageWriter.cs" />
+    <Compile Include="Replay\ReplayReader.cs" />
     <Compile Include="Score\ScoreReader.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Payment\PaymentWriter.cs" />
@@ -92,12 +98,21 @@
     <Compile Include="Prize\PrizeWriter.cs" />
     <Compile Include="Prize\PrizeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Users\UserWriter.cs" />
     <Compile Include="Users\UserReader.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DotMatrix.Cache.Common\DotMatrix.Cache.Common.csproj">
+      <Project>{19E68EE5-E46C-4D6C-B7C3-D2E8750E0456}</Project>
+      <Name>DotMatrix.Cache.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DotMatrix.Common\DotMatrix.Common.csproj">
       <Project>{0aeab0f6-db8a-4d61-ac8a-597bc227eeb3}</Project>
       <Name>DotMatrix.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.Datatables\DotMatrix.Datatables.csproj">
+      <Project>{389ade94-7c32-4885-812e-68a2a74c82d8}</Project>
+      <Name>DotMatrix.Datatables</Name>
     </ProjectReference>
     <ProjectReference Include="..\DotMatrix.Entity\DotMatrix.Entity.csproj">
       <Project>{272067d0-df82-4ea2-a8ed-187b7462dfcf}</Project>

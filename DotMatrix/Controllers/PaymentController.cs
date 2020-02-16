@@ -7,12 +7,13 @@ using Microsoft.AspNet.Identity;
 
 namespace DotMatrix.Controllers
 {
-	public class PaymentController : Controller
+	public class PaymentController : BaseController
 	{
 		public IPaymentReader PaymentReader { get; set; }
 		public IPaymentWriter PaymentWriter { get; set; }
 
 		[HttpGet]
+		[Authorize]
 		public async Task<ActionResult> Index()
 		{
 			var paymentMethods = await PaymentReader.GetMethods();
@@ -24,21 +25,22 @@ namespace DotMatrix.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public async Task<ActionResult> Method(int id)
+		public async Task<ActionResult> MethodModal(int id)
 		{
 			var userId = User.Identity.GetUserId<int>();
 			var paymentMethod = await PaymentReader.GetMethod(userId, id);
 			if (paymentMethod != null)
 				return View(paymentMethod);
 
-			if (await PaymentWriter.CreateMethod(userId, id))
+			var result = await PaymentWriter.CreateMethod(userId, id);
+			if (result.Success)
 			{
 				paymentMethod = await PaymentReader.GetMethod(userId, id);
 				if (paymentMethod != null)
 					return View(paymentMethod);
 			}
 
-			return RedirectToAction("Error");
+			return View("ErrorModal");
 		}
 
 		[HttpGet]
@@ -55,7 +57,7 @@ namespace DotMatrix.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public Task<ActionResult> Error()
+		public Task<ActionResult> ErrorModal()
 		{
 			return Task.FromResult<ActionResult>(View());
 		}

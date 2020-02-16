@@ -13,5 +13,7 @@ namespace DotMatrix.Common.Prize
 		public int Points { get; set; }
 		public PrizeType Type { get; set; }
 		public DateTime Timestamp { get; set; }
+		public string Game { get; set; }
+		public int GameId { get; set; }
 	}
 }

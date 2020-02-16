@@ -10,6 +10,7 @@ namespace DotMatrix.Entity
 	{
 		[Key]
 		public int Id { get; set; }
+		public int GameId { get; set; }
 		public int UserId { get; set; }
 
 		public int X { get; set; }
@@ -19,8 +20,12 @@ namespace DotMatrix.Entity
 		public int Points { get; set; }
 		public DateTime LastUpdate { get; set; }
 
+		[ForeignKey("GameId")]
+		public virtual Game Game { get; set; }
+
 		[ForeignKey("UserId")]
 		public virtual User User { get; set; }
+
 		public virtual ICollection<PixelHistory> History { get; set; }
 	}
 }

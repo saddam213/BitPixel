@@ -10,7 +10,7 @@ namespace DotMatrix.Entity
 	{
 		[Key]
 		public int Id { get; set; }
-		
+		public int GameId { get; set; }
 		public PrizeType Type { get; set; }
 		public PrizeStatus Status { get; set; }
 		public bool IsClaimed { get; set; }
@@ -30,6 +30,9 @@ namespace DotMatrix.Entity
 		public int? UserId { get; set; }
 		public DateTime? ClaimTime { get; set; }
 		public DateTime Timestamp { get; set; }
+
+		[ForeignKey("GameId")]
+		public virtual Game Game { get; set; }
 
 		[ForeignKey("UserId")]
 		public virtual User User { get; set; }

@@ -1,0 +1,35 @@
+﻿@model DotMatrix.Common.Prize.ViewPrizeModalModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+<div class="modal-dialog" role="document" style="min-width:300px;">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h5 class="modal-title">Prize Details</h5>
+			<a class="simplemodal-close" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+
+			<div class="d-flex flex-column justify-content-center">
+				<div class="text-center">
+					<h4 class="text-primary"><i class="fa fa-star"></i> @Model.Prize.Name</h4>
+					<h5>@Model.Prize.Description</h5>
+				</div>
+				<div class="text-center">
+					<span>@Model.Prize.UserName</span>
+					<br />
+					<span>@Model.Game.Name - X: @Model.Prize.X - Y: @Model.Prize.Y</span>
+				</div>
+			</div>
+
+		</div>
+		<div class="modal-footer btn-group">
+			<button type="button" class="simplemodal-close btn btn-success invisible"></button>
+			<button type="button" class="simplemodal-close btn btn-success">Close</button>
+		</div>
+	</div>
+</div>
+
+

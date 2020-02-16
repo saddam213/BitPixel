@@ -1,0 +1,23 @@
+﻿@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+<div class="modal-dialog" role="document" style="min-width:300px;max-width:500px">
+	<div class="modal-content">
+		<div class="modal-body">
+
+			<div class="d-flex flex-column align-items-center">
+				<div class="d-flex flex-column w-100" style="max-width:800px">
+					<div class="alert alert-warning" role="alert">
+						<h4 class="alert-heading">Payment Error!</h4>
+						<p>Unfortunately we are unable to process this payment method at this time.</p>
+						<hr>
+						<p class="mb-0">Please try another payment option or try again later, if problem persists please contact our support team.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer btn-group">
+			<button type="button" class="simplemodal-close btn btn-outline-success">Close</button>
+		</div>
+	</div>
+</div>

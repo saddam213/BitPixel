@@ -5,14 +5,17 @@ using System.Web.Mvc;
 using DotMatrix.Api;
 using DotMatrix.Common.Account;
 using DotMatrix.Common.Api;
+using DotMatrix.Common.Award;
+using DotMatrix.Common.Image;
 using DotMatrix.Common.Users;
+using DotMatrix.Helpers;
 using DotMatrix.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 
 namespace DotMatrix.Controllers
 {
-	public class UserController : Controller
+	public class UserController : BaseController
 	{
 		private ApplicationUserManager _userManager;
 
@@ -38,6 +41,8 @@ namespace DotMatrix.Controllers
 		}
 
 		public IUserReader UserReader { get; set; }
+		public IImageWriter ImageWriter { get; set; }
+		public IAwardWriter AwardWriter { get; set; }
 
 		public async Task<ActionResult> Index()
 		{
@@ -103,7 +108,7 @@ namespace DotMatrix.Controllers
 		{
 			var result = ApiKeyStore.GenerateApiKeyPair();
 			if (!result.IsValid)
-				return Json(new { Success = false, Meaage = "Failed to generate API key, if problem persists please contact Support." });
+				return Json(new { Success = false, Message = "Failed to generate API key, if problem persists please contact Support." });
 
 			return Json(new
 			{
@@ -113,7 +118,31 @@ namespace DotMatrix.Controllers
 			});
 		}
 
+		[HttpGet]
+		[Authorize]
+		public ActionResult UpdateAvatarModal()
+		{
+			return View();
+		}
 
+		[HttpPost]
+		[Authorize]
+		public async Task<ActionResult> UpdateAvatarModal(UpdateAvatarModel model)
+		{
+			var userId = User.Identity.GetUserId<int>();
+			model.UserName = User.Identity.Name;
+			model.AvatarPath = Server.MapPath("~/Content/Images/Avatar");
+			var result = await ImageWriter.CreateAvatarImage(model);
+			if (result.Success)
+			{
+				await AwardWriter.AddUserAward(new AddUserAwardModel
+				{
+					UserId = userId,
+					Type = Enums.AwardType.Avatar
+				});
+			}
+			return Json(result);
+		}
 
 		private void AddErrors(IdentityResult result)
 		{

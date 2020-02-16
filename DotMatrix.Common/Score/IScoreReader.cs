@@ -4,6 +4,7 @@ namespace DotMatrix.Common.Score
 {
 	public interface IScoreReader
 	{
-		Task<ScoreViewModel> GetScoreboard();
+		Task<ScoresModel> GetScoreboard();
+		Task<ScoresModel> GetScoreboard(int gameId);
 	}
 }

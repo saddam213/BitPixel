@@ -13,6 +13,8 @@ namespace DotMatrix.DI.Installers
 	{
 		public void Install(IWindsorContainer container, IConfigurationStore store)
 		{
+
+
 			container.Register(Classes.FromAssemblyContaining<DotMatrix.Core.Core>()
 				.Pick()
 				.WithService
@@ -27,12 +29,12 @@ namespace DotMatrix.DI.Installers
 				.LifestyleTransient()
 			);
 
-			container.Register(Classes.FromAssemblyContaining<DotMatrix.Common.Common>()
-				.Pick()
-				.WithService
-				.DefaultInterfaces()
-				.LifestyleTransient()
-			);
+			//container.Register(Classes.FromAssemblyContaining<DotMatrix.Cache.Cache>()
+			//	.Pick()
+			//	.WithService
+			//	.DefaultInterfaces()
+			//	.LifestyleSingleton()
+			//);
 		}
 	}
 }

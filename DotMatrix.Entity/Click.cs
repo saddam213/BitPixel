@@ -10,11 +10,15 @@ namespace DotMatrix.Entity
 	{
 		[Key]
 		public long Id { get; set; }
+		public int GameId { get; set; }
 		public int UserId { get; set; }
-		public PixelClickType Type { get; set; }
+		public ClickType Type { get; set; }
 		public int X { get; set; }
 		public int Y { get; set; }
 		public DateTime Timestamp { get; set; }
+
+		[ForeignKey("GameId")]
+		public virtual Game Game { get; set; }
 
 		[ForeignKey("UserId")]
 		public virtual User User { get; set; }

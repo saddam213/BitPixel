@@ -1,0 +1,238 @@
+﻿@model DotMatrix.Common.Replay.ReplayViewModel
+@{
+	ViewBag.Title = "Replay";
+}
+
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:300px;max-width:850px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0">Replay</h2>
+			<span class="ml-1">Replay a game pixel by pixel</span>
+		</div>
+	</div>
+
+	<div class="card" style="min-width:300px;max-width:850px;width:100%">
+		<div class="card-body">
+			<div class="d-flex flex-column align-items-center">
+				<div class="mb-2">
+					<div class="d-flex align-items-center flex-wrap">
+
+						<div class="btn-group btn-group-sm">
+							@Html.DropDownList("SelectedPlayer", new SelectList(Model.Players), "All Players", new { @class = "form-control form-control-sm search-control search-control-player" })
+							<button class="btn btn-sm btn-secondary search-control search-control-query">
+								<i class="fa fa-search"></i>
+							</button>
+						</div>
+
+						<div class="">
+							<div style="white-space:nowrap;width:180px;padding-left:10px">
+								<span>Pixels Found: <span class="text-primary query-count">0</span></span>
+							</div>
+						</div>
+
+						<div class="btn-group btn-group-sm">
+							<select class="form-control form-control-sm player-control player-control-speed" disabled="disabled">
+								<option value="100">Slow</option>
+								<option value="50" selected="selected">Normal</option>
+								<option value="5">Fast</option>
+								<option value="0">Fastest</option>
+							</select>
+							<button class="btn btn-sm btn-secondary player-control player-control-play" disabled="disabled">
+								<i class="fa fa-play"></i>
+							</button>
+							<button class="btn btn-sm btn-secondary player-control player-control-pause" disabled="disabled">
+								<i class="fa fa-pause"></i>
+							</button>
+							<button class="btn btn-sm btn-secondary player-control player-control-stop" disabled="disabled">
+								<i class="fa fa-stop"></i>
+							</button>
+							<button class="btn btn-sm btn-secondary player-control player-control-clear" disabled="disabled">
+								<i class="fa fa-ban"></i>
+							</button>
+						</div>
+
+						<div>
+							<div style="white-space:nowrap;width:180px;padding-left:10px">
+								<span>Remaining: <span class="text-primary counter-label">0</span></span>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<canvas id="replayCanvas" width="@Model.Width" height="@Model.Height" style="border:solid 1px rgba(238, 232, 213, 0.325);background-image: url('/Content/Images/Games/@Model.GameId/background-fixed-small.png');"></canvas>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+
+	<script>
+
+		(async ($) => {
+
+			let scale = 1;
+			const gameId = @Model.GameId;
+			const canvasWidth = @Model.Width;
+			const canvasHeight = @Model.Height;
+
+			const canvas = document.getElementById('replayCanvas');
+			const context = canvas.getContext('2d');
+			const counter = $(".counter-label");
+
+			const initializeCanvas = () => {
+				canvas.height = canvasHeight * scale;
+				canvas.width = canvasWidth * scale;
+				context.setTransform(1, 0, 0, 1, 0, 0);
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				context.scale(scale, scale);
+			}
+
+			const clearCanvas = () => {
+				context.clearRect(0, 0, canvas.width, canvas.height);
+			}
+
+			const addCanvasPixel = async (x, y, color) => {
+				context.beginPath();
+				context.fillStyle = color;
+				context.fillRect(x, y, 1, 1);
+				context.closePath();
+			}
+
+			const getPixels = async () => {
+				const pixels = await getJson("/Replay/GetPixels", {
+					gameId: gameId,
+					player: currentPlayer
+				}) || [];
+				return pixels;
+			}
+
+			let replayTimer;
+			let isPlayerPaused = false;
+			let currentPlaySpeed = 50;
+			let currentPixelSet = [];
+			let currentPlayer;
+
+			const startReplay = async () => {
+				const clonedPixels = currentPixelSet.slice(0);
+				if (clonedPixels.length === 0) {
+					return;
+				}
+
+				counter.text(clonedPixels.length);
+				replayTimer = setInterval(() => {
+
+					if (clonedPixels.length == 0) {
+						stopReplay();
+						return;
+					}
+
+					if (isPlayerPaused === true) {
+						return;
+					}
+
+					const pixel = clonedPixels.shift();
+					addCanvasPixel(pixel.X, pixel.Y, pixel.Color);
+
+					counter.text(clonedPixels.length);
+				}, currentPlaySpeed);
+			}
+
+			const stopReplay = () => {
+				$(".player-control-stop").attr("disabled", "disabled");
+				$(".player-control-pause").attr("disabled", "disabled");
+				$(".player-control-play").removeAttr("disabled");
+				$(".player-control-speed").removeAttr("disabled");
+				$(".player-control-clear").removeAttr("disabled");
+				$(".search-control").removeAttr("disabled");
+
+				isPlayerPaused = false;
+				clearInterval(replayTimer);
+				counter.text(0);
+			}
+
+			const pauseReplay = () => {
+				$(".player-control-pause").attr("disabled", "disabled");
+				$(".player-control-play").removeAttr("disabled");
+				$(".player-control-stop").removeAttr("disabled");
+				$(".player-control-clear").removeAttr("disabled");
+
+				isPlayerPaused = true;
+			}
+
+			const playReplay = async () => {
+				$(".search-control").attr("disabled", "disabled");
+				$(".player-control-play").attr("disabled", "disabled");
+				$(".player-control-speed").attr("disabled", "disabled");
+				$(".player-control-clear").attr("disabled", "disabled");
+				$(".player-control-pause").removeAttr("disabled");
+				$(".player-control-stop").removeAttr("disabled");
+
+				if (isPlayerPaused === true) {
+					isPlayerPaused = false;
+					return;
+				}
+				await startReplay();
+			}
+
+			const clearReplay = () => {
+				$(".player-control-clear").attr("disabled", "disabled");
+
+				clearCanvas();
+			}
+
+			const queryReplay = async () => {
+				$(".player-control-play").attr("disabled", "disabled");
+				$(".player-control-pause").attr("disabled", "disabled");
+				$(".player-control-stop").attr("disabled", "disabled");
+				$(".player-control-speed").attr("disabled", "disabled");
+
+				// Get pixels from server
+				currentPixelSet = await getPixels();
+				if (currentPixelSet.length > 0) {
+					$(".player-control-play").removeAttr("disabled");
+					$(".player-control-speed").removeAttr("disabled");
+				}
+
+				$(".query-count").text(currentPixelSet.length);
+				counter.text(currentPixelSet.length);
+			}
+
+
+			$(".search-control-query").on("click", async function () {
+				await queryReplay();
+			});
+
+			$(".player-control-play").on("click", async function () {
+				await playReplay();
+			});
+
+			$(".player-control-pause").on("click", function () {
+				pauseReplay();
+			});
+
+			$(".player-control-stop").on("click", function () {
+				stopReplay();
+			});
+
+			$(".player-control-clear").on("click", function () {
+				clearReplay();
+			});
+
+			$(".player-control-speed").on("change", function () {
+				currentPlaySpeed = $(this).val();
+			})
+
+			$(".search-control-player").on("change", function () {
+				currentPlayer = $(this).val();
+			})
+
+			initializeCanvas();
+
+		})(jQuery);
+
+	</script>
+}

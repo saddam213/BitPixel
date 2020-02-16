@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [dbo].[Prize] (
     [Id]          INT            IDENTITY (1, 1) NOT NULL,
+    [GameId]      INT            NOT NULL,
     [UserId]      INT            NULL,
     [Name]        NVARCHAR (50)  NOT NULL,
     [Description] NVARCHAR (128) NOT NULL,
@@ -20,7 +21,11 @@
 );
 
 GO
+CREATE NONCLUSTERED INDEX [IX_UserAudit]
+    ON [dbo].[Prize]([UserId] ASC, [IsClaimed] ASC)
+    INCLUDE([Points]);
+GO
 
-CREATE NONCLUSTERED INDEX [IX_XYClaimed]
-    ON [dbo].[Prize]([X] ASC, [Y] ASC, [IsClaimed] ASC);
-GO;
+CREATE NONCLUSTERED INDEX [IX_PrizeClaimed]
+    ON [dbo].[Prize]([GameId] ASC, [X] ASC, [Y] ASC, [IsClaimed] ASC);
+GO

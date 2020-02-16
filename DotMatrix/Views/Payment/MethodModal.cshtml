@@ -1,0 +1,62 @@
+﻿@model DotMatrix.Common.Payment.PaymentUserMethodModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+<div class="modal-dialog" role="document" style="min-width:300px;max-width:500px">
+	<div class="modal-content">
+		<div class="modal-body">
+
+			<div class="card" style="min-width:300px;">
+				<div class="d-flex justify-content-center align-items-center">
+					<img class="mt-4" src="~/Content/Images/Payment/@(Model.Name).png" alt="" width="200">
+				</div>
+				<div class="card-body">
+					<h5 class="card-title text-primary mb-1">
+						<b>@Model.Name</b>
+					</h5>
+					<p class="">@Model.Description</p>
+					<div class="d-flex flex-column mb-3">
+						<div class="d-flex justify-content-between">
+							<small>Payment Address</small>
+							<small id="copy-label" class="text-success" style="display:none">Copied to clipboard!</small>
+						</div>
+
+						<div class="input-group mb-3">
+							<input id="address-value" type="text" class="form-control text-light" readonly="readonly" value="@Model.Data">
+							<div class="input-group-append">
+								<span class="input-group-text" title="Copy address to clipboard">
+									<i id="address-copy" class="fa fa-copy"></i>
+								</span>
+							</div>
+						</div>
+
+						<div class="text-center">
+							<small>
+								<i>@Model.Note</i>
+							</small>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="modal-footer btn-group">
+			<button type="button" class="simplemodal-close btn btn-success">Close</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	$("#address-copy").on("click", function () {
+		const _button = $(this);
+		const _input = $("#address-value");
+		const _label = $("#copy-label");
+
+		copyTextToClipboard(_input.val());
+
+		_label.show();
+		_button.addClass("text-success");
+		_input.addClass("is-valid")
+	})
+</script>
+

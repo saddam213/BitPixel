@@ -12,5 +12,12 @@
 		public int TeamId { get; set; }
 		public string TeamName { get; set; }
 		public int NewPoints { get; set; }
+		public int GameId { get; set; }
+		public string GameName { get; set; }
+		public string PrizeDescription { get; set; }
+		public int PrizePoints { get; set; }
+		public string PrizeName { get; set; }
+		public int PrizeId { get; set; }
+		public bool IsPrizeWinner { get; set; }
 	}
 }

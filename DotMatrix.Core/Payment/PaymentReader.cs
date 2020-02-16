@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using DotMatrix.Common.DataContext;
@@ -60,13 +62,37 @@ namespace DotMatrix.Core.Payment
 			}
 		}
 
+		public async Task<List<PaymentReceiptModel>> GetReceipts()
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				return await context.PaymentReceipt
+					.Select(MapReceipt())
+					.OrderByDescending(x => x.Created)
+					.ToListAsync();
+			}
+		}
+
 		public async Task<List<PaymentReceiptModel>> GetReceipts(int userId)
 		{
 			using (var context = DataContextFactory.CreateContext())
 			{
-				return await GetReceiptsQuery(userId, context)
+				return await context.PaymentReceipt
+					.Where(x => x.UserId == userId)
+					.Select(MapReceipt())
 					.OrderByDescending(x => x.Created)
 					.ToListAsync();
+			}
+		}
+
+		public async Task<PaymentReceiptModel> GetReceipt(int paymentReceiptId)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				return await context.PaymentReceipt
+					.Where(x => x.Id == paymentReceiptId)
+					.Select(MapReceipt())
+					.FirstOrDefaultAsync();
 			}
 		}
 
@@ -74,32 +100,34 @@ namespace DotMatrix.Core.Payment
 		{
 			using (var context = DataContextFactory.CreateContext())
 			{
-				return await GetReceiptsQuery(userId, context)
-					.FirstOrDefaultAsync(x => x.Id == paymentReceiptId);
+				return await context.PaymentReceipt
+					.Where(x => x.UserId == userId && x.Id == paymentReceiptId)
+					.Select(MapReceipt())
+					.FirstOrDefaultAsync();
 			}
 		}
 
-		private static IQueryable<PaymentReceiptModel> GetReceiptsQuery(int userId, IDataContext context)
+
+		private static Expression<Func<Entity.PaymentReceipt, PaymentReceiptModel>> MapReceipt()
 		{
-			return context.PaymentReceipt
-				.Where(x => x.UserId == userId)
-				.Select(x => new PaymentReceiptModel
-				{
-					Id = x.Id,
-					Points = x.Points,
-					Rate = x.Rate,
-					Amount = x.Amount,
-					Status = x.Status,
-					Name = x.PaymentMethod.Name,
-					Description = x.Description,
-					Data = x.Data,
-					Data2 = x.Data2,
-					Data3 = x.Data3,
-					Data4 = x.Data4,
-					Data5 = x.Data5,
-					Updated = x.Updated,
-					Created = x.Timestamp
-				});
+			return x => new PaymentReceiptModel
+			{
+				Id = x.Id,
+				UserName = x.User.UserName,
+				Points = x.Points,
+				Rate = x.Rate,
+				Amount = x.Amount,
+				Status = x.Status,
+				Name = x.PaymentMethod.Name,
+				Description = x.Description,
+				Data = x.Data,
+				Data2 = x.Data2,
+				Data3 = x.Data3,
+				Data4 = x.Data4,
+				Data5 = x.Data5,
+				Updated = x.Updated,
+				Created = x.Timestamp
+			};
 		}
 	}
 }

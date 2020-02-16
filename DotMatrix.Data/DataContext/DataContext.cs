@@ -20,6 +20,7 @@ namespace DotMatrix.Data.DataContext
 		public DbSet<EmailTemplate> EmailTemplate { get; set; }
 		public DbSet<EmailOutbox> EmailOutbox { get; set; }
 
+		public DbSet<Game> Games { get; set; }
 		public DbSet<Team> Teams { get; set; }
 		public DbSet<Pixel> Pixel { get; set; }
 		public DbSet<PixelHistory> PixelHistory { get; set; }
@@ -50,6 +51,9 @@ namespace DotMatrix.Data.DataContext
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.Pixel).WithMany(x => x.History);
 
 			modelBuilder.Entity<PaymentReceipt>().HasRequired(x => x.User).WithMany(x => x.Deposits);
+
+			modelBuilder.Entity<AwardHistory>().HasOptional(x => x.Game);
+			modelBuilder.Entity<AwardHistory>().HasRequired(x => x.User).WithMany(x => x.Awards);
 		}
 	}
 }

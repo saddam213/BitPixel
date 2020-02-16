@@ -70,28 +70,36 @@
     <Build Include="Tables\UserRoles.sql" />
     <Build Include="Tables\UserInRoles.sql" />
     <Build Include="Tables\Users.sql" />
-    <Build Include="Tables\UserClaims.sql" />
-    <Build Include="Tables\UserExternalLogon.sql" />
-    <Build Include="Stored Procedures\AddPixel.sql" />
-    <Build Include="Stored Procedures\GetPixelRectangle.sql" />
+    <Build Include="Stored Procedures\Game_AddPixel.sql" />
+    <Build Include="Stored Procedures\Game_GetPixelRectangle.sql" />
     <Build Include="Tables\Team.sql" />
     <Build Include="Tables\PaymentUserMethod.sql" />
     <Build Include="Tables\PaymentReceipt.sql" />
     <Build Include="Tables\PaymentAddress.sql" />
-    <Build Include="Stored Procedures\PaymentAssignAddress.sql" />
+    <Build Include="Stored Procedures\Payment_AssignAddress.sql" />
     <Build Include="Tables\Click.sql" />
-    <Build Include="Stored Procedures\AddClick.sql" />
+    <Build Include="Stored Procedures\Game_AddClick.sql" />
     <Build Include="Tables\Prize.sql" />
-    <Build Include="Stored Procedures\AuditPoints.sql" />
+    <Build Include="Stored Procedures\User_AuditPoints.sql" />
     <Build Include="Tables\Award.sql" />
     <Build Include="Tables\AwardHistory.sql" />
     <Build Include="Tables\EmailOutbox.sql" />
     <Build Include="Tables\EmailTemplate.sql" />
+    <Build Include="Tables\Game.sql" />
+    <Build Include="Stored Procedures\Cache_Game_GetInitial.sql" />
+    <Build Include="Stored Procedures\Cache_Game_GetUpdates.sql" />
+    <Build Include="Stored Procedures\WalletService_GetWithdrawals.sql" />
+    <Build Include="Stored Procedures\WalletService_UpdateWithdraw.sql" />
+    <Build Include="Stored Procedures\Award_AddAwardHistory.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DotMatrix.Database.refactorlog" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\StaticData.sql" />
+    <None Include="Scripts\AwardData.sql" />
+    <None Include="SqlSchemaCompare_Development.scmp" />
+    <None Include="SqlSchemaCompare_Production_Dev.scmp" />
+    <None Include="SqlSchemaCompare_Production.scmp" />
   </ItemGroup>
 </Project>

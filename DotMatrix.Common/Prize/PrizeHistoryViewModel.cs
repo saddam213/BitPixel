@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿//using System.Collections.Generic;
+//using DotMatrix.Common.Game;
 
-namespace DotMatrix.Common.Prize
-{
-	public class PrizeHistoryViewModel
-	{
-		public List<PrizeHistoryItemModel> Prizes { get; set; }
-	}
-}
+//namespace DotMatrix.Common.Prize
+//{
+//	public class PrizeHistoryViewModel
+//	{
+
+//	}
+//}

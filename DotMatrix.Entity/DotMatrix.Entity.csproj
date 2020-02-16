@@ -72,6 +72,7 @@
     <Compile Include="Prize.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="PixelHistory.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="Team.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

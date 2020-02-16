@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [dbo].[Pixel] (
     [Id]         INT            IDENTITY (1, 1) NOT NULL,
+    [GameId]      INT           NOT NULL,
     [UserId]     INT            NOT NULL,
     [X]          INT            NOT NULL,
     [Y]          INT            NOT NULL,
@@ -12,5 +13,6 @@
 GO
 
 CREATE UNIQUE NONCLUSTERED INDEX [UIX_XY]
-    ON [dbo].[Pixel]([X] ASC, [Y] ASC);
+    ON [dbo].[Pixel]([GameId] ASC, [X] ASC, [Y] ASC)
+    INCLUDE([UserId], [Type], [Color], [Points]);
 GO

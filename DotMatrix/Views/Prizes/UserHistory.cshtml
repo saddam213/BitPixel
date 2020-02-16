@@ -1,56 +1,60 @@
-﻿@model DotMatrix.Common.Prize.PrizeUserHistoryViewModel
-@{
+﻿@{
 	ViewBag.Title = "Prize History";
+	var isMobile = Request.Browser.IsMobileDevice;
 }
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
 
-<div class="d-flex justify-content-center pt-4">
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:340px;max-width:1000px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0">My Prize History</h2>
+			<span class="ml-1">My prize history for BitPixel</span>
+		</div>
+	</div>
 
-	<div class="card" style="min-width:300px;max-width:1000px">
+	<div class="card" style="min-width:350px;max-width:1000px">
 		<div class="card-body">
-			<h5 class="card-title">Prize History</h5>
-			<h6 class="card-subtitle mb-2 text-muted">Prizes you have won playing BitPixel</h6>
-			<div>
-				<table class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
-					<thead>
-						<tr>
-							<th width="160">Name</th>
-							<th>Description</th>
-							<th width="100">Points</th>
-							<th width="160">Timestamp</th>
-						</tr>
-					</thead>
-					<tbody>
-						@if (!Model.Prizes.Any())
-						{
-							<tr>
-								<td colspan="4">You have not won any prizes yet, to learn how please click here: <a href="/Points/Prizes" class=""><b>Get Prizes!</b></a></td>
-							</tr>
-						}
-						else
-						{
-							foreach (var prize in Model.Prizes)
-							{
-								<tr>
-									<td>@prize.Name</td>
-									<td>@prize.Description</td>
-									<td class="text-right">@prize.Points</td>
-									<td class="text-right">@prize.Timestamp.ToString("dd/MM/yyyy hh:mm tt")</td>
-								</tr>
-							}
-						}
-					</tbody>
-				</table>
-
+			<div class="d-flex justify-content-between align-items-center">
 				<div>
-					<div class="d-flex justify-content-between">
-						<div class="w-25">
-							<a href="/Prizes" class="btn btn-block btn-sm btn-warning">Get Prizes!</a>
+
+				</div>
+				<div>
+					<div class="input-group input-group-sm mb-3">
+						<input id="filter-search" type="text" class="filter-input form-control" placeholder="Search...">
+						<div class="input-group-append">
+							<button id="filter-clear" class="btn btn-outline-danger" type="button" style="display:none">
+								<i class="fa fa-times"></i>
+							</button>
 						</div>
-						<div class="w-25">
-							<a href="/Awards/UserHistory" class="btn btn-block btn-sm btn-outline-dark">Awards History</a>
+						<div class="input-group-append">
+							<button id="filter-apply" class="btn btn-outline-secondary" type="button" disabled="disabled">
+								<i class="fa fa-search"></i>
+							</button>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div>
+
+				<table id="table-history" class="dataTable table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>GameId</th>
+							<th>IsUnclaimed</th>
+							<th>Game</th>
+							<th>Prize</th>
+							<th>Description</th>
+							<th>X</th>
+							<th>Y</th>
+							<th>Points</th>
+							<th>Status</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
 
 			</div>
 		</div>
@@ -59,7 +63,180 @@
 
 
 @section Scripts {
+
+	<script id="claimCellTemplate" type="text/html">
+		{{#IsUnclaimed}}
+		<a class="prize-claim text-primary" data-prizeid="{{Id}}" style="cursor:pointer">
+			<strong>Claim Now!</strong>
+		</a>
+		{{/IsUnclaimed}}
+		{{^IsUnclaimed}}
+		<a class="prize-claim text-muted" data-prizeid="{{Id}}" style="cursor:pointer">
+			<span>{{Status}}</span>
+		</a>
+		{{/IsUnclaimed}}
+	</script>
+
 	<script>
+		(async ($) => {
+			const isMobile = @Json.Encode(isMobile);
+			const table = $("#table-history");
+			const linkCellTemplate = $("#linkCellTemplate").html();
+			const claimCellTemplate = $("#claimCellTemplate").html();
+			const viewPrizeCellTemplate = $("#viewPrizeCellTemplate").html();
+			const dataTable = table.DataTable({
+				"dom": datatable_Layout,
+				"order": [[9, "asc"],[10, "desc"]],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": true,
+				"searching": true,
+				"paging": true,
+				"pagingType": isMobile ? "simple" : "simple_numbers",
+				"info": !isMobile,
+				"autoWidth": false,
+				"displayLength": isMobile ? 12 : 15,
+				"language": {
+					emptyTable: "No prizes found",
+					zeroRecords: "No prizes found",
+				},
+
+				"ajaxSource": '/Prizes/GetUserHistory',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": [0, 1, 2],
+					"searchable": false,
+					"visible": false
+				},
+				{
+					"targets": 3,
+					"width": "30%",
+						"visible": !isMobile,
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Game?gameId=" + full[1]
+						});
+					}
+				},
+				{
+					"targets": 4,
+					"width": "30%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(viewPrizeCellTemplate, {
+							Id: full[0],
+							Name: data
+						});
+					}
+				},
+				{
+					"targets": 5,
+					"width": "40%",
+						"visible": !isMobile,
+					"className": 'cell-elipsis'
+				},
+				{
+					"targets": 6,
+					"width": 45,
+						"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 7,
+					"width": 45,
+						"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 8,
+					"width": isMobile ? 40 : 80,
+					"className": 'cell-elipsis text-right'
+				},
+				{
+					"targets": 9,
+					"width": isMobile ? 60 : 100,
+					"className": 'cell-elipsis text-center',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(claimCellTemplate, {
+							Id: full[0],
+							Status: data,
+							IsUnclaimed: full[2]
+						});
+					}
+				},
+				{
+					"targets": 10,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+			$('#filter-apply').on('click', function () {
+				const _this = $(this);
+				_this.attr("disabled", "disabled");
+				dataTable.draw();
+				if (isFilterApplied()) {
+					$("#filter-clear").show();
+				}
+			});
+
+			$('#filter-clear').on('click', function () {
+				$(this).hide();
+				$(".filter-input").val(null);
+				$("#filter-apply").trigger("click");
+			});
+
+			$('#filter-search').on('keyup', function (e) {
+				if (isFilterApplied()) {
+					if (e.keyCode == 13) {
+						$("#filter-apply").trigger("click");
+						return;
+					}
+				}
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			$(".filter-input").on("change paste keyup", function () {
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			const isFilterApplied = () => {
+				const filter_search = $("#filter-search").val();
+				if (filter_search) {
+					return true;
+				}
+				return false;
+			}
+
+
+			$("#table-history").on("click", ".prize-claim", async function () {
+				const prizeid = $(this).data("prizeid");
+				const result = await openModalGet('/Prizes/ClaimPrizeModal', { prizeid: prizeid });
+				if (result.Success === true) {
+					location.reload();
+				}
+			});
+
+			$("#table-history").on("click", ".prize-view", async function () {
+				const prizeid = $(this).data("prizeid");
+				const result = await openModalGet('/Prizes/ViewUserPrizeModal', { prizeid: prizeid });
+				if (result.ClaimPrize === true) {
+					const claimresult = await openModalGet('/Prizes/ClaimPrizeModal', { prizeid: result.PrizeId });
+					if (claimresult.Success === true) {
+						location.reload();
+					}
+				}
+			});
+
+		})(jQuery);
 
 	</script>
 }

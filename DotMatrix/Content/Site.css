@@ -1,31 +1,230 @@
-﻿body {
+﻿html, body {
+	height: 100%;
+	margin: 0;
+}
+
+.body-wrapper {
+	height: 100%;
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
 }
 
 main {
 	flex: 1;
+	overflow: auto;
 }
 
+footer {
+}
 
+.cursor-pointer {
+	cursor: pointer;
+}
 
 .cell-elipsis {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	cursor: pointer;
 }
 
 .checker-board {
-	background-image: linear-gradient(to right, rgba(192, 192, 192, 0.75), rgba(192, 192, 192, 0.75)), linear-gradient(to right, black 50%, white 50%), linear-gradient(to bottom, black 50%, white 50%);
+	background-color: transparent;
+	background-image: linear-gradient(to right, rgba(192, 192, 192, 0.80), rgba(192, 192, 192, 0.80)), linear-gradient(to right, black 50%, white 50%), linear-gradient(to bottom, black 50%, white 50%);
 	background-blend-mode: normal, difference, normal;
 }
 
 	.checker-board.zoomed-out {
-		background-size: 2px 2px;
+		background-size: 10px 10px;
 	}
 
 	.checker-board.zoomed-in {
 		background-size: 20px 20px;
 	}
+
+	.checker-board.thumbnail {
+		background-size: 10px 10px;
+	}
+
+
+	.checker-board.scale-16 {
+		background-size: 32px 32px;
+	}
+
+	.checker-board.scale-10 {
+		background-size: 20px 20px;
+	}
+
+#simplemodal-overlay {
+	background-color: rgba(0,0,0,0.8);
+}
+
+
+.field-validation-error {
+	font-size: 12px;
+}
+
+
+/*Tables*/
+/*----------------------------------------------------------------------------*/
+table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting,
+table.dataTable thead > tr > td.sorting_asc,
+table.dataTable thead > tr > td.sorting_desc,
+table.dataTable thead > tr > td.sorting {
+	padding-right: 30px;
+}
+
+table.dataTable thead > tr > th:active,
+table.dataTable thead > tr > td:active {
+	outline: none;
+}
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc,
+table.dataTable thead .sorting_asc_disabled,
+table.dataTable thead .sorting_desc_disabled {
+	cursor: pointer;
+	position: relative;
+}
+
+	table.dataTable thead .sorting:before, table.dataTable thead .sorting:after,
+	table.dataTable thead .sorting_asc:before,
+	table.dataTable thead .sorting_asc:after,
+	table.dataTable thead .sorting_desc:before,
+	table.dataTable thead .sorting_desc:after,
+	table.dataTable thead .sorting_asc_disabled:before,
+	table.dataTable thead .sorting_asc_disabled:after,
+	table.dataTable thead .sorting_desc_disabled:before,
+	table.dataTable thead .sorting_desc_disabled:after {
+		position: absolute;
+		bottom: 0.9em;
+		display: block;
+		opacity: 0.3;
+	}
+
+	table.dataTable thead .sorting:before,
+	table.dataTable thead .sorting_asc:before,
+	table.dataTable thead .sorting_desc:before,
+	table.dataTable thead .sorting_asc_disabled:before,
+	table.dataTable thead .sorting_desc_disabled:before {
+		right: 1em;
+		content: "\2191";
+	}
+
+	table.dataTable thead .sorting:after,
+	table.dataTable thead .sorting_asc:after,
+	table.dataTable thead .sorting_desc:after,
+	table.dataTable thead .sorting_asc_disabled:after,
+	table.dataTable thead .sorting_desc_disabled:after {
+		right: 0.5em;
+		content: "\2193";
+	}
+
+	table.dataTable thead .sorting_asc:before,
+	table.dataTable thead .sorting_desc:after {
+		opacity: 1;
+	}
+
+	table.dataTable thead .sorting_asc_disabled:before,
+	table.dataTable thead .sorting_desc_disabled:after {
+		opacity: 0;
+	}
+
+
+.dataTables_processing {
+	height: 25px;
+	font-size: 12px;
+	padding: 4px 10px 0px 10px;
+	background-color: #212529;
+	position: absolute;
+	z-index: 20;
+}
+
+
+
+
+
+
+
+
+
+
+.award-view-container {
+	display: flex;
+	flex-direction: column;
+}
+
+	.award-view-container .award-view {
+		margin-right: 5px;
+		margin-bottom: 5px;
+		width: 160px;
+	}
+
+	.award-view-container .award-badge {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 3px 10px;
+	}
+
+		.award-view-container .award-badge > i {
+			font-size: 18px
+		}
+
+.award-badge-Bronze {
+	background-color: #CB4B16
+}
+
+.award-badge-Silver {
+	background-color: #839496
+}
+
+.award-badge-Gold {
+	background-color: #B58900;
+}
+
+.award-badge-Special {
+	background-color: #268BD2;
+}
+
+
+
+.award-icon-Bronze {
+	color: #CB4B16
+}
+
+.award-icon-Silver {
+	color: #839496
+}
+
+.award-icon-Gold {
+	color: #B58900;
+}
+
+.award-icon-Special {
+	color: #268BD2;
+}
+
+
+
+.award-main-container {
+	display: flex;
+	flex-direction: column;
+}
+
+	.award-main-container .award-view {
+		margin-right: 5px;
+		margin-bottom: 5px;
+		width: 160px;
+	}
+
+	.award-main-container .award-badge {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 3px 10px;
+	}
+
+		.award-main-container .award-badge > i {
+			font-size: 20px
+		}

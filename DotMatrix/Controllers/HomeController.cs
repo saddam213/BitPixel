@@ -1,14 +1,25 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
+
+using DotMatrix.Common.Game;
+using DotMatrix.Common.Home;
 
 namespace DotMatrix.Controllers
 {
-	public class HomeController : Controller
+	public class HomeController : BaseController
 	{
+		public IGameReader GameReader { get; set; }
 
-		public Task<ActionResult> Index()
+		public async Task<ActionResult> Index()
 		{
-			return Task.FromResult<ActionResult>(View());
+			var games = await GameReader.GetGames();
+			return View(new HomeViewModel
+			{
+				Games = games
+				 .Where(x => x.Status != Enums.GameStatus.Deleted)
+				 .ToList(),
+			});
 		}
 
 		//public Task<ActionResult> Api()

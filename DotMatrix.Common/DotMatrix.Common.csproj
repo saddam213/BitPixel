@@ -76,8 +76,7 @@
     <Compile Include="Account\LoginViewModel.cs" />
     <Compile Include="Account\RegisterViewModel.cs" />
     <Compile Include="Account\ResetPasswordViewModel.cs" />
-    <Compile Include="Admin\CreatePrizePoolModel.cs" />
-    <Compile Include="Admin\CreatePrizePoolResult.cs" />
+    <Compile Include="Admin\AdminViewModel.cs" />
     <Compile Include="Admin\IAdminReader.cs" />
     <Compile Include="Admin\IAdminWriter.cs" />
     <Compile Include="Api\ApiResponse.cs" />
@@ -85,12 +84,31 @@
     <Compile Include="Api\UserApiAuthKey.cs" />
     <Compile Include="Api\UserApiKeyPair.cs" />
     <Compile Include="Award\AddUserAwardModel.cs" />
-    <Compile Include="Award\AddUserAwardResult.cs" />
+    <Compile Include="Award\AwardGameHistoryViewModel.cs" />
+    <Compile Include="Award\AwardListItemModel.cs" />
+    <Compile Include="Award\AwardModel.cs" />
+    <Compile Include="Award\AwardViewModel.cs" />
+    <Compile Include="Award\AwardUserHistoryViewModel.cs" />
+    <Compile Include="Award\AwardUserModalViewModel.cs" />
+    <Compile Include="Award\AwardUserModel.cs" />
+    <Compile Include="Award\AwardUserListItemModel.cs" />
+    <Compile Include="Award\UpdateAwardModel.cs" />
+    <Compile Include="Click\IClickReader.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="DataContext\ConnectionString.cs" />
     <Compile Include="DataContext\IDataContext.cs" />
     <Compile Include="DataContext\IDataContextFactory.cs" />
     <Compile Include="DataContext\StoredProcedure.cs" />
+    <Compile Include="Explore\ExploreViewModel.cs" />
+    <Compile Include="Game\CreateGameModel.cs" />
+    <Compile Include="Game\GameModel.cs" />
+    <Compile Include="Game\IGameWriter.cs" />
+    <Compile Include="Game\IGameReader.cs" />
+    <Compile Include="Game\UpdateGameModel.cs" />
+    <Compile Include="Home\HomeViewModel.cs" />
+    <Compile Include="Image\CreateFixedImageModel.cs" />
+    <Compile Include="Image\IImageWriter.cs" />
+    <Compile Include="Payment\UpdatePaymentModel.cs" />
     <Compile Include="Payment\IPaymentWriter.cs" />
     <Compile Include="Payment\PaymentHistoryModel.cs" />
     <Compile Include="Payment\PaymentMethodModel.cs" />
@@ -111,12 +129,11 @@
     <Compile Include="Points\PointModel.cs" />
     <Compile Include="Award\IAwardReader.cs" />
     <Compile Include="Award\IAwardWriter.cs" />
-    <Compile Include="Award\AwardHistoryItemModel.cs" />
-    <Compile Include="Award\AwardHistoryViewModel.cs" />
-    <Compile Include="Award\AwardItemModel.cs" />
-    <Compile Include="Award\AwardUserHistoryItemModel.cs" />
-    <Compile Include="Award\AwardUserHistoryViewModel.cs" />
-    <Compile Include="Award\AwardViewModel.cs" />
+    <Compile Include="Award\AwardModalViewModel.cs" />
+    <Compile Include="Prize\ClaimPrizeModel.cs" />
+    <Compile Include="Prize\UpdatePrizePaymenModel.cs" />
+    <Compile Include="Prize\CreatePrizePoolModel.cs" />
+    <Compile Include="Prize\PrizeGameHistoryViewModel.cs" />
     <Compile Include="Prize\PrizeHistoryItemModel.cs" />
     <Compile Include="Prize\PrizeHistoryViewModel.cs" />
     <Compile Include="Prize\PrizeItemModel.cs" />
@@ -125,11 +142,26 @@
     <Compile Include="Prize\IPrizeReader.cs" />
     <Compile Include="Prize\PrizeUserHistoryItemModel.cs" />
     <Compile Include="Prize\PrizeViewModel.cs" />
+    <Compile Include="Prize\UpdatePrizePoolModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Score\ScoreViewItemModel.cs" />
+    <Compile Include="Replay\ReplayFilterModel.cs" />
+    <Compile Include="Replay\ReplayPixelModel.cs" />
+    <Compile Include="Replay\IReplayReader.cs" />
+    <Compile Include="Replay\ReplayViewModel.cs" />
+    <Compile Include="Results\IWriterResult.cs" />
+    <Compile Include="Results\WriterResult.cs" />
+    <Compile Include="Score\GameScoresViewModel.cs" />
+    <Compile Include="Score\ScoreItemModel.cs" />
     <Compile Include="Score\IScoreReader.cs" />
-    <Compile Include="Score\ScoreViewModel.cs" />
+    <Compile Include="Score\ScoresModel.cs" />
+    <Compile Include="Score\ScoresViewModel.cs" />
+    <Compile Include="Users\IUserWriter.cs" />
+    <Compile Include="Users\UpdateAvatarModel.cs" />
+    <Compile Include="Users\UpdateUserModal.cs" />
+    <Compile Include="Users\UserProfileModel.cs" />
+    <Compile Include="Users\UserModel.cs" />
     <Compile Include="Users\IUserReader.cs" />
+    <Compile Include="Users\UserProfileViewModel.cs" />
     <Compile Include="Users\UserSettingsModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +169,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DotMatrix.Datatables\DotMatrix.Datatables.csproj">
+      <Project>{389ade94-7c32-4885-812e-68a2a74c82d8}</Project>
+      <Name>DotMatrix.Datatables</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DotMatrix.Entity\DotMatrix.Entity.csproj">
       <Project>{272067D0-DF82-4EA2-A8ED-187B7462DFCF}</Project>
       <Name>DotMatrix.Entity</Name>
@@ -146,6 +182,7 @@
       <Name>DotMatrix.Enums</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

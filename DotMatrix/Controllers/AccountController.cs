@@ -7,6 +7,7 @@ using DotMatrix.Common.Account;
 using DotMatrix.Common.Award;
 using DotMatrix.Common.Email;
 using DotMatrix.Enums;
+using DotMatrix.Helpers;
 using DotMatrix.Identity;
 
 using Microsoft.AspNet.Identity;
@@ -16,7 +17,7 @@ using Microsoft.Owin.Security;
 namespace DotMatrix.Controllers
 {
 	[Authorize]
-	public class AccountController : Controller
+	public class AccountController : BaseController
 	{
 		private ApplicationUserManager _userManager;
 
@@ -50,6 +51,12 @@ namespace DotMatrix.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
 		{
+			if (!CaptchaHelper.Validate())
+			{
+				ModelState.AddModelError("", "Invalid Captcha");
+				return View(model);
+			}
+
 			if (!ModelState.IsValid)
 			{
 				return View(model);
@@ -128,6 +135,12 @@ namespace DotMatrix.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> Register(RegisterViewModel model)
 		{
+			if (!CaptchaHelper.Validate())
+			{
+				ModelState.AddModelError("", "Invalid Captcha");
+				return View(model);
+			}
+
 			if (ModelState.IsValid)
 			{
 				var apiKeyResult = ApiKeyStore.GenerateApiKeyPair();
@@ -145,7 +158,7 @@ namespace DotMatrix.Controllers
 				var result = await UserManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
-					await AwardWriter.AddAward(new AddUserAwardModel
+					await AwardWriter.AddUserAward(new AddUserAwardModel
 					{
 						UserId = user.Id,
 						Type = AwardType.Registration,
@@ -210,6 +223,12 @@ namespace DotMatrix.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
 		{
+			if (!CaptchaHelper.Validate())
+			{
+				ModelState.AddModelError("", "Invalid Captcha");
+				return View(model);
+			}
+
 			if (ModelState.IsValid)
 			{
 				var user = await UserManager.FindByEmailAsync(model.Email);
@@ -257,12 +276,18 @@ namespace DotMatrix.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
 		{
+			if (!CaptchaHelper.Validate())
+			{
+				ModelState.AddModelError("", "Invalid Captcha");
+				return View(model);
+			}
+
 			if (!ModelState.IsValid)
 			{
 				return View(model);
 			}
 
-			var user = await UserManager.FindByNameAsync(model.Email);
+			var user = await UserManager.FindByEmailAsync(model.Email);
 			if (user == null)
 			{
 				// Don't reveal that the user does not exist

@@ -10,5 +10,9 @@ namespace DotMatrix.Common.Prize
 
 		public int Count { get; set; }
 		public int Unclaimed { get; set; }
+		public string Game { get; set; }
+		public int GameId { get; set; }
+		public int GameRank { get; set; }
+		public string Symbol { get; set; }
 	}
 }

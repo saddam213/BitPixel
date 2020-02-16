@@ -132,9 +132,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\DotMatrix.Common\DotMatrix.Common.csproj">
-      <Project>{0aeab0f6-db8a-4d61-ac8a-597bc227eeb3}</Project>
-      <Name>DotMatrix.Common</Name>
+    <ProjectReference Include="..\DotMatrix.Cache\DotMatrix.Cache.csproj">
+      <Project>{a77d1355-31ca-4ee4-b696-6c90baf5e640}</Project>
+      <Name>DotMatrix.Cache</Name>
     </ProjectReference>
     <ProjectReference Include="..\DotMatrix.Core\DotMatrix.Core.csproj">
       <Project>{968682fb-a576-4f7f-9c74-a4c88aae147c}</Project>

@@ -1,13 +1,22 @@
 ﻿using System.Threading.Tasks;
 using System.Web.Mvc;
+using DotMatrix.Common.Explore;
+using DotMatrix.Common.Game;
+using DotMatrix.Enums;
 
 namespace DotMatrix.Controllers
 {
-	public class ExploreController : Controller
+	public class ExploreController : BaseController
 	{
-		public Task<ActionResult> Index()
+		public IGameReader GameReader { get; set; }
+
+		public async Task<ActionResult> Index(int gameId)
 		{
-			return Task.FromResult<ActionResult>(View());
+			var game = await GameReader.GetGame(gameId);
+			return View(new ExploreViewModel
+			{
+				Game = game
+			});
 		}
 	}
 }

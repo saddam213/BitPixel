@@ -1,0 +1,161 @@
+﻿@{
+	ViewBag.Title = "How To Play";
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+
+<style>
+	.table-bordered tr th,
+	.table-bordered tr td {
+		padding: 0px 5px;
+	}
+
+	.doc-container {
+		padding: 15px;
+		margin: 15px;
+		border: solid 1px rgba(0,0,0,0.3);
+	}
+</style>
+
+<div class="d-flex flex-column align-items-center p-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mb-3" style="min-width:340px;max-width:1000px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0">How To Play</h2>
+			<span class="ml-1">Instructions on how to play BitPixel</span>
+		</div>
+	</div>
+
+	<div class="card" style="min-width:350px;max-width:1000px">
+		<div class="card-body">
+
+			<div>
+
+				<div>
+					<h3 class="text-primary">What is BitPixel?</h3>
+					<p>
+						BitPixel is a desktop web multi-player online pixel based strategy game.
+						<br />
+						Awards and Prizes can be won thoughout the game allowing you access to more tools and features to help your artwork standout above the rest.
+					</p>
+				</div>
+
+				<div>
+					<h3 class="text-primary mb-0">Clicks & Pixels</h3>
+					<p>The game consists of 2 parts, Clicks and Pixels</p>
+					<div class="pl-4">
+						<div>
+							<h5 class="text-primary mb-0">Clicks</h5>
+							<p>
+								<small>Action: <span class="text-info">@(isMobile ? "Tap" : "Left Mouse Click")</span></small>
+								<br />
+								Each click on the gameboard is recorded, you can use clicks to view Pixel information or to generate Awards to win Points
+							</p>
+						</div>
+						<div>
+							<h5 class="text-primary mb-0">Pixels</h5>
+							<p>
+								<small>Action: <span class="text-info">@(isMobile ? "Tap & Hold" : "Right Mouse Click")</span></small>
+								<br />
+								Pixels can be used to fill empty game space, once a pixel has been filled the points multiply making it more expensive to overwrite
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<h3 class="text-primary mb-0">Prizes & Awards</h3>
+					<p>You can win an assortment of prizes and awards by playing BitPixel.</p>
+					<div class="pl-4">
+						<div>
+							<h5 class="text-primary mb-0">Prizes</h5>
+							<p>Prizes can be one by drawing pixels, each game has its own set of prizes </p>
+							<div class="pl-4">
+								<div class="text-primary mb-0">Point Prizes</div>
+								<p>Point prizes award you with more points to continue drawing</p>
+								<div class="text-primary mb-0">Crypto Prizes</div>
+								<p>Crypto prizes are instant crypto-currency prizes.</p>
+							</div>
+						</div>
+						<div>
+							<h5 class="text-primary mb-0">Awards</h5>
+							<p>Awards can be won for performing certain tasks while playing BitPixel, you do not need points to win awards</p>
+							<div class="pl-4">
+								<div class="text-primary mb-0">Point Prizes</div>
+								<p>Point prizes award you with more points to continue drawing</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<h3 class="text-primary mb-0">Game Types</h3>
+					<p>
+						There are several game types, each one has a unique strategy and prize pool.
+						<br />
+						There are 1000's of Prizes scattered accross the game boards, so best of luck while you fill those pixels
+					</p>
+					<div class="pl-4">
+						<h5 class="text-primary mb-0">Treasure Hunt</h5>
+						<p>
+							Treasure Hunt is a simple and fun game, use your points to fill in the Empty game pixels to win prizes
+						</p>
+					</div>
+					<div class="pl-4">
+						<h5 class="text-primary mb-0">Snake Run</h5>
+						<p>
+							Each pixel you draw must be connected to one of your previous pixels, goal is to build the longest chain of pixels
+						</p>
+					</div>
+				</div>
+
+
+				<div>
+					<h3 class="text-primary mb-0">Help & Support</h3>
+					<p>
+						If you need help or support for anything regarding BitPixel feel free to email us.
+					</p>
+					<div class="pl-4">
+						<h5 class="text-primary mb-0">Account Support</h5>
+						<p>
+							If you have have a problem logging into your account or simply have questions about your BitPixel account.
+							<br />
+							<span class="text-primary ml-2">
+								<i class="fa fa-envelope"></i>
+								<span>accounts@bitpixel.win</span>
+							</span>
+						</p>
+					</div>
+					<div class="pl-4">
+						<h5 class="text-primary mb-0">Prize/Payment Support</h5>
+						<p>
+							If you have issues receiving a prize or an incoming payment to your BitPixel account.
+							<br />
+							<span class="text-primary ml-2">
+								<i class="fa fa-envelope"></i>
+								<span>payments@bitpixel.win</span>
+							</span>
+						</p>
+					</div>
+					<div class="pl-4">
+						<h5 class="text-primary mb-0">Game Enquiries</h5>
+						<p>
+							If you would like to create a BitPixel game with your Coin/Token as a prize pool.
+							<br />
+							<span class="text-primary ml-2">
+								<i class="fa fa-envelope"></i>
+								<span>games@bitpixel.win</span>
+							</span>
+						</p>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+	</script>
+}

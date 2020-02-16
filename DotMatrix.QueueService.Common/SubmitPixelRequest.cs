@@ -3,7 +3,7 @@ using DotMatrix.Enums;
 
 namespace DotMatrix.QueueService.Common
 {
-	public class SubmitPixelRequest
+	public class SubmitPixelRequest : IQueueRequest
 	{
 		public int UserId { get; set; }
 
@@ -15,5 +15,6 @@ namespace DotMatrix.QueueService.Common
 		public int MaxPoints { get; set; }
 
 		public bool IsApi { get; set; }
+		public int GameId { get; set; }
 	}
 }

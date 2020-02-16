@@ -1,0 +1,67 @@
+﻿@model DotMatrix.Common.Admin.AdminUserViewModel
+@{
+	ViewBag.Title = "User Admin";
+}
+
+<div class="d-flex flex-column align-items-center">
+
+	<div class="d-flex" style="max-width:1000px;">
+		<div class="card w-100 m-3">
+			<div class="card-body">
+				<h5 class="card-title text-primary">User Management</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Manage user and user settings</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+						<thead>
+							<tr>
+								<th width="60">Id</th>
+								<th width="160">Name</th>
+								<th>Email</th>
+								<th>Team</th>
+								<th width="160">Points</th>
+								<th width="40"></th>
+							</tr>
+
+						</thead>
+						<tbody>
+							@foreach (var game in Model.Users.OrderByDescending(x => x.Points))
+							{
+								<tr>
+									<td>@game.Id</td>
+									<td class="cell-elipsis">@game.UserName</td>
+									<td class="cell-elipsis">@game.Email</td>
+									<td class="cell-elipsis">@game.Team</td>
+									<td>@game.Points</td>
+									<th class="text-center">
+										<i class="fa fa-edit user-update" data-userid="@game.Id"></i>
+									</th>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+
+
+</div>
+
+@section Scripts {
+	<script>
+		(async ($) => {
+
+			$(".user-update").on("click", async function () {
+				const userId = $(this).data("userid");
+				const result = await openModalGet("/Admin/UpdateUserModal", { userId: userId });
+				if (result.Cancel === true) {
+					return;
+				}
+				location.reload();
+			});
+
+		})(jQuery);
+	</script>
+}

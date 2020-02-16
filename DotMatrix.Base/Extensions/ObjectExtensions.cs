@@ -1,61 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace DotMatrix.Base
 {
 	public static class ObjectExtensions
 	{
-
-		public static DateTime RoundToNearestInterval(this DateTime dt, TimeSpan d)
-		{
-			int f = 0;
-			double m = (double)(dt.Ticks % d.Ticks) / d.Ticks;
-			if (m >= 0.5)
-				f = 1;
-			return new DateTime(((dt.Ticks / d.Ticks) + f) * d.Ticks);
-		}
-
-		public static string ElapsedTime(this DateTime dtEvent)
-		{
-			TimeSpan TS = DateTime.UtcNow - dtEvent;
-			int intYears = DateTime.UtcNow.Year - dtEvent.Year;
-			int intMonths = DateTime.UtcNow.Month - dtEvent.Month;
-			int intDays = DateTime.UtcNow.Day - dtEvent.Day;
-			int intHours = DateTime.UtcNow.Hour - dtEvent.Hour;
-			int intMinutes = DateTime.UtcNow.Minute - dtEvent.Minute;
-			int intSeconds = DateTime.UtcNow.Second - dtEvent.Second;
-			if (intYears > 0) return String.Format("{0} {1} ago", intYears, (intYears == 1) ? "year" : "years");
-			else if (intMonths > 0) return String.Format("{0} {1} ago", intMonths, (intMonths == 1) ? "month" : "months");
-			else if (intDays > 0) return String.Format("{0} {1} ago", intDays, (intDays == 1) ? "day" : "days");
-			else if (intHours > 0) return String.Format("{0} {1} ago", intHours, (intHours == 1) ? "hour" : "hours");
-			else if (intMinutes > 0) return String.Format("{0} {1} ago", intMinutes, (intMinutes == 1) ? "minute" : "minutes");
-			else if (intSeconds > 0) return String.Format("{0} {1} ago", intSeconds, (intSeconds == 1) ? "second" : "seconds");
-			else
-			{
-				return String.Format("{0} {1} ago", dtEvent.ToShortDateString(), dtEvent.ToShortTimeString());
-			}
-		}
-
-		public static long ToUnixTime(this DateTime date)
-		{
-			var timeSpan = (date - new DateTime(1970, 1, 1, 0, 0, 0));
-			return (long)timeSpan.TotalSeconds;
-		}
-
-		public static long ToJavaTime(this DateTime date)
-		{
-			var timeSpan = (date - new DateTime(1970, 1, 1, 0, 0, 0));
-			return (long)timeSpan.TotalMilliseconds;
-		}
-
-		public static DateTime ToDateTime(this uint time)
-		{
-			return new DateTime(1970, 1, 1).AddSeconds(time);
-		}
-
-		public static DateTime ToDateTime(this long time)
-		{
-			return new DateTime(1970, 1, 1).AddSeconds(time);
-		}
-
+	
 		public static string GetBytesReadable(this long value)
 		{
 			// Get absolute value
@@ -101,6 +52,83 @@ namespace DotMatrix.Base
 			readable = (readable / 1024);
 			// Return formatted number with suffix
 			return readable.ToString("0.### ") + suffix;
+		}
+
+		public static byte[] ToByteArray(this ulong value)
+		{
+			var size = 8;
+			var result = new byte[size];
+			for (var i = 0; i < size; i++)
+			{
+				var bitOffset = (size - (i + 1)) * 8;
+				result[i] = (byte)((value & ((ulong)0xFF << bitOffset)) >> bitOffset);
+			}
+			return result;
+		}
+
+		public static ulong ToUInt64(this byte[] data)
+		{
+			var requiredSize = 8;
+			if (data.Length != requiredSize)
+				throw new ArgumentException($"The byte-array \"{nameof(data)}\" must be exactly {requiredSize} bytes.");
+
+			var result = 0ul;
+			for (var i = 0; i < requiredSize; i++)
+			{
+				result |= ((ulong)data[i] << ((requiredSize - (i + 1)) * 8));
+			}
+			return result;
+		}
+
+		public static bool IsGreaterThan(this byte[] value, byte[] other)
+		{
+			return value.CompareTo(other) > 0;
+		}
+
+		public static bool IsLessThan(this byte[] value, byte[] other)
+		{
+			return value.CompareTo(other) < 0;
+		}
+
+		public static bool IsGreaterOrEqual(this byte[] value, byte[] other)
+		{
+			return value.CompareTo(other) > 0 || value.CompareTo(other) == 0;
+		}
+
+		public static bool IsLessOrEqual(this byte[] value, byte[] other)
+		{
+			return value.CompareTo(other) < 0 || value.CompareTo(other) == 0;
+		}
+
+		public static int CompareTo(this byte[] value, byte[] other)
+		{
+			if (value == null && other == null)
+				return 0;
+			else if (value == null)
+				return -1;
+			else if (other == null)
+				return 1;
+			return ((IStructuralComparable)value).CompareTo(other, Comparer<byte>.Default);
+		}
+
+		public static bool IsGreaterThan<T>(this T value, T other) where T : IComparable
+		{
+			return value.CompareTo(other) > 0;
+		}
+
+		public static bool IsGreaterOrEqual<T>(this T value, T other) where T : IComparable
+		{
+			return value.CompareTo(other) > 0 || value.CompareTo(other) == 0;
+		}
+
+		public static bool IsLessThan<T>(this T value, T other) where T : IComparable
+		{
+			return value.CompareTo(other) < 0;
+		}
+
+		public static bool IsLessOrEqual<T>(this T value, T other) where T : IComparable
+		{
+			return value.CompareTo(other) < 0 || value.CompareTo(other) == 0;
 		}
 	}
 }

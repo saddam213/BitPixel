@@ -1,0 +1,182 @@
+﻿@{
+	ViewBag.Title = "Pixel History";
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:300px;max-width:1000px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0">My Pixel History</h2>
+			<span class="ml-1">My pixel history for BitPixel</span>
+		</div>
+	</div>
+
+	<div class="card" style="min-width:300px;max-width:1000px">
+		<div class="card-body">
+			<div class="d-flex justify-content-between align-items-center">
+				<div>
+
+				</div>
+				<div>
+					<div class="input-group input-group-sm mb-3">
+						<input id="filter-search" type="text" class="filter-input form-control" placeholder="Search...">
+						<div class="input-group-append">
+							<button id="filter-clear" class="btn btn-outline-danger" type="button" style="display:none">
+								<i class="fa fa-times"></i>
+							</button>
+						</div>
+						<div class="input-group-append">
+							<button id="filter-apply" class="btn btn-outline-secondary" type="button" disabled="disabled">
+								<i class="fa fa-search"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div>
+
+				<table id="table-history" class="dataTable table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>GameId</th>
+							<th>Game</th>
+							<th>X</th>
+							<th>Y</th>
+							<th>Color</th>
+							<th>Points</th>
+							<th>Timestamp</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+
+	<script>
+		(async ($) => {
+			const isMobile = @Json.Encode(isMobile);
+			const linkCellTemplate = $("#linkCellTemplate").html();
+			const colorCellTemplate = $("#colorCellTemplate").html();
+
+			const table = $("#table-history");
+			const dataTable = table.DataTable({
+				"dom": datatable_Layout,
+				"order": [[7, "desc"]],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": true,
+				"searching": true,
+				"paging": true,
+				"pagingType": isMobile ? "simple" : "simple_numbers",
+				"info": !isMobile,
+				"autoWidth": false,
+				"displayLength": isMobile ? 12 : 15,
+				"language": {
+					emptyTable: "No pixels found",
+					zeroRecords: "No pixels found",
+				},
+
+				"ajaxSource": '/Points/GetPixelHistory',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": [0, 1],
+					"searchable": false,
+					"visible": false
+				},
+				{
+					"targets": 2,
+					"width": "30%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Game?gameId=" + full[1]
+						});
+					}
+				},
+				{
+					"targets": 3,
+					"width": isMobile ? 30 : 45,
+					"className": 'text-right'
+				},
+				{
+					"targets": 4,
+					"width": isMobile ? 30 : 45,
+					"className": 'text-right'
+				},
+				{
+					"targets": 5,
+					"width": isMobile ? 40 : 120,
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(colorCellTemplate, data);
+					}
+				},
+				{
+					"targets": 6,
+					"width": isMobile ? 50 : 120,
+					"className": 'cell-elipsis text-right'
+				},
+				{
+					"targets": 7,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+			$('#filter-apply').on('click', function () {
+				const _this = $(this);
+				_this.attr("disabled", "disabled");
+				dataTable.draw();
+				if (isFilterApplied()) {
+					$("#filter-clear").show();
+				}
+			});
+
+			$('#filter-clear').on('click', function () {
+				$(this).hide();
+				$(".filter-input").val(null);
+				$("#filter-apply").trigger("click");
+			});
+
+			$('#filter-search').on('keyup', function (e) {
+				if (isFilterApplied()) {
+					if (e.keyCode == 13) {
+						$("#filter-apply").trigger("click");
+						return;
+					}
+				}
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			$(".filter-input").on("change paste keyup", function () {
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			const isFilterApplied = () => {
+				const filter_search = $("#filter-search").val();
+				if (filter_search) {
+					return true;
+				}
+				return false;
+			}
+
+		})(jQuery);
+
+	</script>
+}

@@ -7,7 +7,9 @@ namespace DotMatrix.Common.Users
 {
 	public interface IUserReader
 	{
-		Task<User> GetUser(int id);
-		Task<List<User>> GetUsers();
+		Task<UserModel> GetUser(int id);
+		Task<List<UserModel>> GetUsers();
+
+		Task<UserProfileModel> GetUserProfile(string userName);
 	}
 }

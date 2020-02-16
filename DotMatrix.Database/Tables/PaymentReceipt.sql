@@ -17,4 +17,9 @@
     [Timestamp]           DATETIME2 (7)   NOT NULL,
     CONSTRAINT [PK_PaymentReceipt] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+GO
 
+CREATE NONCLUSTERED INDEX [IX_UserAudit]
+    ON [dbo].[PaymentReceipt]([UserId] ASC, [Status] ASC)
+    INCLUDE([Points]);
+GO

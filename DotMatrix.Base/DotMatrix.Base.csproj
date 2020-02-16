@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -42,8 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DateExtensions.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\LinqExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Logging\Base\Log.cs" />
     <Compile Include="Logging\Base\LogBase.cs" />
     <Compile Include="Logging\Base\LoggingManager.cs" />
@@ -51,6 +55,8 @@
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\DBLogger.cs" />
     <Compile Include="Logging\FileLogger.cs" />
+    <Compile Include="Objects\ConcurrentValue.cs" />
+    <Compile Include="Objects\ConcurrentLock.cs" />
     <Compile Include="Objects\ConcurrentList.cs" />
     <Compile Include="Process\ProcessorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

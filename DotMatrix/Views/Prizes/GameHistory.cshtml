@@ -1,0 +1,206 @@
+﻿@model DotMatrix.Common.Prize.PrizeGameHistoryViewModel
+@{
+	ViewBag.Title = "Prize History";
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:340px;max-width:1000px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0">@Model.Name Prizeboard</h2>
+			<span class="ml-1">Current prizeboard for @Model.Name game</span>
+		</div>
+	</div>
+
+	<div class="card" style="min-width:350px;max-width:1000px">
+		<div class="card-body">
+			<div class="d-flex justify-content-between align-items-center">
+				<div>
+					@*<h5 class="card-title text-primary">@Model.Name Prize History</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Previous @Model.Name prize winners</h6>*@
+				</div>
+				<div class="d-flex">
+					@*<div>
+							<button id="prizes-modal" class="btn btn-sm btn-outline-primary mr-5">View Prize Board</button>
+						</div>*@
+					<div>
+						<div class="input-group input-group-sm mb-2">
+							<input id="filter-search" type="text" class="filter-input form-control" placeholder="Search...">
+							<div class="input-group-append">
+								<button id="filter-clear" class="btn btn-outline-danger" type="button" style="display:none">
+									<i class="fa fa-times"></i>
+								</button>
+							</div>
+							<div class="input-group-append">
+								<button id="filter-apply" class="btn btn-outline-secondary" type="button" disabled="disabled">
+									<i class="fa fa-search"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div>
+				<table id="table-history" class="dataTable table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>Prize</th>
+							<th>Description</th>
+							<th>X</th>
+							<th>Y</th>
+							<th>Points</th>
+							<th>Player</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+@section Scripts {
+	<script>
+		(async ($) => {
+			const isMobile = @Json.Encode(isMobile);
+			const linkCellTemplate = $("#linkCellTemplate").html();
+			const viewPrizeCellTemplate = $("#viewPrizeCellTemplate").html();
+			const table = $("#table-history");
+			const dataTable = table.DataTable({
+				"dom": datatable_Layout,
+				"order": [[7, "desc"]],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": true,
+				"searching": true,
+				"paging": true,
+				"pagingType": isMobile ? "simple" : "simple_numbers",
+				"info": !isMobile,
+				"autoWidth": false,
+				"displayLength": isMobile ? 12 : 15,
+				"language": {
+					emptyTable: "No prizes found",
+					zeroRecords: "No prizes found",
+				},
+
+				"ajaxSource": '/Prizes/GetGameHistory',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "gameId", "value": '@Model.Id' });
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": [0],
+					"searchable": false,
+					"visible": false
+				},
+				{
+					"targets": 1,
+					"width": isMobile ? "50%":"30%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(viewPrizeCellTemplate, {
+							Id: full[0],
+							Name: data
+						});
+					}
+				},
+				{
+					"targets": 2,
+					"width": "45%",
+						"visible": !isMobile,
+					"className": 'cell-elipsis'
+					},
+				{
+					"targets": 3,
+					"width": 45,
+					"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 4,
+					"width": 45,
+					"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 5,
+					"width": isMobile ? 50 : 80,
+					"className": 'cell-elipsis text-right',
+				},
+				{
+					"targets": 6,
+					"width": isMobile ? "50%": "25%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Player?name=" + data
+						});
+					}
+				},
+				{
+					"targets": 7,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+			$('#filter-apply').on('click', function () {
+				const _this = $(this);
+				_this.attr("disabled", "disabled");
+				dataTable.draw();
+				if (isFilterApplied()) {
+					$("#filter-clear").show();
+				}
+			});
+
+			$('#filter-clear').on('click', function () {
+				$(this).hide();
+				$(".filter-input").val(null);
+				$("#filter-apply").trigger("click");
+			});
+
+			$('#filter-search').on('keyup', function (e) {
+				if (isFilterApplied()) {
+					if (e.keyCode == 13) {
+						$("#filter-apply").trigger("click");
+						return;
+					}
+				}
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			$(".filter-input").on("change paste keyup", function () {
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			const isFilterApplied = () => {
+				const filter_search = $("#filter-search").val();
+				if (filter_search) {
+					return true;
+				}
+				return false;
+			}
+
+			$("#prizes-modal").on("click", async function () {
+				await openModalGet("/Prizes/ViewPrizesModal", { gameId: '@Model.Id' });
+			});
+
+			$("#table-history").on("click", ".prize-view", async function () {
+				const prizeid = $(this).data("prizeid");
+				await openModalGet('/Prizes/ViewPrizeModal', { prizeid: prizeid });
+			});
+
+		})(jQuery);
+
+	</script>
+}

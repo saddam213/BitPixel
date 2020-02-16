@@ -1,0 +1,27 @@
+[
+  {
+    "outputFileName": "Scripts/Bundles/bitPixel_bundle.js",
+    "inputFiles": [
+      "Scripts/moment.js",
+      "Scripts/jquery-3.4.1.js",
+      "Scripts/jquery.unobtrusive-ajax.js",
+      "Scripts/jquery.signalR-2.4.1.js",
+      "Scripts/bootstrap.bundle.js",
+      "Scripts/mustache.js",
+      "Scripts/enums.js",
+      "Scripts/modal.js",
+      "Scripts/datatables.js",
+      "Scripts/spectrum.js",
+      "Scripts/bitPixel.js"
+    ]
+  },
+  {
+    "outputFileName": "Content/Bundles/bitPixel_bundle.css",
+    "inputFiles": [
+      "Content/bootstrap.solar.css",
+      "Content/fontawesome.css",
+      "Content/spectum.css",
+      "Content/Site.css"
+    ]
+  }
+]

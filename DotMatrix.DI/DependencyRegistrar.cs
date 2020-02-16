@@ -36,6 +36,8 @@ namespace DotMatrix.DI
 		public static void Register()
 		{
 			var dependencyResolver = new DotMatrixDependencyResolver(_container.Kernel);
+			var controllerFactory = new DotMatrixControllerFactory(_container.Kernel);
+			ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 			DependencyResolver.SetResolver(dependencyResolver);
 			GlobalHost.DependencyResolver = new SignalrDependencyResolver(_container.Kernel);
 			GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerActivator), new WebApiDependencyResolver(_container));
@@ -62,9 +64,22 @@ namespace DotMatrix.DI
 					.LifestyleSingleton());
 		}
 
+		public static void RegisterSingletonComponent<T>(T component) where T : class
+		{
+			_container
+				.Register(Component.For<T>()
+					.UsingFactoryMethod(() => component)
+					.LifestyleSingleton());
+		}
+
 		public static IWindsorContainer Container
 		{
 			get { return _container; }
+		}
+
+		public static T Resolve<T>() where T : class
+		{
+			return Container.Kernel.Resolve<T>();
 		}
 	}
 }

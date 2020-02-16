@@ -12,13 +12,12 @@ namespace DotMatrix.Common.DataContext
 		int SaveChanges();
 		Task<int> SaveChangesAsync();
 
-		
-
 		DbSet<User> Users { get; set; }
 
 		DbSet<EmailTemplate> EmailTemplate { get; set; }
 		DbSet<EmailOutbox> EmailOutbox { get; set; }
 
+		DbSet<Entity.Game> Games { get; set; }
 		DbSet<Team> Teams { get; set; }
 		DbSet<Entity.Pixel> Pixel { get; set; }
 		DbSet<PixelHistory> PixelHistory { get; set; }

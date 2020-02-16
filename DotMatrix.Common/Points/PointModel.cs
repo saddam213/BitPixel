@@ -8,6 +8,7 @@ namespace DotMatrix.Common.Points
 	{
 		public int Points { get; set; }
 		public List<PrizeUserHistoryItemModel> LatestPrizes { get; set; } = new List<PrizeUserHistoryItemModel>();
-		public List<AwardUserHistoryItemModel> LatestAwards { get; set; } = new List<AwardUserHistoryItemModel>();
+
+		public List<AwardUserListItemModel> AwardList { get; set; } = new List<AwardUserListItemModel>();
 	}
 }

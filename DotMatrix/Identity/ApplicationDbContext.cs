@@ -29,28 +29,29 @@ namespace DotMatrix.Identity
 			modelBuilder.Conventions.Remove<DecimalPropertyConvention>();
 			modelBuilder.Conventions.Add(new DecimalPropertyConvention(22, 8));
 
-			modelBuilder.Entity<ApplicationUser>()
-				.ToTable("Users")
-				.Property(u => u.UserName)
+			var user = modelBuilder.Entity<ApplicationUser>().ToTable("Users");
+			user.HasMany(u => u.Roles).WithRequired(x => x.User);
+			user.Property(u => u.UserName)
 					.IsRequired()
 					.HasMaxLength(256)
 					.HasColumnAnnotation("Index", new IndexAnnotation(new IndexAttribute("UserNameIndex") { IsUnique = true }));
+			user.Property(u => u.Email).HasMaxLength(128);
+			user.Property(u => u.UserName).HasMaxLength(50);
+			user.Property(u => u.PasswordHash).HasMaxLength(256);
+			user.Property(u => u.SecurityStamp).HasMaxLength(50);
 
-			modelBuilder.Entity<ApplicationRole>()
-			.ToTable("UserRoles")
-				.Property(r => r.Name)
+			var roles =	modelBuilder.Entity<ApplicationRole>().ToTable("UserRoles");
+			roles.Property(r => r.Name)
 					.IsRequired()
 					.HasMaxLength(256)
 					.HasColumnAnnotation("Index", new IndexAnnotation(new IndexAttribute("RoleNameIndex") { IsUnique = true }));
+			roles.HasMany(r => r.Users).WithRequired(r => r.Role);
 
 			modelBuilder.Entity<ApplicationUserRole>()
 				.ToTable("UserInRoles")
-				.HasKey(r => new { r.RoleId, r.UserId });//.HasRequired(p => p.User);
+				.HasKey(r => new { r.RoleId, r.UserId });
 
-			modelBuilder.Entity<ApplicationUser>().Property(u => u.Email).HasMaxLength(128);
-			modelBuilder.Entity<ApplicationUser>().Property(u => u.UserName).HasMaxLength(50);
-			modelBuilder.Entity<ApplicationUser>().Property(u => u.PasswordHash).HasMaxLength(256);
-			modelBuilder.Entity<ApplicationUser>().Property(u => u.SecurityStamp).HasMaxLength(50);
+
 		}
 
 		protected override DbEntityValidationResult ValidateEntity(DbEntityEntry entityEntry, IDictionary<object, object> items)

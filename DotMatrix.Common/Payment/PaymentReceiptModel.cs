@@ -6,6 +6,7 @@ namespace DotMatrix.Common.Payment
 	public class PaymentReceiptModel
 	{
 		public int Id { get; set; }
+		public string UserName { get; set; }
 		public decimal Amount { get; set; }
 		public PaymentReceiptStatus Status { get; set; }
 		public string Name { get; set; }
