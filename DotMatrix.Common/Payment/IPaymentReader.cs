@@ -6,7 +6,9 @@ namespace DotMatrix.Common.Payment
 	public interface IPaymentReader
 	{
 		Task<List<PaymentMethodModel>> GetMethods();
-		Task<PaymentUserMethodModel> GetMethod(int userId, int paymentMethodId);
+		Task<PaymentMethodModel> GetMethod(string symbol);
+
+		Task<PaymentUserMethodModel> GetUserMethod(int userId, int paymentMethodId);
 
 		Task<List<PaymentReceiptModel>> GetReceipts();
 		Task<List<PaymentReceiptModel>> GetReceipts(int userId);

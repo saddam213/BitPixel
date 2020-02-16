@@ -28,14 +28,14 @@ namespace DotMatrix.Controllers
 		public async Task<ActionResult> MethodModal(int id)
 		{
 			var userId = User.Identity.GetUserId<int>();
-			var paymentMethod = await PaymentReader.GetMethod(userId, id);
+			var paymentMethod = await PaymentReader.GetUserMethod(userId, id);
 			if (paymentMethod != null)
 				return View(paymentMethod);
 
 			var result = await PaymentWriter.CreateMethod(userId, id);
 			if (result.Success)
 			{
-				paymentMethod = await PaymentReader.GetMethod(userId, id);
+				paymentMethod = await PaymentReader.GetUserMethod(userId, id);
 				if (paymentMethod != null)
 					return View(paymentMethod);
 			}

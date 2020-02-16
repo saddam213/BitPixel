@@ -37,7 +37,29 @@ namespace DotMatrix.Core.Payment
 			}
 		}
 
-		public async Task<PaymentUserMethodModel> GetMethod(int userId, int paymentMethodId)
+		public async Task<PaymentMethodModel> GetMethod(string symbol)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				return await context.PaymentMethod
+					.Where(x => x.Symbol == symbol)
+					.Select(x => new PaymentMethodModel
+					{
+						Id = x.Id,
+						Name = x.Name,
+						Symbol = x.Symbol,
+						Description = x.Description,
+						Type = x.Type,
+						Status = x.Status,
+						Rate = x.Rate,
+						Note = x.Note,
+						Updated = x.Updated,
+						Created = x.Timestamp
+					}).FirstOrDefaultAsync();
+			}
+		}
+
+		public async Task<PaymentUserMethodModel> GetUserMethod(int userId, int paymentMethodId)
 		{
 			using (var context = DataContextFactory.CreateContext())
 			{

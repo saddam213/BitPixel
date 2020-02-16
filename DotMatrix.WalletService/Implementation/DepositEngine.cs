@@ -215,25 +215,67 @@ namespace DotMatrix.WalletService.Implementation
 		private async Task ProcessWithdrawals()
 		{
 			Log.Message(LogLevel.Info, "Processing Withdrawals..");
-			using (var context = DataContextFactory.CreateConnection())
+			using (var context = DataContextFactory.CreateContext())
 			{
-				var pendingPrizes = await context.QueryAsync<PrizePayment>(StoredProcedure.WalletService_GetWithdrawals, commandType: System.Data.CommandType.StoredProcedure);
+				var internalAddresses = await context.PaymentUserMethod
+					.Include(x => x.PaymentMethod)
+					.ToListAsync();
+				var pendingPrizes = await context.Database.Connection.QueryAsync<PrizePayment>(StoredProcedure.WalletService_GetWithdrawals, commandType: System.Data.CommandType.StoredProcedure);
 				Log.Message(LogLevel.Info, $"{pendingPrizes.Count()} withdrawals found to process.");
 				foreach (var prize in pendingPrizes)
 				{
 					Log.Message(LogLevel.Info, $"Processing prize Id: {prize.PrizeId}, Symbol: {prize.Symbol}, Amount: {prize.Amount}, Destination: {prize.Destination}");
-					var transactionId = await SendTransaction(prize);
-					if (string.IsNullOrEmpty(transactionId))
+
+					var userPaymentMethod = internalAddresses.FirstOrDefault(x => x.Data.Equals(prize.Destination, StringComparison.OrdinalIgnoreCase));
+					if (userPaymentMethod != null)
 					{
-						continue;
+						Log.Message(LogLevel.Debug, "INTERNAL CLAIM");
+						var transactionId = $"Internal_Prize_Claim: #{prize.PrizeId}";
+						var cryptoAmount = decimal.Parse(prize.Amount);
+						var minConfirmations = int.Parse(userPaymentMethod.PaymentMethod.Data4);
+						var points = (int)(cryptoAmount / userPaymentMethod.PaymentMethod.Rate);
+						var newDeposit = new Entity.PaymentReceipt
+						{
+							UserId = userPaymentMethod.UserId,
+							Data = userPaymentMethod.Data,
+							Data2 = transactionId,
+							Data3 = userPaymentMethod.PaymentMethod.Data4, // minconfirms
+							Data4 = default(string),
+							Amount = cryptoAmount,
+							PaymentMethodId = userPaymentMethod.PaymentMethodId,
+							PaymentUserMethodId = userPaymentMethod.Id,
+							Rate = userPaymentMethod.PaymentMethod.Rate,
+							Status = PaymentReceiptStatus.Complete,
+							Updated = DateTime.UtcNow,
+							Timestamp = DateTime.UtcNow,
+							Points = points
+						};
+						context.PaymentReceipt.Add(newDeposit);
+						await context.SaveChangesAsync();
+						await context.Database.Connection.QueryAsync(StoredProcedure.WalletService_UpdateWithdraw, new
+						{
+							PrizeId = prize.PrizeId,
+							TransactionId = transactionId
+						}, commandType: System.Data.CommandType.StoredProcedure);
+						await context.Database.Connection.ExecuteAsync(StoredProcedure.User_AuditPoints, new { UserId = userPaymentMethod.UserId }, commandType: System.Data.CommandType.StoredProcedure);
+					}
+					else
+					{
+						Log.Message(LogLevel.Debug, "EXTERNAL CLAIM");
+						var transactionId = await SendTransaction(prize);
+						if (string.IsNullOrEmpty(transactionId))
+						{
+							continue;
+						}
+
+						Log.Message(LogLevel.Info, $"Transaction sent, TrasnactionId: {transactionId}");
+						await context.Database.Connection.QueryAsync(StoredProcedure.WalletService_UpdateWithdraw, new
+						{
+							PrizeId = prize.PrizeId,
+							TransactionId = transactionId
+						}, commandType: System.Data.CommandType.StoredProcedure);
 					}
 
-					Log.Message(LogLevel.Info, $"Transaction sent, TrasnactionId: {transactionId}");
-					await context.QueryAsync(StoredProcedure.WalletService_UpdateWithdraw, new
-					{
-						PrizeId = prize.PrizeId,
-						TransactionId = transactionId
-					}, commandType: System.Data.CommandType.StoredProcedure);
 					Log.Message(LogLevel.Info, $"Processing prize complete.");
 				}
 			}

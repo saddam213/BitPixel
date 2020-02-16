@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 
 using DotMatrix.Common.Game;
+using DotMatrix.Common.Payment;
 using DotMatrix.Common.Prize;
 using DotMatrix.Datatables;
 using DotMatrix.Enums;
@@ -16,6 +17,8 @@ namespace DotMatrix.Controllers
 		public IGameReader GameReader { get; set; }
 		public IPrizeReader PrizeReader { get; set; }
 		public IPrizeWriter PrizeWriter { get; set; }
+		public IPaymentReader PaymentReader { get; set; }
+		public IPaymentWriter PaymentWriter { get; set; }
 
 		[HttpGet]
 		public async Task<ActionResult> Index()
@@ -69,6 +72,10 @@ namespace DotMatrix.Controllers
 		{
 			var userId = User.Identity.GetUserId<int>();
 			var prize = await PrizeReader.GetUserPrize(userId, prizeId);
+			if (prize.Type != PrizeType.Crypto)
+				return RedirectToAction("ViewUserPrizeModal", new { prizeId = prizeId });
+
+			var paymentMethod = await PaymentReader.GetMethod(prize.Data);
 			return View(new ClaimPrizeModel
 			{
 				Id = prize.Id,
@@ -84,7 +91,10 @@ namespace DotMatrix.Controllers
 				Data = prize.Data,
 				Data2 = prize.Data2,
 				Data3 = prize.Data3,
-				Data4 = prize.Data4
+				Data4 = prize.Data4,
+
+				Rate = paymentMethod.Rate,
+				Amount = decimal.Parse(prize.Data2)
 			});
 		}
 
@@ -95,11 +105,34 @@ namespace DotMatrix.Controllers
 		{
 			if (!ModelState.IsValid)
 				return View(model);
-
+		
 			var userId = User.Identity.GetUserId<int>();
 			var prize = await PrizeReader.GetUserPrize(userId, model.Id);
 			if (prize.Status != PrizeStatus.Unclaimed)
 				return CloseModalSuccess();
+
+			if (model.IsPointsClaim)
+			{
+				var paymentMethod = await PaymentReader.GetMethod(prize.Data);
+				if (paymentMethod == null)
+					return CloseModalError("Unknown Error");
+
+				var paymentUserMethod = await PaymentReader.GetUserMethod(userId, paymentMethod.Id);
+				if (paymentUserMethod == null)
+					await PaymentWriter.CreateMethod(userId, paymentMethod.Id);
+
+				paymentUserMethod = await PaymentReader.GetUserMethod(userId, paymentMethod.Id);
+				if (paymentUserMethod == null)
+					return CloseModalError("Unknown Error");
+
+				model.Data3 = paymentUserMethod.Data;
+			}
+
+			if (string.IsNullOrEmpty(model.Data3))
+			{
+				ModelState.AddModelError("", "Invalid Crypto Address");
+				return View(model);
+			}
 
 			var result = await PrizeWriter.ClaimPrize(userId, model);
 			if (!ModelState.IsWriterResultValid(result))

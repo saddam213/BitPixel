@@ -41,7 +41,7 @@
 			$("#update-avatar").on("click", async function () {
 				const result = await openModalGet('/User/UpdateAvatarModal');
 				if (result.Success === true) {
-					const cacheBreak = Math.round((new Date()).getTime() / 1000);
+					const cacheBreak = Math.round((new Date()).getTime());
 					$("#avatar-img").attr("src", "/Content/Images/Avatar/@(User.Identity.Name)-large.png?v=" + cacheBreak)
 				}
 			});
