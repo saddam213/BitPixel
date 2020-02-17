@@ -80,7 +80,13 @@ AS
 	INSERT INTO [dbo].[PixelHistory]([PixelId], [GameId], [UserId], [Type], [Color], [Points], [Timestamp])
 	VALUES(@PixelId, @GameId, @UserId, @Type, @Color, @PixelPoints, @Timestamp)
 
-	EXEC @UserPoints = [dbo].[User_AuditPoints] @UserId
+	--EXEC @UserPoints = [dbo].[User_AuditPoints] @UserId
+	UPDATE [dbo].[Users]
+		SET @UserPoints = [Points]
+				,[Points] = [Points] - @PixelPoints
+	WHERE [Id] = @UserId
+	SELECT @UserPoints = @UserPoints - @PixelPoints;
+
 
 	SELECT 
 		@PixelId AS [PixelId], 

@@ -35,7 +35,12 @@ AS
 
     IF(@PrizeId IS NOT NULL)
       BEGIN
-        EXEC @UserPoints = [dbo].[User_AuditPoints] @UserId
+       -- EXEC @UserPoints = [dbo].[User_AuditPoints] @UserId
+        UPDATE [dbo].[Users]
+          SET @UserPoints = [Points]
+             ,[Points] = [Points] + @PrizePoints
+        WHERE [Id] = @UserId
+        SELECT @UserPoints = @UserPoints + @PrizePoints;
       END
   END
 
