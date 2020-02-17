@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using DotMatrix.Common.DataContext;
 using DotMatrix.Common.Payment;
+using DotMatrix.Datatables;
+using DotMatrix.Datatables.Models;
 using DotMatrix.Enums;
 
 namespace DotMatrix.Core.Payment
@@ -95,6 +97,27 @@ namespace DotMatrix.Core.Payment
 			}
 		}
 
+
+		public async Task<DataTablesResponseData> GetReceipts(DataTablesParam model)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.PaymentReceipt
+					.Select(x => new
+					{
+						Id = x.Id,
+						Name = x.User.UserName,
+						Symbol = x.PaymentMethod.Symbol,
+						Transaction = x.Data2,
+						Amount = x.Amount,
+						Rate = x.Rate,
+						Points = x.Points,
+						Status = x.Status,
+						Timestamp = x.Timestamp
+					}).GetDataTableResponseAsync(model);
+			}
+		}
+
 		public async Task<List<PaymentReceiptModel>> GetReceipts(int userId)
 		{
 			using (var context = DataContextFactory.CreateContext())
@@ -151,5 +174,6 @@ namespace DotMatrix.Core.Payment
 				Created = x.Timestamp
 			};
 		}
+
 	}
 }

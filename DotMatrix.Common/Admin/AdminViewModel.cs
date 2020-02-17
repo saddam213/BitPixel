@@ -26,10 +26,4 @@ namespace DotMatrix.Common.Admin
 	{
 		public List<AwardModel> Awards { get; set; }
 	}
-
-	public class AdminPaymentViewModel
-	{
-		public List<PaymentReceiptModel> Payments { get; set; }
-		public List<PrizeUserHistoryItemModel> PrizePayments { get; set; }
-	}
 }

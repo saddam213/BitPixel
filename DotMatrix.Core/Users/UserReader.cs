@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using DotMatrix.Common.DataContext;
 using DotMatrix.Common.Users;
+using DotMatrix.Datatables;
+using DotMatrix.Datatables.Models;
 using DotMatrix.Entity;
 
 namespace DotMatrix.Core.Users
@@ -34,6 +36,22 @@ namespace DotMatrix.Core.Users
 				return await context.Users
 				.Select(MapUser())
 				.ToListAsync();
+			}
+		}
+
+		public async Task<DataTablesResponseData> GetUsers(DataTablesParam model)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.Users
+					.Select(x => new
+					{
+						Id = x.Id,
+						Name = x.UserName,
+						Email = x.Email,
+						Team = x.Team.Name,
+						Points = x.Points
+					}).GetDataTableResponseAsync(model);
 			}
 		}
 
@@ -72,5 +90,7 @@ namespace DotMatrix.Core.Users
 				}).FirstOrDefaultAsync();
 			}
 		}
+
+
 	}
 }

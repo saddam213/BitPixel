@@ -21,5 +21,6 @@ namespace DotMatrix.Common.Prize
 		Task<DataTablesResponseData> GetHistory(DataTablesParam model);
 		Task<DataTablesResponseData> GetUserHistory(DataTablesParam model, int userId, int? count);
 		Task<DataTablesResponseData> GetGameHistory(DataTablesParam model, int gameId);
+		Task<DataTablesResponseData> GetPrizePayments(DataTablesParam model);
 	}
 }

@@ -38,6 +38,29 @@ namespace DotMatrix.Core.Prize
 			}
 		}
 
+
+		public async Task<DataTablesResponseData> GetPrizePayments(DataTablesParam model)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.Prize
+					.Where(p => p.IsClaimed && p.Type == Enums.PrizeType.Crypto)
+					.Select(x => new
+					{
+						x.Id,
+						Game = x.Game.Name,
+						x.Name,
+						x.User.UserName,
+						x.Data,
+						x.Data2,
+						x.Data4,
+						x.Status,
+						x.ClaimTime,
+					}).GetDataTableResponseAsync(model);
+			}
+		}
+
+
 		public async Task<PrizeUserHistoryItemModel> GetPrizePayment(int prizeId)
 		{
 			using (var context = DataContextFactory.CreateReadOnlyContext())
@@ -226,5 +249,7 @@ namespace DotMatrix.Core.Prize
 					.FirstOrDefaultAsync();
 			}
 		}
+
+
 	}
 }

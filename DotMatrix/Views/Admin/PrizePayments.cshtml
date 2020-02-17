@@ -1,16 +1,16 @@
 ﻿@{
-	ViewBag.Title = "User Admin";
+	ViewBag.Title = "Prize Payment Admin";
 }
 
-<div class="d-flex flex-column align-items-center">
+<div class="d-flex justify-content-center">
 
-	<div class="d-flex" style="max-width:1000px;">
+	<div class="d-flex" style="min-width:500px;max-width:1600px">
 		<div class="card w-100 m-3">
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center">
 					<div>
-						<h5 class="card-title text-primary">User Management</h5>
-						<h6 class="card-subtitle mb-2 text-muted">Manage user and user settings</h6>
+						<h5 class="card-title text-primary">Prize Payment Management</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Manage prize payment details</h6>
 					</div>
 					<div>
 						<div class="input-group input-group-sm ">
@@ -29,14 +29,18 @@
 					</div>
 				</div>
 				<div>
-					<table id="table-users" class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+					<table id="table-prizepayment" class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
 						<thead>
 							<tr>
 								<th>Id</th>
+								<th>Game</th>
 								<th>Name</th>
-								<th>Email</th>
-								<th>Team</th>
-								<th>Points</th>
+								<th>Player</th>
+								<th>Symbol</th>
+								<th>Amount</th>
+								<th>Transaction</th>
+								<th>Status</th>
+								<th>ClaimTime</th>
 								<th></th>
 							</tr>
 						</thead>
@@ -46,15 +50,17 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
+
 </div>
+
 
 @section Scripts {
 
+
 	<script id="editCellTemplate" type="text/html">
 		<div class="text-center text-primary">
-			<i class="fa fa-edit user-update" data-userid="{{.}}"></i>
+			<i class="fa fa-edit prize-payment-update" data-prizeId="{{.}}"></i>
 		</div>
 	</script>
 
@@ -62,10 +68,10 @@
 		(async ($) => {
 
 			const editCellTemplate = $("#editCellTemplate").html();
-			const table = $("#table-users");
+			const table = $("#table-prizepayment");
 			const dataTable = table.DataTable({
 				"dom": datatable_Layout,
-				"order": [[4, "desc"]],
+				"order": [[8, "desc"]],
 				"stateSave": false,
 				"processing": true,
 				"serverSide": true,
@@ -74,12 +80,12 @@
 				"pagingType": "simple_numbers",
 				"info": true,
 				"autoWidth": false,
-				"displayLength": 20,
+				"displayLength": 15,
 				"language": {
-					emptyTable: "No users found",
-					zeroRecords: "No users found",
+					emptyTable: "No prizes found",
+					zeroRecords: "No prizes found",
 				},
-				"ajaxSource": '/Admin/GetUsers',
+				"ajaxSource": '/Admin/GetPrizePayments',
 				"serverMethod": "POST",
 				"serverParams": function (data) {
 					if (Array.isArray(data)) {
@@ -92,23 +98,45 @@
 				},
 				{
 					"targets": 1,
-					"width": "100%",
+					"width": 180,
+					"className": 'cell-elipsis',
 				},
 				{
 					"targets": 2,
-					"width": "100%",
+					"width": 180,
+					"className": 'cell-elipsis',
 				},
 				{
 					"targets": 3,
-					"width": "100%",
+					"width": 180,
+					"className": 'cell-elipsis',
 				},
 				{
 					"targets": 4,
-					"width": 180,
-					"className": 'text-right',
+					"width": 100
 				},
 				{
 					"targets": 5,
+					"width": 140,
+					"className": 'text-right',
+				},
+				{
+					"targets": 6,
+					"width": "100%",
+					"className": 'cell-elipsis',
+				},
+				{
+					"targets": 7,
+					"width": 120
+				},
+				{
+					"targets": 8,
+					"width": 160,
+					"className": 'text-right text-nowrap',
+					"render": toLocalTime
+				},
+				{
+					"targets": 9,
 					"width": 30,
 					"orderable": false,
 					"searchable": false,
@@ -155,10 +183,9 @@
 				return false;
 			}
 
-
-			$("#table-users").on("click", ".user-update", async function () {
-				const userId = $(this).data("userid");
-				const result = await openModalGet("/Admin/UpdateUserModal", { userId: userId });
+			$("#table-prizepayment").on("click", ".prize-payment-update", async function () {
+				const prizeId = $(this).data("prizeid");
+				const result = await openModalGet("/Admin/UpdatePrizePaymentModal", { prizeId: prizeId });
 				if (result.Cancel === true) {
 					return;
 				}

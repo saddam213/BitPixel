@@ -11,6 +11,7 @@ using DotMatrix.Common.Image;
 using DotMatrix.Common.Payment;
 using DotMatrix.Common.Prize;
 using DotMatrix.Common.Users;
+using DotMatrix.Datatables;
 using DotMatrix.Enums;
 using DotMatrix.Helpers;
 
@@ -32,9 +33,9 @@ namespace DotMatrix.Controllers
 		public IAwardWriter AwardWriter { get; set; }
 
 		[HttpGet]
-		public async Task<ActionResult> Index()
+		public Task<ActionResult> Index()
 		{
-			return View(new AdminViewModel());
+			return Task.FromResult<ActionResult>(View(new AdminViewModel()));
 		}
 
 
@@ -51,13 +52,18 @@ namespace DotMatrix.Controllers
 
 
 		[HttpGet]
-		public async Task<ActionResult> Users()
+		public Task<ActionResult> Users()
 		{
-			return View(new AdminUserViewModel
-			{
-				Users = await UserReader.GetUsers()
-			});
+			return Task.FromResult<ActionResult>(View());
 		}
+
+
+		[HttpPost]
+		public async Task<ActionResult> GetUsers(DataTablesParam model)
+		{
+			return DataTable(await UserReader.GetUsers(model));
+		}
+
 
 		[HttpGet]
 		public async Task<ActionResult> Award()
@@ -69,14 +75,31 @@ namespace DotMatrix.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult> Payment()
+		public Task<ActionResult> Payments()
 		{
-			return View(new AdminPaymentViewModel
-			{
-				Payments = await PaymentReader.GetReceipts(),
-				PrizePayments = await PrizeReader.GetPrizePayments()
-			});
+			return Task.FromResult<ActionResult>(View());
 		}
+
+		[HttpPost]
+		public async Task<ActionResult> GetPayments(DataTablesParam model)
+		{
+			return DataTable(await PaymentReader.GetReceipts(model));
+		}
+
+
+
+		[HttpGet]
+		public Task<ActionResult> PrizePayments()
+		{
+			return Task.FromResult<ActionResult>(View());
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> GetPrizePayments(DataTablesParam model)
+		{
+			return DataTable(await PrizeReader.GetPrizePayments(model));
+		}
+
 
 		[HttpGet]
 		public async Task<ActionResult> CreatePrizePoolModal()
@@ -139,9 +162,9 @@ namespace DotMatrix.Controllers
 
 
 		[HttpGet]
-		public async Task<ActionResult> CreateGameModal()
+		public Task<ActionResult> CreateGameModal()
 		{
-			return View(new CreateGameModel());
+			return Task.FromResult<ActionResult>(View(new CreateGameModel()));
 		}
 
 		[HttpPost]

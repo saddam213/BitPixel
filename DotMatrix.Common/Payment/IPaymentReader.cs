@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotMatrix.Datatables;
+using DotMatrix.Datatables.Models;
 
 namespace DotMatrix.Common.Payment
 {
@@ -14,5 +16,6 @@ namespace DotMatrix.Common.Payment
 		Task<List<PaymentReceiptModel>> GetReceipts(int userId);
 		Task<PaymentReceiptModel> GetReceipt(int paymentReceiptId);
 		Task<PaymentReceiptModel> GetReceipt(int userId, int paymentReceiptId);
+		Task<DataTablesResponseData> GetReceipts(DataTablesParam model);
 	}
 }
