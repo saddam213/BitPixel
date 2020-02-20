@@ -34,10 +34,10 @@
 
 						<div class="btn-group btn-group-sm">
 							<select class="form-control form-control-sm player-control player-control-speed" disabled="disabled">
-								<option value="100">Slow</option>
-								<option value="50" selected="selected">Normal</option>
-								<option value="5">Fast</option>
-								<option value="0">Fastest</option>
+								<option value="0" data-speed="100" data-pixels="1">Slow</option>
+								<option value="1" data-speed="25" data-pixels="5" selected="selected">Normal</option>
+								<option value="2" data-speed="0" data-pixels="10">Fast</option>
+								<option value="3" data-speed="0" data-pixels="50">Fastest</option>
 							</select>
 							<button class="btn btn-sm btn-secondary player-control player-control-play" disabled="disabled">
 								<i class="fa fa-play"></i>
@@ -112,9 +112,10 @@
 
 			let replayTimer;
 			let isPlayerPaused = false;
-			let currentPlaySpeed = 50;
+			let currentPlaySpeed = 25;
 			let currentPixelSet = [];
 			let currentPlayer;
+			let pixelDrawCount = 1;
 
 			const startReplay = async () => {
 				const clonedPixels = currentPixelSet.slice(0);
@@ -134,8 +135,10 @@
 						return;
 					}
 
-					const pixel = clonedPixels.shift();
-					addCanvasPixel(pixel.X, pixel.Y, pixel.Color);
+					for (let i = 0; i < pixelDrawCount; i++) {
+						const pixel = clonedPixels.shift();
+						addCanvasPixel(pixel.X, pixel.Y, pixel.Color);
+					}
 
 					counter.text(clonedPixels.length);
 				}, currentPlaySpeed);
@@ -223,7 +226,9 @@
 			});
 
 			$(".player-control-speed").on("change", function () {
-				currentPlaySpeed = $(this).val();
+				const selection = $(this).find(":selected");
+				currentPlaySpeed = selection.data("speed");
+				pixelDrawCount = selection.data("pixels");
 			})
 
 			$(".search-control-player").on("change", function () {

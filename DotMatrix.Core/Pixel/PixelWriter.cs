@@ -35,11 +35,7 @@ namespace DotMatrix.Core.Pixel
 				return new AddClickResponse
 				{
 					Success = result.Success,
-					Message = result.Message,
-					UserPoints = result.UserPoints,
-
-					GameId = game.Id,
-					GameName = game.Name
+					Message = result.Message
 				};
 			}
 			catch (Exception)
@@ -83,24 +79,6 @@ namespace DotMatrix.Core.Pixel
 				{
 					Success = result.Success,
 					Message = result.Message,
-
-					PixelId = result.PixelId,
-					NewPoints = result.NewPoints,
-
-					TeamId = result.TeamId,
-					TeamName = result.TeamName,
-					UserId = result.UserId,
-					UserName = result.UserName,
-					UserPoints = result.UserPoints,
-
-					GameId = game.Id,
-					GameName = game.Name,
-
-					IsPrizeWinner = result.IsPrizeWinner,
-					PrizeId = result.PrizeId,
-					PrizeName = result.PrizeName,
-					PrizePoints = result.PrizePoints,
-					PrizeDescription = result.PrizeDescription
 				};
 			}
 			catch (Exception)

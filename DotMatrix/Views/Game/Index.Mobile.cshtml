@@ -367,7 +367,7 @@
 <script id="prizeNotifyTemplate" type="text/html">
 	<div class="toast bg-warning mb-0" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000">
 		<div class="toast-header">
-			<strong class="mr-auto text-warning"><i class="fa fa-trophy"></i> {{PrizeName}}</strong>
+			<strong class="mr-auto text-warning"><i class="fa fa-trophy"></i> {{Name}}</strong>
 			<small class="text-muted">just now</small>
 			<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
@@ -378,7 +378,7 @@
 				Congratulations you have won!
 			</div>
 			<div class="text-center text-light">
-				<b style="font-size: larger">{{PrizeDescription}}</b>
+				<b style="font-size: larger">{{Description}}</b>
 			</div>
 		</div>
 	</div>
@@ -388,7 +388,7 @@
 <script id="awardNotifyTemplate" type="text/html">
 	<div class="toast bg-warning mb-0" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000">
 		<div class="toast-header">
-			<strong class="mr-auto text-warning"><i class="fa fa-trophy"></i> {{AwardLevel}} Award</strong>
+			<strong class="mr-auto text-warning"><i class="fa fa-trophy"></i> {{Level}} Award</strong>
 			<small class="text-muted">just now</small>
 			<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
@@ -399,7 +399,7 @@
 				Congratulations you have won!
 			</div>
 			<div class="text-center text-light">
-				<b style="font-size: larger">{{AwardName}} - {{AwardPoints}} points</b>
+				<b style="font-size: larger">{{Name}} - {{Points}} points</b>
 			</div>
 		</div>
 	</div>
@@ -554,26 +554,35 @@
 			const initializeGame = async () => {
 				await resetCanvas(backgroundSmall)
 
-				pixelHub.client.OnPixelUpdate = function (result) {
-					addCanvasPixel(result.X, result.Y, result.Color);
-					updateSelectedPixel(result);
+				pixelHub.client.OnNotifyPixel = function (notification) {
+					addCanvasPixel(notification.X, notification.Y, notification.Color);
+					updateSelectedPixel(notification);
 				};
 
-				//pixelHub.client.OnPrizeUpdate = function (result) {
-				//	logPrize(result);
+				//pixelHub.client.OnNotifyPrize = function (notification) {
+				//	logPrize(notification);
 				//};
 
-				pixelHub.client.OnPointsUpdate = function (result) {
-					updatePoints(result);
+				//pixelHub.client.OnNotifyAward = function (notification) {
+				//	logAward(notification);
+				//};
+
+				pixelHub.client.OnUserNotifyPoints = function (notification) {
+					updatePoints(notification);
+					notifyPoints(notification);
 				}
 
-				pixelHub.client.OnNewPrize = function (result) {
-					notifyPrize(result);
+				pixelHub.client.OnUserNotifyPrize = function (notification) {
+					notifyPrize(notification);
 				}
 
-				pixelHub.client.OnNewAward = function (result) {
-					notifyAward(result);
+				pixelHub.client.OnUserNotifyAward = function (notification) {
+					notifyAward(notification);
 				}
+
+				//pixelHub.client.OnChatMessage = function (result) {
+				//	logChat(result);
+				//}
 
 				await $.connection.hub.start();
 				await pixelHub.server.joinGame(gameId);
@@ -624,7 +633,7 @@
 					return;
 				}
 
-				$("#selected-user").html(pixel.Owner);
+				$("#selected-user").html(pixel.Player);
 			}
 
 			const updateSelectedPixel = (pixel) => {
@@ -632,8 +641,8 @@
 				const selectedY = $("#selected-y").text();
 				if (selectedX == pixel.X && selectedY == pixel.Y) {
 					$("#selected-team").text(pixel.Team);
-					$("#selected-owner").text(pixel.Owner);
-					$("#selected-points").text(pixel.NewPoints);
+					$("#selected-owner").text(pixel.Player);
+					$("#selected-points").text(pixel.Points);
 				}
 			}
 
@@ -655,20 +664,26 @@
 				return false;
 			}
 
-
-			const notifyPrize = (prize) => {
+			const notifyPoints = (notification) => {
 				if (userSettings.showPrizeLog === false) {
 					return;
 				}
-				$("#toast-container").prepend($(Mustache.render(prizeNotifyTemplate, prize)).toast('show'));
+				//notification.Points
 			};
 
-			const notifyAward = (award) => {
+			const notifyPrize = (notification) => {
 				if (userSettings.showPrizeLog === false) {
 					return;
 				}
-				award.AwardLevel = Enums.GetName(Enums.AwardType, award.AwardLevel);
-				$("#toast-container").prepend($(Mustache.render(awardNotifyTemplate, award)).toast('show'));
+				$("#toast-container").prepend($(Mustache.render(prizeNotifyTemplate, notification)).toast('show'));
+			};
+
+			const notifyAward = (notification) => {
+				if (userSettings.showPrizeLog === false) {
+					return;
+				}
+				notification.AwardLevel = Enums.GetName(Enums.AwardType, notification.AwardLevel);
+				$("#toast-container").prepend($(Mustache.render(awardNotifyTemplate, notification)).toast('show'));
 			};
 
 			const notifyError = (error) => {
@@ -678,11 +693,11 @@
 				$("#toast-container").prepend($(Mustache.render(errorNotifyTemplate, {Message: error})).toast('show'));
 			};
 
-			const notifyPixel = (pixel) => {
+			const notifyPixel = (notification) => {
 				if (userSettings.showPixelLog === false) {
 					return;
 				}
-				$("#toast-container").prepend($(Mustache.render(infoNotifyTemplate, pixel)).toast('show'));
+				$("#toast-container").prepend($(Mustache.render(infoNotifyTemplate, notification)).toast('show'));
 			};
 
 

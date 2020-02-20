@@ -56,7 +56,7 @@
 		$('form').submit(function () {
 			const form = $(this);
 			if (form.valid()) {
-				$("button").attr("disabled", "disabled").text("Updating...");
+				$("#submit").attr("disabled", "disabled");
 			}
 		});
 

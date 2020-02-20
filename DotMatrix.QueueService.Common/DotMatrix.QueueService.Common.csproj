@@ -43,9 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AwardNotification.cs" />
     <Compile Include="IQueueHubClient.cs" />
     <Compile Include="IQueueRequest.cs" />
     <Compile Include="IQueueResponse.cs" />
+    <Compile Include="PixelNotification.cs" />
+    <Compile Include="PointsNotification.cs" />
+    <Compile Include="PrizeNotification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueErrorResponse.cs" />
     <Compile Include="SubmitClickRequest.cs" />

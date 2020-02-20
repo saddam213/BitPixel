@@ -1,24 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-
+using DotMatrix.QueueService.Common;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Transports;
 
-namespace DotMatrix.AwardService.Implementation
+namespace DotMatrix.QueueService.Client
 {
-	public class NotificationProxy
+	public class PixelHubClient
 	{
 		public static IHubProxy Proxy { get; private set; }
 		public static HubConnection Connection { get; private set; }
 		protected bool _disconnecting = false;
-		private static readonly string _endPoint = ConfigurationManager.AppSettings["PixelHub_Endpoint"];
-		private static readonly string _authToken = ConfigurationManager.AppSettings["Signalr_AuthToken"];
 
-		public NotificationProxy()
+		public PixelHubClient(string endPoint, string authToken)
 		{
-			Connection = new HubConnection(_endPoint);
-			Connection.Headers.Add("auth", _authToken);
+			Connection = new HubConnection(endPoint);
+			Connection.Headers.Add("auth", authToken);
 			Connection.Closed += async () => await TryReconnect();
 			Proxy = Connection.CreateHubProxy("PixelHub");
 			Start();
@@ -65,25 +66,34 @@ namespace DotMatrix.AwardService.Implementation
 			}
 		}
 
-		public Task InternalSendAward(AddAwardResult request)
+		public Task NotifyPoints(PointsNotification notification)
 		{
-			return SafeInvoke(nameof(InternalSendAward), request);
+			return SafeInvoke(nameof(NotifyPoints), notification);
+		}
+
+		public Task NotifyPixel(PixelNotification notification)
+		{
+			return SafeInvoke(nameof(NotifyPixel), notification);
+		}
+
+		public Task NotifyPrize(PrizeNotification notification)
+		{
+			return SafeInvoke(nameof(NotifyPrize), notification);
+		}
+
+		public Task NotifyAward(AwardNotification notification)
+		{
+			return SafeInvoke(nameof(NotifyAward), notification);
 		}
 
 		private Task SafeInvoke(string methodName, object request)
 		{
+			if (request == null)
+				return Task.FromResult(0);
+
 			if (Connection.State == ConnectionState.Connected)
 				return Proxy.Invoke(methodName, request);
 			return Task.FromResult(0);
 		}
 	}
-
-	//public class PixelHubAwardRequest
-	//{
-	//	public int UserId { get; set; }
-	//	public int AwardId { get; set; }
-	//	public string AwardName { get; set; }
-	//	public int AwardPoints { get; set; }
-	//	public int UserPoints { get; set; }
-	//}
 }

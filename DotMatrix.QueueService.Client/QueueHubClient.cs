@@ -15,7 +15,6 @@ namespace DotMatrix.QueueService.Client
 		public static HubConnection Connection { get; private set; }
 		protected bool _disconnecting = false;
 
-		public QueueHubClient() : this(ConfigurationManager.AppSettings["QueueService_Endpoint"]) { }
 		public QueueHubClient(string endpoint)
 		{
 			Connection = new HubConnection(endpoint);

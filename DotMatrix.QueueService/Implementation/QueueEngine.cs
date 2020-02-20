@@ -109,30 +109,58 @@ namespace DotMatrix.QueueService.Implementation
 				if (!string.IsNullOrEmpty(addClickResult.Error))
 					throw new QueueException(addClickResult.Error);
 
-
-				return new SubmitPixelResponse
+				var response = new SubmitPixelResponse
 				{
 					Success = true,
+					PointsNotification = new PointsNotification
+					{
+						UserId = pixelRequest.UserId,
+						Points = addClickResult.PrizeId.HasValue
+						? addClickResult.UserPoints
+						: addPixelResult.UserPoints
+					},
+					PixelNotification = new PixelNotification
+					{
+						PixelId = addPixelResult.PixelId,
+						X = pixelRequest.X,
+						Y = pixelRequest.Y,
+						Color = pixelRequest.Color,
+						Points = addPixelResult.NewPoints,
+						Type = pixelRequest.Type,
 
-					PixelId = addPixelResult.PixelId,
-					NewPoints = addPixelResult.NewPoints,
+						UserId = addPixelResult.UserId,
+						UserName = addPixelResult.UserName,
 
-					TeamId = addPixelResult.TeamId,
-					TeamName = addPixelResult.TeamName,
-					UserId = addPixelResult.UserId,
-					UserName = addPixelResult.UserName,
-					UserPoints = addPixelResult.UserPoints,
-
-
-					IsPrizeWinner = addClickResult.PrizeId.HasValue,
-					PrizeId = addClickResult.PrizeId ?? 0,
-					PrizeName = addClickResult.PrizeName,
-					PrizePoints = addClickResult.PrizePoints,
-					PrizeDescription = addClickResult.PrizeDescription,
-
-					GameId = pixelRequest.GameId,
-					GameName = addPixelResult.GameName
+						GameId = pixelRequest.GameId,
+						GameName = addPixelResult.GameName,
+						TeamId = addPixelResult.TeamId,
+						TeamName = addPixelResult.TeamName
+					}
 				};
+
+				if (addClickResult.PrizeId.HasValue)
+				{
+					response.PrizeNotification = new PrizeNotification
+					{
+						PrizeId = addClickResult.PrizeId.Value,
+						X = pixelRequest.X,
+						Y = pixelRequest.Y,
+
+						Name = addClickResult.PrizeName,
+						Points = addClickResult.PrizePoints,
+						Description = addClickResult.PrizeDescription,
+
+						UserId = addPixelResult.UserId,
+						UserName = addPixelResult.UserName,
+
+						GameId = pixelRequest.GameId,
+						GameName = addPixelResult.GameName,
+						TeamId = addPixelResult.TeamId,
+						TeamName = addPixelResult.TeamName
+					};
+				}
+
+				return response;
 			}
 			catch (SqlException)
 			{
@@ -162,12 +190,7 @@ namespace DotMatrix.QueueService.Implementation
 
 				return new SubmitClickResponse
 				{
-					Success = true,
-
-					UserPoints = result.UserPoints,
-
-					GameId = clickRequest.GameId,
-					GameName = result.GameName
+					Success = true
 				};
 			}
 			catch (SqlException)

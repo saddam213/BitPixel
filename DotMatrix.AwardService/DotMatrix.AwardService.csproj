@@ -88,7 +88,6 @@
     <Compile Include="Implementation\Pixel\PixelUserGameAwards.cs" />
     <Compile Include="Implementation\Click\ClickGameAwards.cs" />
     <Compile Include="Implementation\PixelAwardProcessor.cs" />
-    <Compile Include="Implementation\NotificationProxy.cs" />
     <Compile Include="Implementation\Pixel\PixelUserAwards.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -116,6 +115,14 @@
     <ProjectReference Include="..\DotMatrix.Enums\DotMatrix.Enums.csproj">
       <Project>{0748a30e-4cf8-4f2e-8369-76f8cb4f3467}</Project>
       <Name>DotMatrix.Enums</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.QueueService.Client\DotMatrix.QueueService.Client.csproj">
+      <Project>{21595A73-D464-407A-9CAE-36170EDFD2BD}</Project>
+      <Name>DotMatrix.QueueService.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.QueueService.Common\DotMatrix.QueueService.Common.csproj">
+      <Project>{C68E1323-DA0F-4A13-9DF2-003DF573D3E2}</Project>
+      <Name>DotMatrix.QueueService.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

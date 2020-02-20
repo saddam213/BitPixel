@@ -55,44 +55,6 @@ namespace DotMatrix.Controllers
 			if (!result.Success)
 				return Json(new { Success = false, Message = result.Message });
 
-			await PixelHub.UpdateFrontEndPixel(new PixelHubAddPixelRequest
-			{
-				X = model.X,
-				Y = model.Y,
-				Color = model.Color,
-				Type = PixelType.User,
-
-				PixelId = result.PixelId,
-				UserId = result.UserId,
-				UserName = result.UserName,
-				UserPoints = result.UserPoints,
-				TeamId = result.TeamId,
-				TeamName = result.TeamName,
-				NewPoints = result.NewPoints,
-
-				GameId = result.GameId,
-				GameName = result.GameName,
-				IsApi = false
-			});
-
-			if (result.IsPrizeWinner)
-			{
-				await PixelHub.UpdateFrontEndPrize(new PixelHubAddPrizeRequest
-				{
-					X = model.X,
-					Y = model.Y,
-					UserId = userId,
-					PrizeId = result.PrizeId,
-					PrizeName = result.PrizeName,
-					PrizeUser = User.Identity.Name,
-					PrizePoints = result.PrizePoints,
-					PrizeDescription = result.PrizeDescription,
-					UserPoints = result.UserPoints,
-					GameId = result.GameId,
-					GameName = result.GameName
-				});
-			}
-
 			return Json(new { Success = true });
 		}
 

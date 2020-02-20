@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ using DotMatrix.Base.Processor;
 using DotMatrix.Common.DataContext;
 using DotMatrix.Data.DataContext;
 using DotMatrix.Enums;
+using DotMatrix.QueueService.Client;
+using DotMatrix.QueueService.Common;
 
 namespace DotMatrix.AwardService.Implementation
 {
@@ -21,7 +24,10 @@ namespace DotMatrix.AwardService.Implementation
 		private static readonly Log Log = LoggingManager.GetLog(typeof(AwardEngine));
 
 		private static IDataContextFactory DataContextFactory = new DataContextFactory();
-		private static NotificationProxy NotificationProxy = new NotificationProxy();
+
+		private static readonly string _endPoint = ConfigurationManager.AppSettings["PixelHub_Endpoint"];
+		private static readonly string _authToken = ConfigurationManager.AppSettings["Signalr_AuthToken"];
+		private static PixelHubClient PixelHubClient = new PixelHubClient(_endPoint, _authToken);
 
 		protected override TimeSpan ProcessPeriod
 		{
@@ -149,7 +155,20 @@ namespace DotMatrix.AwardService.Implementation
 					return false;
 				}
 
-				await NotificationProxy.InternalSendAward(result);
+				await PixelHubClient.NotifyAward(new AwardNotification
+				{
+					AwardId = result.AwardId,
+					Level = result.AwardLevel,
+					Name = result.AwardName,
+					Points = result.AwardPoints,
+					UserId = result.UserId,
+					UserName = result.UserName
+				});
+				await PixelHubClient.NotifyPoints(new PointsNotification
+				{
+					UserId = result.UserId,
+					Points = result.UserPoints
+				});
 				Log.Message(LogLevel.Info, "[InsertAward] - Inserting award complete.");
 				return true;
 			}

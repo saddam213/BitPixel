@@ -190,10 +190,6 @@
     <Compile Include="Helpers\DataTablesModelBinder.cs" />
     <Compile Include="Helpers\ValidationHelpers.cs" />
     <Compile Include="Hubs\AuthorizeLocalAttribute.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubAddPrizeRequest.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubAwardRequest.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubNewPrizeUpdate.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubPrizeUpdate.cs" />
     <Compile Include="Identity\ApplicationRole.cs" />
     <Compile Include="Identity\ApplicationUserManager.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -211,14 +207,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\HubIdentityProvider.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubPixelUpdate.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubPointsUpdate.cs" />
-    <Compile Include="Hubs\PixelHub\Models\PixelHubAddPixelRequest.cs" />
     <Compile Include="Identity\ApplicationDbContext.cs" />
     <Compile Include="Identity\ApplicationUserRole.cs" />
     <Compile Include="Identity\ApplicationUserStore.cs" />
     <Compile Include="Identity\ApplicationUser.cs" />
-    <Compile Include="Hubs\PixelHub\PixelHub.cs" />
+    <Compile Include="Hubs\PixelHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Content\Bundles\bitPixel_bundle.css" />
     <Content Include="Scripts\Bundles\bitPixel_bundle.js" />

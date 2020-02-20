@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -37,7 +38,7 @@ namespace DotMatrix
 
 		private void InitializeCache(string nodeKey)
 		{
-			DependencyRegistrar.RegisterSingletonComponent<IQueueHubClient>(new QueueHubClient());
+			DependencyRegistrar.RegisterSingletonComponent<IQueueHubClient>(new QueueHubClient(ConfigurationManager.AppSettings["QueueService_Endpoint"]));
 			DependencyRegistrar.RegisterSingletonComponent<IThrottleCache>(new ThrottleCache());
 			Task.WaitAll(new[]
 			{

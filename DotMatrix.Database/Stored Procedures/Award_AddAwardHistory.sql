@@ -13,6 +13,7 @@ AS
   DECLARE @AwardLevel TINYINT;
   DECLARE @AwardName NVARCHAR(50);
   DECLARE @AwardPoints INT = 0;
+  DECLARE @AwardHistoryId INT;
   DECLARE @Timestamp DATETIME2(7) = SYSUTCDATETIME();
 
   SELECT
@@ -32,13 +33,17 @@ AS
 
   INSERT INTO [dbo].[AwardHistory] ([AwardId], [UserId], [GameId], [Points], [Version],[VersionData], [Timestamp])
   SELECT @AwardId, @UserId, @GameId, @AwardPoints, @Version, @VersionData, @Timestamp
+  SELECT @AwardHistoryId = SCOPE_IDENTITY();
 
   EXEC @UserPoints = [dbo].[User_AuditPoints] @UserId
 
   SELECT 
-   @UserId AS [UserId]
-  ,SCOPE_IDENTITY() AS [AwardId]
-  ,@AwardName AS [AwardName]
-  ,@AwardPoints AS [AwardPoints]
-  ,@AwardLevel AS [AwardLevel]
-  ,@UserPoints AS [UserPoints]
+     @UserId AS [UserId]
+    ,[UserName] AS [UserName]
+    ,@AwardHistoryId AS [AwardId]
+    ,@AwardName AS [AwardName]
+    ,@AwardPoints AS [AwardPoints]
+    ,@AwardLevel AS [AwardLevel]
+    ,@UserPoints AS [UserPoints]
+  FROM [dbo].[Users]
+  WHERE [Id] = @UserId
