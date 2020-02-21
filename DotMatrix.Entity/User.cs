@@ -7,7 +7,6 @@ namespace DotMatrix.Entity
 	public class User
 	{
 		public int Id { get; set; }
-		public int TeamId { get; set; }
 		public string Email { get; set; }
 		public string UserName { get; set; }
 		public string ApiKey { get; set; }
@@ -17,9 +16,6 @@ namespace DotMatrix.Entity
 		public string SecurityStamp { get; set; }
 		public bool EmailConfirmed { get; set; }
 		public DateTime? LockoutEndDateUtc { get; set; }
-
-		[ForeignKey("TeamId")]
-		public Team Team { get; set; }
 
 		public virtual ICollection<Click> Clicks { get; set; }
 		public virtual ICollection<Prize> Prizes { get; set; }

@@ -72,7 +72,6 @@
     <Build Include="Tables\Users.sql" />
     <Build Include="Stored Procedures\Game_AddPixel.sql" />
     <Build Include="Stored Procedures\Game_GetPixelRectangle.sql" />
-    <Build Include="Tables\Team.sql" />
     <Build Include="Tables\PaymentUserMethod.sql" />
     <Build Include="Tables\PaymentReceipt.sql" />
     <Build Include="Tables\PaymentAddress.sql" />

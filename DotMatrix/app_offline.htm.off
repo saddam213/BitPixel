@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Update</title>
+
+	<style>
+		html,
+		body {
+			height: 100%;
+		}
+
+		html {
+			font-size: 10px;
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+
+		body {
+			background-color: #002b36;
+			color: #268BD2;
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 15px;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			text-rendering: optimizeLegibility;
+			width: 100%;
+		}
+
+		.headline {
+			background: #073642;
+			color: #fff;
+			display: table;
+			height: 220px;
+			position: relative;
+			width: 100%;
+		}
+
+
+		.logo-container {
+			text-align: center;
+			width: 300px;
+			margin: 40px auto 0;
+			margin-bottom: 50px;
+			fill:#B58900;
+			color:#B58900;
+			text-align:center
+		}
+
+		.logo-container > .logo {
+			padding-left:50px;
+			padding-right:50px;
+		}
+
+
+		h1 {
+			font-size:75px;
+			font-weight: 700;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+
+		h2 {
+			font-size:45px;
+			font-weight: 500;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+
+		.page-message-container {
+			margin: 0 auto;
+			position: relative;
+			width: 600px;
+		}
+
+		.page-message {
+			margin-top: 10%;
+		}
+
+
+	</style>
+</head>
+<body>
+	<div class="headline">
+		<div class="logo-container" >
+			<div class="logo">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+					<path d="M256 208V48a48 48 0 0 0-48-48H48A48 48 0 0 0 0 48v160a48 48 0 0 0 48 48h160a48 48 0 0 0 48-48zM48 48h160v160H48zm384 176h48v-80a48 48 0 0 0-48-48H288v48h144zM96 160h64V96H96zm496 96H432a48 48 0 0 0-48 48v160a48 48 0 0 0 48 48h160a48 48 0 0 0 48-48V304a48 48 0 0 0-48-48zm0 208H432V304h160zM208 288h-48v80a48 48 0 0 0 48 48h144v-48H208zm336 64h-64v64h64z"/>
+				</svg>
+			</div>
+			<h1>BitPixel</h1>
+		</div>
+	</div>
+
+	<div class="page-message-container">
+		<div class="page-message">
+			<h2>Game Update In Progress</h2>
+		</div>
+	</div>
+</body>
+</html>

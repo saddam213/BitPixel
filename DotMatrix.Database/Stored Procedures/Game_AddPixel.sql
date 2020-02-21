@@ -9,10 +9,8 @@
  ,@MaxPoints INT
 AS
 
-	DECLARE @TeamId INT;
 	DECLARE @UserPoints INT;
 	DECLARE @UserName NVARCHAR(128);
-	DECLARE @TeamName NVARCHAR(128);
 
 	DECLARE @PixelId INT;
 	DECLARE @PixelType TINYINT;
@@ -37,11 +35,8 @@ AS
 
 	SELECT 
 		@UserPoints = u.[Points],
-		@UserName = u.[UserName],
-		@TeamId = t.[Id],
-		@TeamName = t.[Name]
+		@UserName = u.[UserName]
 	FROM [dbo].[Users] u
-	JOIN [dbo].[Team] t ON t.[Id] = u.[TeamId]
 	WHERE u.[Id] = @UserId
 
 	SELECT @PixelPoints = ISNULL(@PixelPoints, @Points);
@@ -92,8 +87,6 @@ AS
 		@PixelId AS [PixelId], 
 		@UserId AS [UserId],
 		@UserName AS [UserName], 
-		@TeamId AS [TeamId],
-		@TeamName AS [TeamName],
 		@NewPixelPoints AS [NewPoints],
 		@UserPoints AS [UserPoints]
 	

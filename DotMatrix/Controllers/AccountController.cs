@@ -151,8 +151,7 @@ namespace DotMatrix.Controllers
 					EmailConfirmed = false,
 					Points = 0,
 					ApiKey = apiKeyResult.Key,
-					ApiSecret = apiKeyResult.Secret,
-					TeamId = Constant.DefaultTeamId,
+					ApiSecret = apiKeyResult.Secret
 				};
 
 				var result = await UserManager.CreateAsync(user, model.Password);

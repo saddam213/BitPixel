@@ -66,7 +66,6 @@ namespace DotMatrix.Core.Pixel
 				Type = p.Type,
 				Color = p.Color,
 				Player = p.User.UserName,
-				Team = p.User.Team.Name,
 				Points = p.Points
 			};
 		}
@@ -80,8 +79,7 @@ namespace DotMatrix.Core.Pixel
 				Type = PixelType.Empty,
 				Color = "#FFFFFF",
 				Points = Constant.PixelPoints,
-				Player = "Empty Pixel",
-				Team = "Empty Pixel"
+				Player = "Empty Pixel"
 			};
 		}
 

@@ -132,9 +132,7 @@ namespace DotMatrix.QueueService.Implementation
 						UserName = addPixelResult.UserName,
 
 						GameId = pixelRequest.GameId,
-						GameName = addPixelResult.GameName,
-						TeamId = addPixelResult.TeamId,
-						TeamName = addPixelResult.TeamName
+						GameName = addPixelResult.GameName
 					}
 				};
 
@@ -154,9 +152,7 @@ namespace DotMatrix.QueueService.Implementation
 						UserName = addPixelResult.UserName,
 
 						GameId = pixelRequest.GameId,
-						GameName = addPixelResult.GameName,
-						TeamId = addPixelResult.TeamId,
-						TeamName = addPixelResult.TeamName
+						GameName = addPixelResult.GameName
 					};
 				}
 
@@ -206,8 +202,6 @@ namespace DotMatrix.QueueService.Implementation
 		public int UserId { get; set; }
 		public string UserName { get; set; }
 		public int UserPoints { get; set; }
-		public int TeamId { get; set; }
-		public string TeamName { get; set; }
 		public int NewPoints { get; set; }
 		public string GameName { get; set; }
 		public string Error { get; set; }

@@ -10,6 +10,5 @@ namespace DotMatrix.Common.Pixel
 		public PixelType Type { get; set; }
 		public int Points { get; set; }
 		public string Player { get; set; }
-		public string Team { get; set; }
 	}
 }

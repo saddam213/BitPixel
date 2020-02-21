@@ -10,7 +10,6 @@ namespace DotMatrix.Enums
 	public static class Constant
 	{
 		public const int SystemUserId = 1;
-		public const int DefaultTeamId = 1;
 		public const int DefaultGameId = 1;
 		//public const int ClicksPerSecond = 3;
 		public const int ClicksPerDay = 200000;

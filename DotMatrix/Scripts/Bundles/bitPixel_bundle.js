@@ -25674,8 +25674,6 @@ return jQuery;
   Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=bootstrap.bundle.js.map
-
 /*!
  * mustache.js - Logic-less {{mustache}} templates with JavaScript
  * http://github.com/janl/mustache.js
@@ -44527,32 +44525,14 @@ const getJson = (url, vars) => {
 	});
 }
 
-function getMousePos(canvas, evt) {
-	var rect = canvas.getBoundingClientRect();
+const getMousePos = (canvas, evt) => {
+	const rect = canvas.getBoundingClientRect();
 	return {
 		x: evt.clientX - rect.left,
 		y: evt.clientY - rect.top
 	};
 }
 
-function rgb2hex(red, green, blue) {
-	var rgb = blue | (green << 8) | (red << 16);
-	return '#' + (0x1000000 + rgb).toString(16).slice(1)
-}
-
-function hex2rgb(hex) {
-	// long version
-	r = hex.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-	if (r) {
-		return r.slice(1, 4).map(function (x) { return parseInt(x, 16); });
-	}
-	// short version
-	r = hex.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
-	if (r) {
-		return r.slice(1, 4).map(function (x) { return 0x11 * parseInt(x, 16); });
-	}
-	return null;
-}
 
 const throttleFunction = (func, limit) => {
 	let lastFunc
@@ -44692,3 +44672,37 @@ jQuery.extend(jQuery.fn.dataTable.ext.classes, {
 jQuery.extend(jQuery.fn.dataTable.ext, {
 	errMode: "none"
 });
+
+
+
+
+const loadBackgroundImage = (imageName) => {
+	return new Promise(function (resolve, reject) {
+		const image = new Image();
+		const cacheBreak = Math.round((new Date()).getTime());
+		image.src = imageName + cacheBreak;
+		image.onload = function () {
+			return resolve(image);
+		}
+		image.onerror = function () {
+			return resolve(undefined);
+		}
+	});
+}
+
+
+
+const addCanvasPixel = async (context, x, y, color) => {
+	context.beginPath();
+	context.fillStyle = color,
+	context.fillRect(x, y, 1, 1);
+	context.closePath();
+}
+
+const getCanvasLocation = (canvas, scale, mouseEvent) => {
+	const rect = canvas.getBoundingClientRect();
+	return {
+		x: parseInt((mouseEvent.clientX - rect.left) / scale),
+		y: parseInt((mouseEvent.clientY - rect.top) / scale)
+	}
+}

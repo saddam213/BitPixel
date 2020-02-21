@@ -1,6 +1,5 @@
 ﻿CREATE TABLE [dbo].[Users] (
     [Id]                INT             IDENTITY (1, 1) NOT NULL,
-    [TeamId]            INT             NOT NULL,
     [ApiKey]            NVARCHAR (128)  NOT NULL,
     [ApiSecret]         NVARCHAR (128)  NOT NULL,
     [IsApiEnabled]      BIT             NOT NULL,

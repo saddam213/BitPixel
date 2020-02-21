@@ -214,6 +214,9 @@
     <Compile Include="Hubs\PixelHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Content\Bundles\bitPixel_bundle.css" />
+    <Content Include="Content\Bundles\bitPixel_bundle.min.css">
+      <DependentUpon>bitPixel_bundle.css</DependentUpon>
+    </Content>
     <Content Include="Scripts\Bundles\bitPixel_bundle.js" />
     <Content Include="Scripts\enums.js" />
     <Compile Include="Startup.cs" />
@@ -264,6 +267,7 @@
     <Content Include="Scripts\Event.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="App_Browsers\firefox.browser" />
+    <None Include="app_offline.htm.off" />
     <None Include="bundleconfig.json" />
     <None Include="Properties\PublishProfiles\Production_DEV.pubxml" />
     <None Include="Properties\PublishProfiles\Production_PROD.pubxml" />

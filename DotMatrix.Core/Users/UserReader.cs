@@ -49,7 +49,6 @@ namespace DotMatrix.Core.Users
 						Id = x.Id,
 						Name = x.UserName,
 						Email = x.Email,
-						Team = x.Team.Name,
 						Points = x.Points
 					}).GetDataTableResponseAsync(model);
 			}
@@ -65,9 +64,7 @@ namespace DotMatrix.Core.Users
 				ApiKey = x.ApiKey,
 				ApiSecret = x.ApiSecret,
 				IsApiEnabled = x.IsApiEnabled,
-				TeamId = x.TeamId,
 				Points = x.Points,
-				Team = x.Team.Name,
 				IsEmailConfirmed = x.EmailConfirmed,
 				IsLocked = x.LockoutEndDateUtc.HasValue
 			};

@@ -24162,16 +24162,8 @@ footer {
 	background-blend-mode: normal, difference, normal;
 }
 
-	.checker-board.zoomed-out {
-		background-size: 10px 10px;
-	}
-
-	.checker-board.zoomed-in {
-		background-size: 20px 20px;
-	}
-
 	.checker-board.thumbnail {
-		background-size: 10px 10px;
+		background-size: 6px 6px;
 	}
 
 
@@ -24179,8 +24171,20 @@ footer {
 		background-size: 32px 32px;
 	}
 
+	.checker-board.scale-1 {
+		background-size: 6px 6px;
+	}
+
+	.checker-board.scale-5 {
+		background-size: 10px 10px;
+	}
+
 	.checker-board.scale-10 {
 		background-size: 20px 20px;
+	}
+
+	.checker-board.scale-15 {
+		background-size: 30px 30px;
 	}
 
 #simplemodal-overlay {

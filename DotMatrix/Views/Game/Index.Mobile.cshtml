@@ -56,7 +56,7 @@
 		padding-right: 5px;
 	}
 
-	.canvas-scroll-container {
+	#canvas-scroll-container {
 		height: 100%;
 		overflow: auto;
 	}
@@ -188,14 +188,24 @@
 							</small>
 							<div class="btn-toolbar" role="toolbar">
 								<div class="btn-group" role="group">
-									<button id="pixel-zoomout" type="button" class="btn btn-sm btn-secondary p-1" disabled="disabled" style="border-radius:0">
-										<div style="width:23px;height:20px;">
-											<i class="fal fa-search-minus"></i>
+									<button data-scale="1" type="button" class="pixel-zoom btn btn-sm btn-secondary btn-warning p-1" disabled="disabled" style="border-radius:0">
+										<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:9px">
+											<i class="fal fa-search"></i>
 										</div>
 									</button>
-									<button id="pixel-zoomin" type="button" class="btn btn-sm btn-secondary p-1" style="border-radius:0">
-										<div style="width:23px;height:20px;">
-											<i class="fal fa-search-plus"></i>
+									@*<button data-scale="5" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
+						<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:12px">
+							<i class="fal fa-search"></i>
+						</div>
+					</button>*@
+									<button data-scale="10" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
+										<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:14px">
+											<i class="fal fa-search"></i>
+										</div>
+									</button>
+									<button data-scale="15" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
+										<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:16px">
+											<i class="fal fa-search"></i>
 										</div>
 									</button>
 								</div>
@@ -204,9 +214,9 @@
 
 
 						<div class="">
-							<small>
-								<i>Pixel Color</i>
-							</small>
+							<div>
+								<i style="font-size:11px">Pixel Color</i>
+							</div>
 							<div class="d-flex">
 								<div id="color-picker" class="btn-toolbar" role="toolbar">
 									<div class="btn-group btn-group-sm" role="group">
@@ -303,12 +313,12 @@
 
 
 			<div class="canvas-scroll-wrapper">
-				<div class="canvas-scroll-container">
+				<div id="canvas-scroll-container">
 					<div id="canvas-container" style="width:@(width)px;height:@(height)px">
 						<div id="pixel-finder">
 							<i class="fa fa-map-marker-alt" style="color:#ff0000;text-shadow: 1px 1px 1px black"></i>
 						</div>
-						<canvas id="mainCanvas" width="@width" height="@height" class="zoomed-out"></canvas>
+						<canvas id="mainCanvas" width="@width" height="@height" class="scale-1"></canvas>
 					</div>
 				</div>
 			</div>
@@ -412,22 +422,25 @@
 	<script>
 		(async ($) => {
 
-			const gameId = @gameId;
-			const canvasWidth = @width;
-			const canvasHeight = @height;
-			const cacheBuster = '@cacheBreak';
-			const userName = '@User.Identity.Name';
+
+			const gameSettings = {
+				gameId: @gameId,
+				width: @width,
+				height: @height,
+				player: '@User.Identity.Name',
+			};
 
 			const userSettings = store.get("gameSettings")	|| {
-					color: '#000000',
-					maxPoints: 2,
-					showNotifications: true,
-					showTransparent: true,
+				color: '#000000',
+				maxPoints: 2,
+				showNotifications: true,
+				showTransparent: true,
 
-					showPixelLog: true,
-					showPrizeLog: true,
-					showErrorLog: true,
-					showChatLog: true
+				showPixelLog: true,
+				showPrizeLog: true,
+				showAwardLog: true,
+				showErrorLog: true,
+				showChatLog: true
 			};
 
 			const saveSettings = () => {
@@ -441,173 +454,238 @@
 
 				$("#log-toggle-pixel").prop("checked", userSettings.showPixelLog);
 				$("#log-toggle-prize").prop("checked", userSettings.showPrizeLog);
+				$("#log-toggle-award").prop("checked", userSettings.showAwardLog);
 				$("#log-toggle-error").prop("checked", userSettings.showErrorLog);
 				$("#log-toggle-chat").prop("checked", userSettings.showChatLog);
 
 				$("#transparent-toggle").prop("checked", userSettings.showTransparent);
+				$("#notifications-toggle").prop("checked", userSettings.showNotifications);
 				$("#jump-x, #jump-y").val(null);
 			}
 
 
 
+
+
+
+
 			const pixelHub = $.connection.pixelHub;
-
-			const mainCanvas = $("#mainCanvas");
+			const gameCanvas = document.getElementById('mainCanvas');
+			const gameCanvasContext = gameCanvas.getContext('2d');
 			const canvasContainer = $("#canvas-container");
-			const pixelFinder = $("#pixel-finder");
+			const canvasScrollContainer = $("#canvas-scroll-container");
+			const locationMarker = $("#pixel-finder");
 
+			let gameScale = 1;
+			let eyedropperEnabled = false;
+
+
+			const initializeGame = async () => {
+				await resetCanvas()
+
+				pixelHub.client.OnNotifyPixel = onNotifyPixel;
+				pixelHub.client.OnNotifyPrize = onNotifyPrize;
+				pixelHub.client.OnNotifyAward = onNotifyAward;
+				pixelHub.client.OnUserNotifyPoints = onUserNotifyPoints;
+				pixelHub.client.OnUserNotifyPrize = onUserNotifyPrize;
+				pixelHub.client.OnUserNotifyAward = onUserNotifyAward;
+				pixelHub.client.OnChatMessage = onChatMessage;
+				await $.connection.hub.start();
+				await pixelHub.server.joinGame(gameSettings.gameId);
+
+				// Setup Mouse Events
+				gameCanvas.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
+				gameCanvas.addEventListener('click', processLeftClick);
+				gameCanvas.addEventListener('contextmenu', processRightClick, false);
+				gameCanvas.addEventListener('mousemove', processMove, false);
+
+				locationMarker.on("click", function () {
+					locationMarker.hide();
+				});
+			}
+
+
+			const resetCanvas = async () => {
+				gameCanvas.height = gameSettings.height * gameScale;
+				gameCanvas.width = gameSettings.width * gameScale;
+				canvasContainer.css({ width: gameCanvas.width, height:gameCanvas.height });
+
+				gameCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
+				gameCanvasContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+				const background = gameScale == 1
+					? await loadBackgroundImage("../Content/Images/Games/" + gameSettings.gameId + "/background-small.png?v=")
+					: await loadBackgroundImage("../Content/Images/Games/" + gameSettings.gameId + "/background-large.png?v=");
+				if (gameScale == 1) {
+					gameCanvasContext.drawImage(background, 0, 0);
+					gameCanvasContext.scale(1, 1);
+				}
+				else if (gameScale == 5) {
+					gameCanvasContext.drawImage(background, 0, 0);
+					gameCanvasContext.scale(5, 5);
+				}
+				else if (gameScale == 10) {
+					gameCanvasContext.scale(2, 2);
+					gameCanvasContext.drawImage(background, 0, 0);
+					gameCanvasContext.scale(5, 5);
+				}
+				else if (gameScale == 15) {
+					gameCanvasContext.scale(3, 3);
+					gameCanvasContext.drawImage(background, 0, 0);
+					gameCanvasContext.scale(5, 5);
+				}
+				await getServerPixels();
+			}
+
+			const scaleCanvas = async (scaleValue) => {
+				gameScale = scaleValue
+				await resetCanvas();
+				gameCanvas.classList.remove("scale-1", "scale-5", "scale-10", "scale-15");
+				gameCanvas.classList.add("scale-" + gameScale);
+			}
+
+
+			const processLeftClick = async (mouseEvent) => {
+				mouseEvent.preventDefault();
+				mouseEvent.stopImmediatePropagation();
+
+				const location = getCanvasLocation(gameCanvas, gameScale, mouseEvent);
+				const getPixelRequest = {
+					gameId: gameSettings.gameId,
+					x: location.x,
+					y: location.y
+				}
+
+				const pixelResponse = await getServerPixel(getPixelRequest);
+				if (pixelResponse === undefined) {
+					return;
+				}
+				setSelectedPixel(pixelResponse);
+			}
+
+
+			const processRightClick =  async (mouseEvent) => {
+				mouseEvent.preventDefault();
+				mouseEvent.stopImmediatePropagation();
+
+				const location = getCanvasLocation(gameCanvas, gameScale, mouseEvent);
+				let addPixelRequest = {
+					gameId: gameSettings.gameId,
+					x: location.x,
+					y: location.y,
+					color: userSettings.color,
+					maxPoints: userSettings.maxPoints
+				}
+				await addServerPixel(addPixelRequest);
+			}
+
+
+			const processMove = async (mouseEvent) => {
+				const location = getCanvasLocation(gameCanvas, gameScale, mouseEvent);
+				setLocation(location)
+			}
+
+
+			const addServerPixel = async (data) => {
+				if (gameSettings.player.length == 0) {
+					notifyError("You must be logged in to create pixels.");
+					return;
+				}
+				const result = await postJson('/Game/AddPixel', data);
+				if (result.Success == false) {
+					notifyError(result.Message);
+				}
+				notifyPixel(result);
+			}
+
+			const getServerPixel = async (data) => {
+				const result = await postJson('/Game/GetPixel', data);
+				if (result.Success == false) {
+					notifyError(result.Message);
+					return;
+				}
+				return result.Data;
+			}
+
+			const getServerPixels = async () => {
+				const pixelUpdates = await getJson('/Game/GetPixels?gameId=' + gameSettings.gameId) || [];
+				for (let pixel of pixelUpdates) {
+					addCanvasPixel(gameCanvasContext, pixel.X, pixel.Y, pixel.Color);
+				}
+			}
+
+			const onNotifyPixel = async (notification) => {
+				addCanvasPixel(gameCanvasContext, notification.X, notification.Y, notification.Color);
+				updateSelectedPixel(notification);
+			}
+
+			const onNotifyPrize = async (notification) => {
+
+			}
+
+			const onNotifyAward = async (notification) => {
+
+			}
+
+			const onUserNotifyPoints = async (notification) => {
+				$("#user-points").text(notification.Points);
+			}
+
+			const onUserNotifyPrize = async (notification) => {
+				notifyPrize(notification);
+			}
+
+			const onUserNotifyAward = async (notification) => {
+				notifyAward(notification);
+			}
+
+			const onChatMessage = async (message) => {
+		
+			}
+
+
+
+			const toggleTransparentBackground = () => {
+				gameCanvas.classList.remove("checker-board");
+				if (userSettings.showTransparent === true) {
+					gameCanvas.classList.add("checker-board");
+				}
+			}
+
+			const jumpToLocation = (x, y) => {
+				const posx = x * gameScale;
+				const posy = y * gameScale;
+				const containerWidth = canvasScrollContainer.width();
+				const containerHeight = canvasScrollContainer.height();
+
+				const deltaX = containerWidth / 8;
+				const deltaY = containerHeight / 8;
+				if (posx > (containerWidth - deltaX) || posx < (containerWidth - deltaX)) {
+						canvasScrollContainer.scrollLeft(posx - (containerWidth / 2));
+				}
+
+				if (posy > (containerHeight - deltaY) || posy < (containerHeight - deltaY)) {
+				 canvasScrollContainer.scrollTop(posy - (containerHeight / 2));
+				}
+
+				if (gameScale == 1) {
+					locationMarker.css({ left: posx - 7, top: posy - 17, "font-size": "14px" }).show();
+				}
+				else if (gameScale == 5) {
+					locationMarker.css({ left: posx - 5, top: posy - 20, "font-size": "18px" }).show();
+				}
+				else if (gameScale == 10) {
+					locationMarker.css({ left: posx - 2, top: posy - 20, "font-size": "20px" }).show();
+				}
+				else if (gameScale == 15) {
+					locationMarker.css({ left: posx, top: posy - 20, "font-size": "22px" }).show();
+				}
+			}
 
 			const prizeNotifyTemplate = $("#prizeNotifyTemplate").html();
 			const awardNotifyTemplate = $("#awardNotifyTemplate").html();
 			const errorNotifyTemplate = $("#errorNotifyTemplate").html();
 			const infoNotifyTemplate = $("#infoNotifyTemplate").html();
-
-			let scale = 1;
-			const canvas = document.getElementById('mainCanvas');
-			const context = canvas.getContext('2d');
-
-
-			let isSmallLoaded = false;
-			let isLargeLoaded = false;
-			const backgroundSmall = new Image();
-			const backgroundLarge = new Image();
-
-			let eyedropperEnabled = false;
-
-			const loadSmallBackground = () => {
-				return new Promise(function (resolve, reject) {
-					backgroundSmall.src = "../Content/Images/Games/" + gameId + "/background-small.png?v=" + cacheBuster;
-					backgroundSmall.onload = function () {
-						isSmallLoaded = true;
-						return resolve();
-					}
-					backgroundSmall.onerror = function () {
-						return resolve();
-					}
-				});
-			}
-
-			const loadLargeBackground = () => {
-				return new Promise(function (resolve, reject) {
-					backgroundLarge.src = "../Content/Images/Games/" + gameId + "/background-large.png?v=" + cacheBuster;
-					backgroundLarge.onload = function () {
-						isLargeLoaded = true;
-						return resolve();
-					}
-					backgroundLarge.onerror = function () {
-						return resolve();
-					}
-				});
-			}
-
-			const initializeCanvas = async () => {
-
-				await loadSmallBackground();
-				await loadLargeBackground();
-				await initializeGame();
-
-				canvas.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
-				canvas.addEventListener('click', async function (evt) {
-					evt.preventDefault();
-					evt.stopImmediatePropagation();
-
-					const mousePos = getMousePos(canvas, evt);
-					const getPixelRequest = {
-						gameId: gameId,
-						x: parseInt(mousePos.x / scale),
-						y: parseInt(mousePos.y / scale)
-					}
-
-					const pixelResponse = await getServerPixel(getPixelRequest);
-					if (pixelResponse === undefined) {
-						return;
-					}
-
-					setSelectedPixel(pixelResponse);
-				});
-				canvas.addEventListener('contextmenu', async function (evt) {
-					evt.preventDefault();
-					evt.stopImmediatePropagation();
-
-					const mousePos = getMousePos(canvas, evt);
-					let addPixelRequest = {
-						gameId: gameId,
-						x: parseInt(mousePos.x / scale),
-						y: parseInt(mousePos.y / scale),
-						color: userSettings.color,
-						maxPoints: $("#max-points").val()
-					}
-					setLocation(addPixelRequest)
-					await addServerPixel(addPixelRequest);
-				}, false);
-
-				canvas.addEventListener('mousemove', function (evt) {
-					const mousePos = getMousePos(canvas, evt);
-					const locationData = {
-						x: parseInt(mousePos.x / scale),
-						y: parseInt(mousePos.y / scale)
-					}
-					setLocation(locationData)
-				}, false);
-			}
-
-			const initializeGame = async () => {
-				await resetCanvas(backgroundSmall)
-
-				pixelHub.client.OnNotifyPixel = function (notification) {
-					addCanvasPixel(notification.X, notification.Y, notification.Color);
-					updateSelectedPixel(notification);
-				};
-
-				//pixelHub.client.OnNotifyPrize = function (notification) {
-				//	logPrize(notification);
-				//};
-
-				//pixelHub.client.OnNotifyAward = function (notification) {
-				//	logAward(notification);
-				//};
-
-				pixelHub.client.OnUserNotifyPoints = function (notification) {
-					updatePoints(notification);
-					notifyPoints(notification);
-				}
-
-				pixelHub.client.OnUserNotifyPrize = function (notification) {
-					notifyPrize(notification);
-				}
-
-				pixelHub.client.OnUserNotifyAward = function (notification) {
-					notifyAward(notification);
-				}
-
-				//pixelHub.client.OnChatMessage = function (result) {
-				//	logChat(result);
-				//}
-
-				await $.connection.hub.start();
-				await pixelHub.server.joinGame(gameId);
-			}
-
-			const resetCanvas = async (background) => {
-				canvas.height = canvasHeight * scale;
-				canvas.width = canvasWidth * scale;
-				canvasContainer.css({ width: canvas.width, height:canvas.height });
-
-				context.setTransform(1, 0, 0, 1, 0, 0);
-				context.clearRect(0, 0, canvas.width, canvas.height);
-				context.drawImage(background, 0, 0)
-				context.scale(scale, scale);
-
-				await getServerUpdates();
-			}
-
-			const addCanvasPixel = async (x, y, color) => {
-				context.beginPath();
-				context.fillStyle = color,
-				context.fillRect(x, y, 1, 1);
-				context.closePath();
-			}
-
 
 
 			const setLocation = (location) => {
@@ -622,8 +700,9 @@
 				if (eyedropperEnabled === true) {
 					setSelectedColor(pixel.Color);
 				}
+				
 				if (pixel.Type == 2) {
-					$("#selected-points,#selected-user").html("<small><i>Fixed Pixel</i></small>");
+					$("#selected-points,#selected-user").html("<small><i>Game Pixel</i></small>");
 					return;
 				}
 
@@ -640,35 +719,19 @@
 				const selectedX = $("#selected-x").text();
 				const selectedY = $("#selected-y").text();
 				if (selectedX == pixel.X && selectedY == pixel.Y) {
-					$("#selected-team").text(pixel.Team);
 					$("#selected-owner").text(pixel.Player);
 					$("#selected-points").text(pixel.Points);
 				}
 			}
 
-			const zoomInCanvas = async () => {
-				if (isLargeLoaded === true) {
-					scale = 10;
-					await resetCanvas(backgroundLarge);
-					return true;
-				}
-				return false;
-			}
 
-			const zoomOutCanvas = async () => {
-				if (isSmallLoaded === true) {
-					scale = 1;
-					await resetCanvas(backgroundSmall);
-					return true;
-				}
-				return false;
-			}
 
-			const notifyPoints = (notification) => {
-				if (userSettings.showPrizeLog === false) {
+
+			const notifyPixel = (notification) => {
+				if (userSettings.showPixelLog === false) {
 					return;
 				}
-				//notification.Points
+				$("#toast-container").prepend($(Mustache.render(infoNotifyTemplate, notification)).toast('show'));
 			};
 
 			const notifyPrize = (notification) => {
@@ -679,10 +742,10 @@
 			};
 
 			const notifyAward = (notification) => {
-				if (userSettings.showPrizeLog === false) {
+				if (userSettings.showAwardLog === false) {
 					return;
 				}
-				notification.AwardLevel = Enums.GetName(Enums.AwardType, notification.AwardLevel);
+				notification.Level = Enums.GetName(Enums.AwardType, notification.Level);
 				$("#toast-container").prepend($(Mustache.render(awardNotifyTemplate, notification)).toast('show'));
 			};
 
@@ -693,59 +756,7 @@
 				$("#toast-container").prepend($(Mustache.render(errorNotifyTemplate, {Message: error})).toast('show'));
 			};
 
-			const notifyPixel = (notification) => {
-				if (userSettings.showPixelLog === false) {
-					return;
-				}
-				$("#toast-container").prepend($(Mustache.render(infoNotifyTemplate, notification)).toast('show'));
-			};
 
-
-
-			const updatePoints = (result) => {
-				$("#user-points").text(result.Points);
-			};;
-
-
-			const addServerPixel = async (data) => {
-				if (userName.length == 0) {
-					notifyError("You must be logged in to create pixels.");
-					return;
-				}
-				const result = await postJson('@Url.Action("AddPixel", "Game")', data);
-				if (result.Success == false) {
-					notifyError(result.Message);
-					return;
-				}
-				notifyPixel(data);
-			}
-
-			const getServerPixel = async (data) => {
-				const result = await postJson('@Url.Action("GetPixel", "Game")', data);
-				if (result.Success == false) {
-					notifyError(result.Message);
-					return;
-				}
-				return result.Data;
-			}
-
-			const getServerUpdates = async () => {
-				const deltas = await getJson('@Url.Action("GetPixels", "Game", new { gameId = Model.Game.Id})');
-				if (deltas) {
-					for (let i = 0; i < deltas.length; i++) {
-						const pixel = deltas[i];
-						addCanvasPixel(pixel.X, pixel.Y, pixel.Color);
-					}
-				}
-			}
-
-
-			const setSelectedColor = (color) => {
-				userSettings.color = color;
-				saveSettings();
-				$("#color-dropdown").spectrum("set", color);
-				$("#color-picker-selected, #color-dropdown-selected").css("background-color", color);
-			}
 
 
 			$("#log-toggle-pixel").on("click", function () {
@@ -758,39 +769,41 @@
 				saveSettings();
 			});
 
+			$("#log-toggle-award").on("click", function () {
+				userSettings.showAwardLog = $(this).is(":checked");
+				saveSettings();
+			});
+
 			$("#log-toggle-error").on("click", function () {
 				userSettings.showErrorLog = $(this).is(":checked");
 				saveSettings();
 			});
 
-			$("#log-toggle-chat").on("click", function () {
-				userSettings.showChatLog = $(this).is(":checked");
+
+			$("#max-points").on("keyup change paste", function () {
+				const value = Number($(this).val()) || 1;
+				userSettings.maxPoints = Math.max(1, value);
 				saveSettings();
-
-				$("#chat-container").hide();
-				if (userSettings.showChatLog === true) {
-					$("#chat-container").show();
-				}
 			});
 
 
-			$("#pixel-zoomin").on("click", async function () {
-				if (await zoomInCanvas() === true) {
-					$(this).attr("disabled", "disabled");
-					$("#pixel-zoomout").removeAttr("disabled");
-					mainCanvas.removeClass("zoomed-out").addClass("zoomed-in");
-					pixelFinder.hide();
-				}
+			const setSelectedColor = (color) => {
+				userSettings.color = color;
+				saveSettings();
+				$("#color-dropdown").spectrum("set", color);
+				$("#color-picker-selected, #color-dropdown-selected").css("background-color", color);
+			}
+
+
+			$(".pixel-zoom").on("click", async function () {
+				$(".pixel-zoom").attr("disabled", "disabled");
+				locationMarker.hide();
+				const _this = $(this);
+				await scaleCanvas(_this.data("scale"));
+				$(".pixel-zoom").removeAttr("disabled").removeClass("btn-warning");
+				_this.attr("disabled", "disabled").addClass("btn-warning");
 			});
 
-			$("#pixel-zoomout").on("click", async function () {
-				if (await zoomOutCanvas() === true) {
-					$(this).attr("disabled", "disabled");
-					$("#pixel-zoomin").removeAttr("disabled");
-					mainCanvas.removeClass("zoomed-in").addClass("zoomed-out");
-					pixelFinder.hide();
-				}
-			});
 
 			$("#transparent-toggle").on("click", async function () {
 				userSettings.showTransparent = $(this).is(":checked");
@@ -798,14 +811,12 @@
 				toggleTransparentBackground();
 			})
 
-			const toggleTransparentBackground = () => {
-				mainCanvas.removeClass("checker-board");
-				if (userSettings.showTransparent === true) {
-					mainCanvas.addClass("checker-board");
-				}
-			}
 
 
+			$("#notifications-toggle").on("click", async function () {
+				userSettings.showNotifications = $(this).is(":checked");
+				saveSettings();
+			})
 
 
 			$(".color-picker-item").on("click", function () {
@@ -841,85 +852,22 @@
 
 
 			$("#prizes-modal").on("click", async function () {
-				await openModalGet("/Prizes/ViewPrizesModal", { gameId: gameId });
+				await openModalGet("/Prizes/ViewPrizesModal", { gameId: gameSettings.gameId });
 			});
 
-
-			pixelFinder.on("click", function () {
-				pixelFinder.hide();
-			});
-
-
-			$("#log-window").on("click",".location-jump" ,function () {
-				const _this = $(this);
-				const x = _this.data("x");
-				const y = _this.data("y");
-				jumpToLocation(x, y);
-			});
-
-
-			const jumpToLocation = (x, y) => {
-
-				const posx = x * scale;
-				const posy = y * scale;
-				const scrollContainer = $(".canvas-scroll-container");
-
-				const containerWidth = scrollContainer.width();
-				const containerHeight = scrollContainer.height();
-
-
-				const deltaX = containerWidth / 8;
-				const deltaY = containerHeight / 8;
-				if (posx > (containerWidth - deltaX) || posx < (containerWidth - deltaX)) {
-						scrollContainer.scrollLeft(posx - (containerWidth / 2));
-				}
-
-
-				if (posy > (containerHeight - deltaY) || posy < (containerHeight - deltaY)) {
-				 scrollContainer.scrollTop(posy - (containerHeight / 2));
-				}
-				if (scale > 1) {
-					pixelFinder.css({ left: posx - 2, top: posy - 20, "font-size": "22px" }).show();
-					return;
-				}
-				pixelFinder.css({ left: posx - 7, top: posy - 17, "font-size": "14px" }).show();
-			}
-
-			$("#chat-send").on("click", async function () {
-				const _this = $(this);
-				const messageBox = $("#chat-message");
-				const message = messageBox.val();
-				if (message.length == 0) {
-					return;
-				}
-				_this.attr("disabled", "disabled");
-				messageBox.attr("disabled", "disabled");
-
-				const dataMessage = message.substring(0, Math.min(240, message.length));
-				await pixelHub.server.sendChatMessage(dataMessage);
-				messageBox.val(null);
-				messageBox.removeAttr("disabled");
-				_this.removeAttr("disabled");
-			})
-
-			$("#chat-message").on("keyup", function (e) {
-				if (e.keyCode == 13) {
-					$("#chat-send").trigger("click");
-				}
-			});
 
 
 			$("#jump-send").on("click", function () {
 				const posX = Number($("#jump-x").val()) || 0;
 				const posY = Number($("#jump-y").val() || 0);
-				if (posX < 0 || posX > (canvasWidth - 1)) {
+				if (posX < 0 || posX > (gameSettings.width - 1)) {
 					$("#jump-x").addClass("text-danger");
-					pixelFinder.hide();
+					locationMarker.hide();
 					return;
 				}
-				if (posY < 0 || posY > (canvasHeight - 1)) {
+				if (posY < 0 || posY > (gameSettings.height - 1)) {
 					$("#jump-y").addClass("text-danger");
-					pixelFinder.hide();
+					locationMarker.hide();
 					return;
 				}
 
@@ -927,11 +875,6 @@
 				jumpToLocation(posX, posY);
 			});
 
-			$("#max-points").on("keyup change paste", function () {
-				const value = Number($(this).val()) || 1;
-				userSettings.maxPoints = Math.max(1, value);
-				saveSettings();
-			});
 
 			$(".selected-pos").on("click", function () {
 				$("#jump-x").val($("#selected-x").text());
@@ -939,8 +882,7 @@
 			})
 
 			loadSettings();
-			initializeCanvas();
-
+			initializeGame();
 		})(jQuery);
 
 	</script>

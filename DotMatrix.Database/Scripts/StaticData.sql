@@ -2,7 +2,6 @@
 
 DECLARE @SystemUserId INT = 1;
 DECLARE @DefaultGameId INT = 1;
-DECLARE @DefaultTeamId INT = 1;
 DECLARE @AdminRoleId INT = 1;
 
 
@@ -13,17 +12,11 @@ VALUES (@DefaultGameId, N'Game 1', N'', 0, 0, 800, 600, 0, @Current)
 SET IDENTITY_INSERT [dbo].[Game] OFF
 
 
--- Team
-SET IDENTITY_INSERT [dbo].[Team] ON 
-INSERT [dbo].[Team] ([Id], [Name]) VALUES (@DefaultTeamId, N'No Team')
-SET IDENTITY_INSERT [dbo].[Team] OFF
-
-
 -- Users
 SET IDENTITY_INSERT [dbo].[Users] ON 
-INSERT [dbo].[Users] ([Id], [UserName], [Email], [EmailConfirmed], [PasswordHash], [SecurityStamp], [LockoutEndDateUtc], [LockoutEnabled], [AccessFailedCount], [TeamId], [IsApiEnabled], [ApiKey], [ApiSecret], [Points]) 
+INSERT [dbo].[Users] ([Id], [UserName], [Email], [EmailConfirmed], [PasswordHash], [SecurityStamp], [LockoutEndDateUtc], [LockoutEnabled], [AccessFailedCount], [IsApiEnabled], [ApiKey], [ApiSecret], [Points]) 
 VALUES 
- (@SystemUserId, N'System',	N'System@bitpixel.chainstack.nz', 1, N'AJeijVxBCaOH3r80aPR9yzc/aLGZYw87XJSZDjcApDd14LtWbj50bUBSJch45Onyww==', N'EAC481E0-258B-4BFC-BA6C-FB74360D8A82',NULL, 1, 0, @DefaultTeamId, 0,'','', 0)
+ (@SystemUserId, N'System',	N'System@bitpixel.chainstack.nz', 1, N'AJeijVxBCaOH3r80aPR9yzc/aLGZYw87XJSZDjcApDd14LtWbj50bUBSJch45Onyww==', N'EAC481E0-258B-4BFC-BA6C-FB74360D8A82',NULL, 1, 0, 0,'','', 0)
 SET IDENTITY_INSERT [dbo].[Users] OFF
 
 

@@ -34,8 +34,6 @@
 //				UserId = result.UserId,
 //				UserName = result.UserName,
 //				UserPoints = result.UserPoints,
-//				TeamId = result.TeamId,
-//				TeamName = result.TeamName,
 //				NewPoints = result.NewPoints,
 
 //				IsApi = true,

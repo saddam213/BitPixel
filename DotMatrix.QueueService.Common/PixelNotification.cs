@@ -14,9 +14,6 @@ namespace DotMatrix.QueueService.Common
 		public int UserId { get; set; }
 		public string UserName { get; set; }
 
-		public int TeamId { get; set; }
-		public string TeamName { get; set; }
-
 		public int GameId { get; set; }
 		public string GameName { get; set; }
 	}

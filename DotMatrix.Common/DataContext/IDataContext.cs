@@ -18,7 +18,6 @@ namespace DotMatrix.Common.DataContext
 		DbSet<EmailOutbox> EmailOutbox { get; set; }
 
 		DbSet<Entity.Game> Games { get; set; }
-		DbSet<Team> Teams { get; set; }
 		DbSet<Entity.Pixel> Pixel { get; set; }
 		DbSet<PixelHistory> PixelHistory { get; set; }
 

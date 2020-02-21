@@ -36,7 +36,6 @@ namespace DotMatrix.Identity
 		public int AccessFailedCount { get; set; }
 
 
-		public int TeamId { get; set; }
 		public string ApiKey { get; set; }
 		public string ApiSecret { get; set; }
 		public bool IsApiEnabled { get; set; }

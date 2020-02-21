@@ -21,7 +21,6 @@ namespace DotMatrix.Data.DataContext
 		public DbSet<EmailOutbox> EmailOutbox { get; set; }
 
 		public DbSet<Game> Games { get; set; }
-		public DbSet<Team> Teams { get; set; }
 		public DbSet<Pixel> Pixel { get; set; }
 		public DbSet<PixelHistory> PixelHistory { get; set; }
 
@@ -45,7 +44,6 @@ namespace DotMatrix.Data.DataContext
 			modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
 			modelBuilder.Entity<User>().ToTable("Users");
-			modelBuilder.Entity<User>().HasRequired(x => x.Team).WithMany(x => x.Users);
 
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.User);
 			modelBuilder.Entity<PixelHistory>().HasRequired(x => x.Pixel).WithMany(x => x.History);

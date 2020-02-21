@@ -67,8 +67,7 @@ namespace DotMatrix
 						Type = notification.Type,
 						Points = notification.Points,
 
-						Player = notification.UserName,
-						Team = notification.TeamName
+						Player = notification.UserName
 					})
 			);
 		}
