@@ -20,7 +20,7 @@ namespace DotMatrix.QueueService
 			var location = ConfigurationManager.AppSettings["LogLocation"];
 
 #if DEBUG
-			LoggingManager.AddLog(new ConsoleLogger(LogLevel.Info));
+			LoggingManager.AddLog(new ConsoleLogger(level));
 			using (var processor = new QueueService())
 			{
 				Console.WriteLine("Starting QueueProcessor Service ...");

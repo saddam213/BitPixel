@@ -42,7 +42,7 @@ namespace DotMatrix.QueueService.Hubs
 				PixelHubClient.NotifyPrize(response.PrizeNotification),
 				PixelHubClient.NotifyPoints(response.PointsNotification)
 			);
-			return response as SubmitPixelResponse;
+			return response;
 		}
 
 		public async Task<SubmitClickResponse> SubmitClick(SubmitClickRequest request)

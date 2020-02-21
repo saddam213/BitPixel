@@ -53,6 +53,7 @@ namespace DotMatrix.ImageService.Implementation
 
 		private async Task ProcessImages()
 		{
+			var start = DateTime.UtcNow;
 			Log.Message(LogLevel.Info, "Processing Images");
 			using (var context = DataContextFactory.CreateReadOnlyContext())
 			{
@@ -66,6 +67,7 @@ namespace DotMatrix.ImageService.Implementation
 					{
 						RenderPixels(pixelGame, pixelGame.Pixels, "background");
 					}
+					Log.Message(LogLevel.Info, $"Processing Images complete, Elapsed: {DateTime.UtcNow - start}ms");
 				}
 				catch (Exception ex)
 				{
