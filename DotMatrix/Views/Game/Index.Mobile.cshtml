@@ -51,6 +51,7 @@
 		top: 1px;
 		right: 0;
 		bottom: 0;
+		pointer-events:none;
 	}
 
 	#canvas-container {
@@ -251,7 +252,7 @@
 						<div class="d-flex justify-content-between w-100" style="font-size:12px">
 							<div class="custom-control custom-checkbox" style="min-height:unset;margin-top:2px">
 								<input type="checkbox" class="custom-control-input" id="transparent-toggle">
-								<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Transparent</label>
+								<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Show Empty</label>
 							</div>
 							<div class="custom-control custom-checkbox" style="min-height:unset;margin-top:2px">
 								<input type="checkbox" class="custom-control-input" id="overlay-toggle">
@@ -608,7 +609,7 @@
 					notifyError("You must be logged in to create pixels.");
 					return;
 				}
-				const result = await postJson('/Game/AddPixel', data);
+				const result = await pixelHub.server.addPixel(data);
 				if (result.Success == false) {
 					notifyError(result.Message);
 				}
@@ -616,7 +617,7 @@
 			}
 
 			const getServerPixel = async (data) => {
-				const result = await postJson('/Game/GetPixel', data);
+				const result = await pixelHub.server.getPixel(data);
 				if (result.Success == false) {
 					notifyError(result.Message);
 					return;

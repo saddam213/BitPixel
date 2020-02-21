@@ -51,6 +51,7 @@
 		top: 1px;
 		right: 0;
 		bottom: 0;
+		pointer-events: none;
 	}
 
 	#canvas-container {
@@ -285,7 +286,7 @@
 							<div class="w-100" style="font-size:12px">
 								<div class="custom-control custom-checkbox" style="margin-top:12px">
 									<input type="checkbox" class="custom-control-input" id="transparent-toggle">
-									<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Show Transparent</label>
+									<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Show Empty</label>
 								</div>
 								<div class="custom-control custom-checkbox">
 									<input type="checkbox" class="custom-control-input" id="overlay-toggle">
@@ -480,7 +481,7 @@
 			const loadSettings = () => {
 				setSelectedColor(userSettings.color);
 				$("#max-points").val(userSettings.maxPoints);
-				
+
 
 				$("#log-toggle-pixel").prop("checked", userSettings.showPixelLog);
 				$("#log-toggle-prize").prop("checked", userSettings.showPrizeLog);
@@ -618,16 +619,24 @@
 				setLocation(location)
 			}
 
-
 			const addServerPixel = async (data) => {
 				if (gameSettings.player.length == 0) {
 					logError("You must be logged in to create pixels.");
 					return;
 				}
-				const result = await postJson('/Game/AddPixel', data);
+				const result = await pixelHub.server.addPixel(data);
 				if (result.Success == false) {
 					logError(result.Message);
 				}
+			}
+
+			const getServerPixel = async (data) => {
+				const result = await pixelHub.server.getPixel(data);
+				if (result.Success == false) {
+					logError(result.Message);
+					return;
+				}
+				return result.Data;
 			}
 
 			const addServerChatMessage = async (message) => {
@@ -635,14 +644,7 @@
 				await pixelHub.server.sendChatMessage(dataMessage);
 			}
 
-			const getServerPixel = async (data) => {
-				const result = await postJson('/Game/GetPixel', data);
-				if (result.Success == false) {
-					logError(result.Message);
-					return;
-				}
-				return result.Data;
-			}
+
 
 			const getServerPixels = async () => {
 				const pixelUpdates = await getJson('/Game/GetPixels?gameId=' + gameSettings.gameId) || [];
