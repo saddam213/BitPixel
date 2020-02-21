@@ -41,7 +41,16 @@
 		width: 16px;
 		height: 16px;
 		text-align: center;
-		z-index: 2000;
+		z-index: 11;
+	}
+
+	#pixel-overlay {
+		position: absolute;
+		z-index: 10;
+		left: 1px;
+		top: 1px;
+		right: 0;
+		bottom: 0;
 	}
 
 	#canvas-container {
@@ -108,6 +117,7 @@
 						<div id="pixel-finder">
 							<i class="fa fa-map-marker-alt" style="color:#ff0000;text-shadow: 1px 1px 1px black"></i>
 						</div>
+						<div id="pixel-overlay" class="scale-1"></div>
 						<canvas id="mainCanvas" width="@width" height="@height" class="scale-1"></canvas>
 					</div>
 				</div>
@@ -188,7 +198,7 @@
 											</div>
 										</button>
 										<button data-scale="5" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
-											<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:12px">
+											<div class="d-flex justify-content-center align-items-center" style="width: 20px;height: 20px;font-size: 12px">
 												<i class="fal fa-search"></i>
 											</div>
 										</button>
@@ -277,7 +287,10 @@
 									<input type="checkbox" class="custom-control-input" id="transparent-toggle">
 									<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Show Transparent</label>
 								</div>
-
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input" id="overlay-toggle">
+									<label class="custom-control-label" for="overlay-toggle" style="padding-top:2px">Show Overlay</label>
+								</div>
 								<div class="custom-control custom-checkbox">
 									<input type="checkbox" class="custom-control-input" id="notifications-toggle">
 									<label class="custom-control-label" for="notifications-toggle" style="padding-top:2px">Show Notifications</label>
@@ -451,6 +464,7 @@
 				maxPoints: 2,
 				showNotifications: true,
 				showTransparent: true,
+				showOverlay: false,
 
 				showPixelLog: true,
 				showPrizeLog: true,
@@ -466,7 +480,7 @@
 			const loadSettings = () => {
 				setSelectedColor(userSettings.color);
 				$("#max-points").val(userSettings.maxPoints);
-				toggleTransparentBackground();
+				
 
 				$("#log-toggle-pixel").prop("checked", userSettings.showPixelLog);
 				$("#log-toggle-prize").prop("checked", userSettings.showPrizeLog);
@@ -475,14 +489,13 @@
 				$("#log-toggle-chat").prop("checked", userSettings.showChatLog);
 
 				$("#transparent-toggle").prop("checked", userSettings.showTransparent);
+				$("#overlay-toggle").prop("checked", userSettings.showOverlay);
 				$("#notifications-toggle").prop("checked", userSettings.showNotifications);
 				$("#jump-x, #jump-y").val(null);
+
+				toggleOverlay();
+				toggleTransparentBackground();
 			}
-
-
-
-
-
 
 
 			const pixelHub = $.connection.pixelHub;
@@ -491,6 +504,7 @@
 			const canvasContainer = $("#canvas-container");
 			const canvasScrollContainer = $("#canvas-scroll-container");
 			const locationMarker = $("#pixel-finder");
+			const pixelOverlay = $("#pixel-overlay");
 
 			let gameScale = 1;
 			let eyedropperEnabled = false;
@@ -558,6 +572,9 @@
 				await resetCanvas();
 				gameCanvas.classList.remove("scale-1", "scale-5", "scale-10", "scale-15");
 				gameCanvas.classList.add("scale-" + gameScale);
+
+				pixelOverlay.removeClass("scale-1 scale-5 scale-10 scale-15");
+				pixelOverlay.addClass("scale-" + gameScale);
 			}
 
 
@@ -673,6 +690,13 @@
 				}
 			}
 
+			const toggleOverlay = () => {
+				pixelOverlay.removeClass("grid-board");
+				if (userSettings.showOverlay === true) {
+					pixelOverlay.addClass("grid-board");
+				}
+			}
+
 			const jumpToLocation = (x, y) => {
 				const posx = x * gameScale;
 				const posy = y * gameScale;
@@ -729,7 +753,7 @@
 				if (eyedropperEnabled === true) {
 					setSelectedColor(pixel.Color);
 				}
-				
+
 				if (pixel.Type == 2) {
 					$("#selected-points,#selected-user").html("<small><i>Game Pixel</i></small>");
 					return;
@@ -894,7 +918,11 @@
 				toggleTransparentBackground();
 			})
 
-
+			$("#overlay-toggle").on("click", async function () {
+				userSettings.showOverlay = $(this).is(":checked");
+				saveSettings();
+				toggleOverlay();
+			})
 
 			$("#notifications-toggle").on("click", async function () {
 				userSettings.showNotifications = $(this).is(":checked");
@@ -971,7 +999,7 @@
 
 
 
-			
+
 			$("#log-window").on("click",".location-jump" ,function () {
 				const _this = $(this);
 				const x = _this.data("x");

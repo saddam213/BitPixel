@@ -41,7 +41,16 @@
 		width: 16px;
 		height: 16px;
 		text-align: center;
-		z-index: 2000;
+		z-index: 11;
+	}
+
+	#pixel-overlay {
+		position: absolute;
+		z-index: 10;
+		left: 1px;
+		top: 1px;
+		right: 0;
+		bottom: 0;
 	}
 
 	#canvas-container {
@@ -193,11 +202,6 @@
 											<i class="fal fa-search"></i>
 										</div>
 									</button>
-									@*<button data-scale="5" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
-						<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:12px">
-							<i class="fal fa-search"></i>
-						</div>
-					</button>*@
 									<button data-scale="10" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
 										<div class="d-flex justify-content-center align-items-center" style="width:20px;height:20px;font-size:14px">
 											<i class="fal fa-search"></i>
@@ -244,10 +248,14 @@
 
 					<div class="d-flex justify-content-between">
 
-						<div class="w-100" style="font-size:12px">
+						<div class="d-flex justify-content-between w-100" style="font-size:12px">
 							<div class="custom-control custom-checkbox" style="min-height:unset;margin-top:2px">
 								<input type="checkbox" class="custom-control-input" id="transparent-toggle">
-								<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Show Transparent</label>
+								<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Transparent</label>
+							</div>
+							<div class="custom-control custom-checkbox" style="min-height:unset;margin-top:2px">
+								<input type="checkbox" class="custom-control-input" id="overlay-toggle">
+								<label class="custom-control-label" for="overlay-toggle" style="padding-top:2px">Overlay</label>
 							</div>
 						</div>
 
@@ -318,6 +326,7 @@
 						<div id="pixel-finder">
 							<i class="fa fa-map-marker-alt" style="color:#ff0000;text-shadow: 1px 1px 1px black"></i>
 						</div>
+						<div id="pixel-overlay" class="scale-1"></div>
 						<canvas id="mainCanvas" width="@width" height="@height" class="scale-1"></canvas>
 					</div>
 				</div>
@@ -435,6 +444,7 @@
 				maxPoints: 2,
 				showNotifications: true,
 				showTransparent: true,
+				showOverlay: false,
 
 				showPixelLog: true,
 				showPrizeLog: true,
@@ -450,7 +460,6 @@
 			const loadSettings = () => {
 				setSelectedColor(userSettings.color);
 				$("#max-points").val(userSettings.maxPoints);
-				toggleTransparentBackground();
 
 				$("#log-toggle-pixel").prop("checked", userSettings.showPixelLog);
 				$("#log-toggle-prize").prop("checked", userSettings.showPrizeLog);
@@ -459,8 +468,12 @@
 				$("#log-toggle-chat").prop("checked", userSettings.showChatLog);
 
 				$("#transparent-toggle").prop("checked", userSettings.showTransparent);
+				$("#overlay-toggle").prop("checked", userSettings.showOverlay);
 				$("#notifications-toggle").prop("checked", userSettings.showNotifications);
 				$("#jump-x, #jump-y").val(null);
+
+				toggleOverlay();
+				toggleTransparentBackground();
 			}
 
 
@@ -475,6 +488,7 @@
 			const canvasContainer = $("#canvas-container");
 			const canvasScrollContainer = $("#canvas-scroll-container");
 			const locationMarker = $("#pixel-finder");
+			const pixelOverlay = $("#pixel-overlay");
 
 			let gameScale = 1;
 			let eyedropperEnabled = false;
@@ -542,6 +556,9 @@
 				await resetCanvas();
 				gameCanvas.classList.remove("scale-1", "scale-5", "scale-10", "scale-15");
 				gameCanvas.classList.add("scale-" + gameScale);
+
+				pixelOverlay.removeClass("scale-1 scale-5 scale-10 scale-15");
+				pixelOverlay.addClass("scale-" + gameScale);
 			}
 
 
@@ -649,6 +666,13 @@
 				gameCanvas.classList.remove("checker-board");
 				if (userSettings.showTransparent === true) {
 					gameCanvas.classList.add("checker-board");
+				}
+			}
+
+			const toggleOverlay = () => {
+				pixelOverlay.removeClass("grid-board");
+				if (userSettings.showOverlay === true) {
+					pixelOverlay.addClass("grid-board");
 				}
 			}
 
@@ -811,7 +835,11 @@
 				toggleTransparentBackground();
 			})
 
-
+			$("#overlay-toggle").on("click", async function () {
+				userSettings.showOverlay = $(this).is(":checked");
+				saveSettings();
+				toggleOverlay();
+			})
 
 			$("#notifications-toggle").on("click", async function () {
 				userSettings.showNotifications = $(this).is(":checked");
