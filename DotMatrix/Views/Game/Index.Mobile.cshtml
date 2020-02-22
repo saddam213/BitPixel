@@ -371,7 +371,7 @@
 <script id="infoNotifyTemplate" type="text/html">
 	<div class="toast bg-info mb-0" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500">
 		<div class="toast-body">
-			<small class="text-white"><i class="fal fa-info-circle"></i> Added <i class="fa fa-square-full" style="width:14px;text-align:center;color:{{color}}"></i> pixel @@ X: {{x}}, Y: {{x}}</small>
+			<small class="text-white"><i class="fal fa-info-circle"></i> Added <i class="fa fa-square-full" style="width:14px;text-align:center;color:{{color}}"></i> pixel @@ X: {{x}}, Y: {{y}}</small>
 		</div>
 	</div>
 </script>
@@ -613,7 +613,7 @@
 				if (result.Success == false) {
 					notifyError(result.Message);
 				}
-				notifyPixel(result);
+				notifyPixel(data);
 			}
 
 			const getServerPixel = async (data) => {
