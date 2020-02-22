@@ -9,6 +9,7 @@ using System.Transactions;
 using Dapper;
 
 using DotMatrix.Base.Logging;
+using DotMatrix.Base.Objects;
 using DotMatrix.Base.Queueing;
 using DotMatrix.Common.DataContext;
 using DotMatrix.Enums;
@@ -156,7 +157,7 @@ namespace DotMatrix.QueueService.Implementation
 				};
 			}
 
-			Log.Message(LogLevel.Info, $"[AddPixel] - GameId: {pixelRequest.GameId}, UserId: {pixelRequest.UserId}, X: {pixelRequest.X}, Y: {pixelRequest.Y}, Color: {pixelRequest.Color}, {GetElapsedTime(stopwatch)}");
+			Log.Message(LogLevel.Info, $"[AddPixel] - GameId: {pixelRequest.GameId.ToString().PadRight(5)}, UserId: {pixelRequest.UserId.ToString().PadRight(5)}, X: {pixelRequest.X.ToString().PadRight(5)}, Y: {pixelRequest.Y.ToString().PadRight(5)}, Color: {pixelRequest.Color}, {GetElapsedTime(stopwatch)}");
 			return response;
 		}
 
@@ -180,23 +181,23 @@ namespace DotMatrix.QueueService.Implementation
 			if (!string.IsNullOrEmpty(result.Error))
 				return new SubmitClickResponse { Success = false, Message = result.Error };
 
-			Log.Message(LogLevel.Info, $"[AddClick] - GameId: {clickRequest.GameId}, UserId: {clickRequest.UserId}, X: {clickRequest.X}, Y: {clickRequest.Y}, {GetElapsedTime(stopwatch)}");
+			Log.Message(LogLevel.Info, $"[AddClick] - GameId: {clickRequest.GameId.ToString().PadRight(3)}, UserId: {clickRequest.UserId.ToString().PadRight(3)}, X: {clickRequest.X.ToString().PadRight(3)}, Y: {clickRequest.Y.ToString().PadRight(3)}, {GetElapsedTime(stopwatch)}");
 			return new SubmitClickResponse
 			{
 				Success = true
 			};
 		}
 
-		private static Stopwatch GetStopwatch()
+		private static MicroStopwatch GetStopwatch()
 		{
-			var stopwatch = new Stopwatch();
+			var stopwatch = new MicroStopwatch();
 			stopwatch.Start();
 			return stopwatch;
 		}
 
-		private static string GetElapsedTime(Stopwatch stopwatch)
+		private static string GetElapsedTime(MicroStopwatch stopwatch)
 		{
-			return $"Elapsed: {stopwatch.ElapsedMilliseconds.ToString("0ms").PadRight(6)}({stopwatch.ElapsedTicks / 10}us)";
+			return $"Elapsed: {stopwatch.ElapsedMilliseconds.ToString("0ms").PadRight(6)}({stopwatch.ElapsedMicroseconds}us)";
 		}
 	}
 

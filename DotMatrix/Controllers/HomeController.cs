@@ -17,7 +17,7 @@ namespace DotMatrix.Controllers
 			return View(new HomeViewModel
 			{
 				Games = games
-				 .Where(x => x.Status != Enums.GameStatus.Deleted)
+				 .Where(x => x.Status != Enums.GameStatus.Deleted && x.Status != Enums.GameStatus.Finished)
 				 .ToList(),
 			});
 		}

@@ -179,6 +179,7 @@
     <Compile Include="Api\ApiAuthenticationAttribute.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AwardsController.cs" />
+    <Compile Include="Controllers\GalleryController.cs" />
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\ReplayController.cs" />
@@ -362,6 +363,8 @@
     <Content Include="Views\Admin\Users.cshtml" />
     <Content Include="Views\Admin\Game.cshtml" />
     <Content Include="Views\Admin\Payments.cshtml" />
+    <Content Include="Views\Gallery\Game.cshtml" />
+    <Content Include="Views\Gallery\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

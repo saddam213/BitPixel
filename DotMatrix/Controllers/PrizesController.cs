@@ -23,9 +23,12 @@ namespace DotMatrix.Controllers
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
+			var prizes = await PrizeReader.GetPrizes();
 			return View(new PrizesViewModel
 			{
-				Prizes = await PrizeReader.GetPrizes()
+				Prizes = prizes
+					.Where(x => x.GameStatus != GameStatus.Finished)
+					.ToList()
 			});
 		}
 

@@ -55,6 +55,7 @@
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\DBLogger.cs" />
     <Compile Include="Logging\FileLogger.cs" />
+    <Compile Include="Objects\MicroStopwatch.cs" />
     <Compile Include="Objects\ConcurrentValue.cs" />
     <Compile Include="Objects\ConcurrentLock.cs" />
     <Compile Include="Objects\ConcurrentList.cs" />

@@ -35,7 +35,7 @@ namespace DotMatrix.Core.Pixel
 		{
 			using (var context = DataContextFactory.CreateReadOnlyContext())
 			{
-				var lastdate = DateTime.UtcNow.AddMinutes(-5);
+				var lastdate = DateTime.UtcNow.AddMinutes(-2);
 				return await context.Pixel
 					.Where(x => x.GameId == gameId && x.LastUpdate > lastdate)
 					.Select(MapPixel())

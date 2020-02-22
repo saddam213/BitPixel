@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using DotMatrix.Base.Logging;
 using DotMatrix.Data.DataContext;
+using DotMatrix.Enums;
 
 namespace DotMatrix.ImageService.Implementation
 {
@@ -46,15 +47,16 @@ namespace DotMatrix.ImageService.Implementation
 		{
 			while (_isRunning)
 			{
-				await ProcessImages();
-				await Task.Delay(TimeSpan.FromMinutes(1));
+				await ProcessLiveImages();
+				await ProcessGalleryImages();
+				await Task.Delay(TimeSpan.FromSeconds(30));
 			}
 		}
 
-		private async Task ProcessImages()
+		private async Task ProcessLiveImages()
 		{
 			var start = DateTime.UtcNow;
-			Log.Message(LogLevel.Info, "Processing Images");
+			Log.Message(LogLevel.Info, "Processing Game Images");
 			using (var context = DataContextFactory.CreateReadOnlyContext())
 			{
 				try
@@ -65,27 +67,110 @@ namespace DotMatrix.ImageService.Implementation
 						.ToListAsync();
 					foreach (var pixelGame in pixelGames)
 					{
-						RenderPixels(pixelGame, pixelGame.Pixels, "background");
+						var gamePixels = pixelGame.Pixels
+							.Select(x => new RenderPixelModel
+							{
+								X = x.X,
+								Y = x.Y,
+								Type = x.Type,
+								Color = x.Color
+							});
+						var userPixels = gamePixels.Where(x => x.Type == PixelType.User).ToList();
+						var fixedPixels = gamePixels.Where(x => x.Type == PixelType.Fixed).ToList();
+						RenderPixels(pixelGame, userPixels, "background");
+						RenderPixels(pixelGame, fixedPixels, "background-fixed");
 					}
-					Log.Message(LogLevel.Info, $"Processing Images complete, Elapsed: {DateTime.UtcNow - start}ms");
+					Log.Message(LogLevel.Info, $"Processing Game Images complete, Elapsed: {DateTime.UtcNow - start}ms");
 				}
 				catch (Exception ex)
 				{
-					Log.Exception("", ex);
+					Log.Exception("Exception Processing Game Images", ex);
 				}
 			}
 		}
 
-		private void RenderPixels(Entity.Game game, ICollection<Entity.Pixel> pixels, string imageName)
+
+
+		private async Task ProcessGalleryImages()
 		{
-			Log.Message(LogLevel.Info, $"[RenderPixels] - Rendering game images, Game: {game.Name}, Pixels: {pixels.Count}");
+			var start = DateTime.UtcNow;
+			Log.Message(LogLevel.Info, "Processing Gallery Images");
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				try
+				{
+					var pixelGames = await context.Games
+						.Where(x => x.Status == Enums.GameStatus.Finished)
+						.ToListAsync();
+					foreach (var game in pixelGames)
+					{
+						var outputDirectory = Path.Combine(_outputPath, $"{game.Id}\\Gallery");
+						if (Directory.Exists(outputDirectory))
+							continue;
+
+						Log.Message(LogLevel.Info, $"Generating Gallery Images... GameId: {game}");
+						Directory.CreateDirectory(outputDirectory);
+
+						var pixels = await context.Pixel
+							.Where(x => x.GameId == game.Id)
+							.Select(x => new RenderPixelModel
+							{
+								X = x.X,
+								Y = x.Y,
+								Type = x.Type,
+								Color = x.Color
+							}).ToListAsync();
+
+						var pixelHistory = await context.PixelHistory
+							.Where(x => x.GameId == game.Id)
+							.Select(x => new RenderPixelModel
+							{
+								Id = x.Id,
+								X = x.Pixel.X,
+								Y = x.Pixel.Y,
+								Type =  PixelType.User,
+								Color = x.Color,
+								Player = x.User.UserName
+							}).ToListAsync();
+
+						var prizes = await context.Prize
+							.Where(x => x.GameId == game.Id && x.IsClaimed)
+							.Select(x => new RenderPixelModel
+							{
+								X = x.X,
+								Y = x.Y,
+								Type = PixelType.User,
+								Color = "#FFA500"
+							}).ToListAsync();
+
+
+						RenderPixels(game, pixels, "Gallery\\pixels");
+						RenderPixels(game, prizes, "Gallery\\prizes");
+
+						foreach (var player in pixelHistory.GroupBy(x => x.Player))
+						{
+							var userPixels = player.OrderBy(x => x.Id).ToList();
+							RenderPixels(game, userPixels, $"Gallery\\pixels-{player.Key}");
+						}
+						Log.Message(LogLevel.Info, $"Generating Gallery Images complete.");
+					}
+					Log.Message(LogLevel.Info, $"Processing Gallery Images complete, Elapsed: {DateTime.UtcNow - start}ms");
+				}
+				catch (Exception ex)
+				{
+					Log.Exception("Exception Processing Gallery Images", ex);
+				}
+			}
+		}
+
+		private void RenderPixels(Entity.Game game, ICollection<RenderPixelModel> pixels, string imageName)
+		{
+			Log.Message(LogLevel.Info, $"[RenderPixels] - Rendering Pixels, GameId: {game.Id}, Pixels: {pixels.Count}, Image: {imageName}.png");
 			var start = DateTime.UtcNow;
 			var outputDirectory = Path.Combine(_outputPath, $"{game.Id}");
 			if (!Directory.Exists(outputDirectory))
 				Directory.CreateDirectory(outputDirectory);
 
-			using (var bitmapFixedSmall = new System.Drawing.Bitmap(game.Width, game.Height))
-			using (var bitmapFixedLarge = new System.Drawing.Bitmap(game.Width * 5, game.Height * 5))
 			using (var bitmapSmall = new System.Drawing.Bitmap(game.Width, game.Height))
 			using (var bitmapLarge = new System.Drawing.Bitmap(game.Width * 5, game.Height * 5))
 			{
@@ -95,23 +180,16 @@ namespace DotMatrix.ImageService.Implementation
 					var py = pixel.Y * 5;
 					var color = ColorTranslator.FromHtml(pixel.Color);
 					bitmapSmall.SetPixel(pixel.X, pixel.Y, color);
-					if(pixel.Type == Enums.PixelType.Fixed)
-						bitmapFixedSmall.SetPixel(pixel.X, pixel.Y, color);
+
 
 					for (int x = 0; x < 5; x++)
 					{
 						for (int y = 0; y < 5; y++)
 						{
 							bitmapLarge.SetPixel(px + x, py + y, color);
-							if (pixel.Type == Enums.PixelType.Fixed)
-								bitmapFixedLarge.SetPixel(px + x, py + y, color);
 						}
 					}
 				}
-
-				
-				bitmapFixedSmall.Save(Path.Combine(outputDirectory, $"{imageName}-fixed-small.png"), System.Drawing.Imaging.ImageFormat.Png);
-				bitmapFixedLarge.Save(Path.Combine(outputDirectory, $"{imageName}-fixed-large.png"), System.Drawing.Imaging.ImageFormat.Png);
 
 				bitmapSmall.Save(Path.Combine(outputDirectory, $"{imageName}-small.png"), System.Drawing.Imaging.ImageFormat.Png);
 				bitmapLarge.Save(Path.Combine(outputDirectory, $"{imageName}-large.png"), System.Drawing.Imaging.ImageFormat.Png);
@@ -128,5 +206,8 @@ namespace DotMatrix.ImageService.Implementation
 		public int X { get; set; }
 		public int Y { get; set; }
 		public string Color { get; set; }
+		public PixelType Type { get; set; }
+		public string Player { get; set; }
+		public int Id { get; set; }
 	}
 }

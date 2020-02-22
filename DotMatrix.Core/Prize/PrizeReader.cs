@@ -145,7 +145,8 @@ namespace DotMatrix.Core.Prize
 				Game = x.Game.Name,
 				x.GameId,
 				GameRank = x.Game.Rank,
-				Symbol = x.Data
+				Symbol = x.Data,
+				GameStatus = x.Game.Status,
 			})
 			.Select(x => new PrizeItemModel
 			{
@@ -157,7 +158,8 @@ namespace DotMatrix.Core.Prize
 				GameRank = x.Key.GameRank,
 				Symbol = x.Key.Symbol,
 				Count = x.Count(),
-				Unclaimed = x.Count(p => !p.IsClaimed)
+				Unclaimed = x.Count(p => !p.IsClaimed),
+				GameStatus = x.Key.GameStatus
 			});
 		}
 

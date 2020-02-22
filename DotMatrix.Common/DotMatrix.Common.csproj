@@ -100,6 +100,7 @@
     <Compile Include="DataContext\IDataContextFactory.cs" />
     <Compile Include="DataContext\StoredProcedure.cs" />
     <Compile Include="Explore\ExploreViewModel.cs" />
+    <Compile Include="Gallery\GalleryViewModel.cs" />
     <Compile Include="Game\CreateGameModel.cs" />
     <Compile Include="Game\GameModel.cs" />
     <Compile Include="Game\IGameWriter.cs" />
