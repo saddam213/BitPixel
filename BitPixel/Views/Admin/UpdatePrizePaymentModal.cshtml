@@ -1,0 +1,64 @@
+﻿﻿@model BitPixel.Common.Prize.UpdatePrizePaymenModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+@using (Ajax.BeginForm("UpdatePrizePaymentModal", "Admin", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "simplemodal-data", InsertionMode = InsertionMode.Replace }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(m => m.Id)
+	@Html.HiddenFor(m => m.Name)
+	@Html.HiddenFor(m => m.Data)
+	@Html.HiddenFor(m => m.Data2)
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Update Prize Payment</h5>
+				<a class="simplemodal-close" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">
+
+				<div class="text-center">
+					<strong class="d-block">@Model.Name</strong>
+					<span>@Model.Data2 @Model.Data</span>
+				</div>
+
+				<div class="form-group">
+					<small>Status</small>
+					@Html.EnumDropDownListFor(m => m.Status, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+				</div>
+				<div class="form-group">
+					<small>Address</small>
+					@Html.TextBoxFor(m => m.Data3, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Data3, "", new { @class = "text-danger" })
+				</div>
+				<div class="form-group">
+					<small>Transaction Id</small>
+					@Html.TextBoxFor(m => m.Data4, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Data4, "", new { @class = "text-danger" })
+				</div>
+			</div>
+			<div class="modal-footer btn-group">
+				<button type="submit" class="btn btn-outline-success">Update</button>
+				<button type="button" class="simplemodal-close btn btn-outline-secondary">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script>
+	(async ($) => {
+
+		$('form').submit(function () {
+			const form = $(this);
+			if (form.valid()) {
+				$("#submit").attr("disabled", "disabled");
+			}
+		});
+
+	})(jQuery);
+</script>

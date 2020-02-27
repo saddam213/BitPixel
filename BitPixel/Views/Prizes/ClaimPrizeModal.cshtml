@@ -1,0 +1,143 @@
+﻿@model BitPixel.Common.Prize.ClaimPrizeModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+@using (Ajax.BeginForm("ClaimPrizeModal", "Prizes", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "simplemodal-data", InsertionMode = InsertionMode.Replace }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(m => m.Id)
+	@Html.HiddenFor(m => m.Description)
+	@Html.HiddenFor(m => m.Game)
+	@Html.HiddenFor(m => m.Name)
+	@Html.HiddenFor(m => m.Points)
+	@Html.HiddenFor(m => m.Status)
+	@Html.HiddenFor(m => m.Type)
+	@Html.HiddenFor(m => m.X)
+	@Html.HiddenFor(m => m.Y)
+	@Html.HiddenFor(m => m.Rate)
+	@Html.HiddenFor(m => m.Amount)
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">
+					@if (Model.Status == BitPixel.Enums.PrizeStatus.Unclaimed)
+					{
+						<span>Claim Prize</span>
+					}
+					else
+					{
+						<span>Prize Information</span>
+					}
+				</h5>
+				<a class="simplemodal-close" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">
+				@Html.ModelValidationSummary()
+
+				<div class="d-flex flex-column justify-content-center">
+					<div class="text-center text-primary">
+						<h4><i class="fa fa-star"></i> Congratulations you won a prize!</h4>
+					</div>
+					<div class="text-center">
+						<h5>@Model.Name</h5>
+						<span>@Model.Description</span>
+					</div>
+					<div class="text-center">
+						<br />
+						<span>@Model.Game - X: @Model.X - Y: @Model.Y</span>
+						@if (Model.Points > 0)
+						{
+							<br />
+							<span><span class="text-info">@Model.Points points</span> have been credited to your account</span>
+						}
+					</div>
+				</div>
+				@if (Model.Type == BitPixel.Enums.PrizeType.Crypto)
+				{
+					if (Model.Status == BitPixel.Enums.PrizeStatus.Unclaimed)
+					{
+						<hr />
+						<div class="d-flex flex-column">
+							<div class="text-center">
+								<strong class="d-block">Claim your @Model.Data prize</strong>
+								<h4 class="text-primary">@Model.Amount.ToString("F8") @Model.Data</h4>
+							</div>
+
+							<div class="d-flex justify-content-center">
+								<button name="IsPointsClaim" value="true" type="submit" class="btn btn-info btn-block">Claim As Points: @((int)(Model.Amount / Model.Rate)) points</button>
+							</div>
+
+							<div class="text-center mt-2">
+								<span class="text-primary"> --- OR --- </span>
+							</div>
+
+							<div class="text-center">
+								<small>Please enter a @Model.Data destination address to send your prize to</small>
+							</div>
+							<div class="form-group">
+								@Html.TextBoxFor(m => m.Data3, new { @class = "form-control form-control-sm", placeholder = string.Format("{0} Address...", Model.Data) })
+								<div class="d-flex justify-content-center mt-1">
+									<button name="IsPointsClaim" value="false" type="submit" class="btn btn-info btn-block">Claim As Crypto: @Model.Amount.ToString("F8") @Model.Data</button>
+								</div>
+								<div class="text-center">
+									<span class="text-danger">Please do not withdraw directly to exchanges!!</span>
+								</div>
+							</div>
+
+							<div class="text-center">
+								<small>
+									<i>Transactions may take up to 24hours to process</i>
+								</small>
+							</div>
+						</div>
+					}
+					else
+					{
+						<hr />
+						<div class="text-center">
+							<strong class="d-block">
+								Crypto Currency Transaction
+							</strong>
+							<small class="d-block">@Model.Data2 @Model.Data</small>
+							@if (Model.Status == BitPixel.Enums.PrizeStatus.Claimed)
+							{
+								<p>
+									<small class="text-primary">@Model.Data4</small>
+								</p>
+							}
+							else
+							{
+								<p class="text-primary">The system is processing your request</p>
+								<small class="d-block">
+									<i>Transactions may take up to 24hours to process</i>
+								</small>
+							}
+						</div>
+					}
+				}
+
+			</div>
+
+			<div class="modal-footer btn-group">
+				<button type="button" class="simplemodal-close btn btn-secondary">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script>
+	(async ($) => {
+
+		$('form').submit(function () {
+			const form = $(this);
+			if (form.valid()) {
+				$("#submit").attr("disabled", "disabled");//.text("Generating...");
+			}
+		});
+
+	})(jQuery);
+</script>

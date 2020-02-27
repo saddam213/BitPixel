@@ -1,0 +1,144 @@
+﻿@model BitPixel.Common.Gallery.GalleryGameViewModel
+@{
+	ViewBag.Title = "Gallery";
+}
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 mt-2" style="min-width:340px;max-width:1600px">
+		<div class="text-center">
+			<h2 class="card-title text-primary mb-0"><i class="fa fa-images mr-1"></i>@Model.Game.Name Gallery</h2>
+			<span class="ml-1">Browse images created during the @Model.Game.Name game</span>
+		</div>
+	</div>
+	<div class="d-flex justify-content-center w-100" style="min-width:340px;max-width:1600px">
+
+		<div class="d-flex flex-column">
+			<div class="d-flex justify-content-center flex-wrap">
+
+				<div class="card m-2 " style="min-width:340px;">
+					<div class="card-img-top ">
+						<div class="d-flex justify-content-center align-items-center p-1">
+							<img src="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-thumb.png", Model.Game.Id)" class="img-fluid" alt="" style="border:solid 1px rgba(0, 0, 0, 0.125);">
+						</div>
+					</div>
+					<div class="card-body text-center pb-0">
+						<h4 class="card-text text-primary mb-0">
+							Finished Result
+						</h4>
+					</div>
+					<div class="d-flex justify-content-between m-2">
+						<a href="@string.Format("/Content/Images/Games/{0}/Gallery/pixels.png", Model.Game.Id)" target="_blank"><i class="fa fa-image"></i> View Image</a>
+						<a href="/Replay?gameId=@Model.Game.Id" target="_blank"><i class="fa fa-film"></i> View Replay</a>
+
+					</div>
+				</div>
+
+				<div class="card m-2 " style="min-width:340px;">
+					<div class="card-img-top ">
+						<div class="d-flex justify-content-center align-items-center p-1">
+							<img src="@string.Format("/Content/Images/Games/{0}/Gallery/prizes-thumb.png", Model.Game.Id)" class="img-fluid" alt="" style="border:solid 1px rgba(0, 0, 0, 0.125);">
+						</div>
+					</div>
+					<div class="card-body text-center pb-0">
+						<h4 class="card-text text-primary mb-0">
+							Prize Pixels
+						</h4>
+					</div>
+					<div class="d-flex justify-content-between m-2">
+						<a href="@string.Format("/Content/Images/Games/{0}/Gallery/prizes.png", Model.Game.Id)" target="_blank"><i class="fa fa-image"></i> View Image</a>
+						<a href="#" target="_blank"></a>
+
+					</div>
+				</div>
+
+
+				@if (Model.Game.Type == BitPixel.Enums.GameType.TeamBattle)
+				{
+					<div class="card m-2 " style="min-width:340px;">
+						<div class="card-img-top ">
+							<div class="d-flex justify-content-center align-items-center p-1">
+								<img src="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-team-{1}-thumb.png", Model.Game.Id, Model.Team.Name)" class="img-fluid" alt="" style="border:solid 1px rgba(0, 0, 0, 0.125);">
+							</div>
+						</div>
+						<div class="card-body text-center pb-0">
+							<h4 class="card-text text-primary mb-0">
+								Winning Team
+							</h4>
+						</div>
+						<div class="d-flex justify-content-between m-2">
+							<a href="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-team-{1}.png", Model.Game.Id, Model.Team.Name)" target="_blank"><i class="fa fa-image"></i> View Image</a>
+							<a href="/Replay?gameId=@Model.Game.Id&teamId=@Model.Team.Id" target="_blank"><i class="fa fa-film"></i> View Replay</a>
+
+						</div>
+					</div>
+				}
+
+			</div>
+
+			@if (Model.Game.Type == BitPixel.Enums.GameType.TeamBattle)
+			{
+				<div class="d-flex justify-content-center mt-2">
+					<h2 class="text-primary"><i class="fa fa-users mr-1"></i>Team Pixels</h2>
+				</div>
+
+				<div class="d-flex justify-content-center flex-wrap">
+					@foreach (var team in Model.Teams.OrderBy(x => x.Result))
+					{
+						<div class="card m-2 " style="min-width:340px;">
+							<div class="card-img-top ">
+								<div class="d-flex justify-content-center align-items-center p-1">
+									<img src="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-team-{1}-thumb.png", Model.Game.Id, team.Name)" class="img-fluid" alt="" style="border:solid 1px rgba(0, 0, 0, 0.125);">
+								</div>
+							</div>
+							<div class="card-body text-center pb-0">
+								<h4 class="card-text text-primary mb-0">
+									@team.Result.AddOrdinal() @team.Name
+								</h4>
+							</div>
+							<div class="d-flex justify-content-between m-2">
+								<a href="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-team-{1}.png", Model.Game.Id, team.Name)" target="_blank"><i class="fa fa-image"></i> View Image</a>
+								<a href="/Replay?gameId=@Model.Game.Id&teamId=@team.Id" target="_blank"><i class="fa fa-film"></i> View Replay</a>
+
+							</div>
+						</div>
+					}
+				</div>
+			}
+
+			<div class="d-flex justify-content-center mt-2">
+				<h2 class="text-primary"><i class="fa fa-portrait mr-1"></i>Player Pixels</h2>
+			</div>
+
+			<div class="d-flex justify-content-center flex-wrap">
+
+				@foreach (var player in Model.Players.OrderBy(x => x))
+				{
+					<div class="card m-2 " style="min-width:340px;">
+						<div class="card-img-top ">
+							<div class="d-flex justify-content-center align-items-center p-1">
+								<img src="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-{1}-thumb.png", Model.Game.Id, player)" class="img-fluid" alt="" style="border:solid 1px rgba(0, 0, 0, 0.125);">
+							</div>
+						</div>
+						<div class="card-body text-center pb-0">
+							<h3 class="card-text text-primary mb-0">
+								@player's Pixels
+							</h3>
+						</div>
+						<div class="d-flex justify-content-between m-2">
+							<a href="@string.Format("/Content/Images/Games/{0}/Gallery/pixels-{1}.png", Model.Game.Id, player)" target="_blank"><i class="fa fa-image"></i> View Image</a>
+							<a href="/Replay?gameId=@Model.Game.Id&player=@player" target="_blank"><i class="fa fa-film"></i> View Replay</a>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		(async ($) => {
+
+		})(jQuery);
+	</script>
+}

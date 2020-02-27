@@ -1,0 +1,202 @@
+﻿@using BitPixel.Base.Extensions
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+	var cacheBreak = DateTime.UtcNow.ToUnixMin();
+	var isMobile = Request.Browser.IsMobileDevice;
+	var width = isMobile ? "160" : "100";
+}
+<div class="modal-dialog" role="document" style="min-width:300px;">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h5 class="modal-title">Build Avatar</h5>
+			<a class="simplemodal-close" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+		<div class="modal-body">
+			<div id="error-msg" class="alert alert-danger text-center" role="alert" style="display:none">
+				<p class="mb-0"></p>
+			</div>
+			<div>
+
+				<div class="d-flex justify-content-around">
+
+					<div style="width:100px">
+
+					</div>
+
+					<div class="d-flex mb-1">
+						<div class="btn-group btn-group-sm">
+							<button id="color-dropdown" type="button" class="btn btn-secondary p-1" style="border-radius:0">
+								<div class="d-flex justify-content-between align-content-center align-items-center">
+									<div id="color-dropdown-selected" style="width:47px;height:24px;background-color:#000000"></div>
+									<i class="fa fa-caret-down ml-1" style="font-size:larger"></i>
+								</div>
+							</button>
+							<button id="eraser" class="btn btn-sm btn-secondary disabled" style="border-radius:0">
+								<i class="fa fa-trash"></i>
+							</button>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="d-flex justify-content-around">
+
+					<div class="d-flex flex-column align-items-center" style="margin-right:1px">
+						<div style="border:solid 1px rgba(238, 232, 213, 0.325)">
+							<img src="~/Content/Images/Avatar/@(User.Identity.Name).png?v=@cacheBreak" onerror="this.src='/Content/Images/Avatar.png'" width="@width" height="@width" class="" />
+						</div>
+						<small>Current Avatar</small>
+					</div>
+
+					<div class="d-flex flex-column align-items-center" style="margin-left:1px">
+						<canvas id="avatarCanvas" width="@width" height="@width" class="checker-board @(isMobile ? "scale-16" : "scale-10")" style="border:solid 1px rgba(238, 232, 213, 0.325)"></canvas>
+						<small>New Avatar</small>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+		<div class="modal-footer btn-group">
+			<button type="button" class="simplemodal-close btn btn-secondary">Cancel</button>
+			<button id="update" type="button" class="btn btn-success">Create</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	(async ($) => {
+		const isMobile = @Json.Encode(isMobile);
+		let scale = isMobile ? 16 : 10;
+		let selectedColor = "#000000";
+		const avatarPixels = {};
+		const canvasWidth = 10;
+		const canvasHeight = 10;
+
+		const canvas = document.getElementById('avatarCanvas');
+		const context = canvas.getContext('2d');
+
+
+		const initializeCanvas = () => {
+
+			canvas.height = canvasHeight * scale;
+			canvas.width = canvasWidth * scale;
+			context.setTransform(1, 0, 0, 1, 0, 0);
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.scale(scale, scale);
+
+			canvas.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
+			canvas.addEventListener('click', async function (evt) {
+				evt.preventDefault();
+				evt.stopImmediatePropagation();
+
+				const mousePos = getMousePos(canvas, evt);
+				const pozX = parseInt(mousePos.x / scale);
+				const pozY = parseInt(mousePos.y / scale);
+
+				if (isEraserEnabled) {
+					removeRequestPixel(pozX, pozY);
+					removeCanvasPixel(pozX, pozY);
+					return;
+				}
+
+				addRequestPixel(pozX, pozY, selectedColor);
+				addCanvasPixel(pozX, pozY, selectedColor);
+			});
+		}
+
+		const addRequestPixel = (x, y, color) => {
+			// add to array
+			const key = x + "-" + y;
+			avatarPixels[key] = {
+				x: x,
+				y: y,
+				color: color
+			};
+
+			console.log("add: ", avatarPixels)
+		}
+
+		const removeRequestPixel = (x, y) => {
+			// remove from array
+			const key = x + "-" + y;
+			delete avatarPixels[key];
+
+			console.log("remove: ", avatarPixels)
+		}
+
+		const addCanvasPixel = async (x, y, color) => {
+			context.beginPath();
+			context.fillStyle = color,
+				context.fillRect(x, y, 1, 1);
+			context.closePath();
+		}
+
+		const removeCanvasPixel = (x, y) => {
+			context.clearRect(x, y, 1, 1);
+		}
+
+		$("#color-dropdown").spectrum({
+			showPalette: true,
+			showSelectionPalette: true,
+			hideAfterPaletteSelect: true,
+			preferredFormat: "hex",
+			showInput: true,
+			palette: ["#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"],
+			change: function (color) {
+				selectedColor = color.toHexString();
+				$("#color-dropdown-selected").css("background-color", selectedColor);
+			}
+		});
+
+		let isEraserEnabled = false;
+		$("#eraser").on("click", function () {
+			const _this = $(this);
+			const dropdown = $("#color-dropdown");
+			if (_this.hasClass("disabled")) {
+				isEraserEnabled = true;
+				_this.removeClass("disabled btn-secondary").addClass("btn-primary");
+				dropdown.attr("disabled", "disabled");
+				return;
+			}
+
+			isEraserEnabled = false;
+			_this.addClass("disabled btn-secondary").removeClass("btn-primary");
+			dropdown.removeAttr("disabled");
+		});
+
+		$(".simplemodal-close").on("click", function () {
+			console.log("asf")
+			$("#color-dropdown").spectrum("destroy");
+		});
+
+		$("#update").on("click", async function () {
+			await saveChanges();
+		});
+
+		const saveChanges = async () => {
+			const pixels = Object.values(avatarPixels);
+			if (pixels.length == 0) {
+				$.modal.close({ Success: false });
+				return;
+			}
+
+			$("#update").attr("disabled", "disabled");
+			const result = await postJson("/User/UpdateAvatarModal", { pixels: pixels });
+			if (result.Success === true) {
+				$.modal.close({ Success: true });
+				return;
+			}
+
+			$("#error-msg").show();
+			$("#error-msg > p").text(result.Message);
+			$("#update").removeAttr("disabled");
+		}
+
+		initializeCanvas();
+
+	})(jQuery);
+</script>

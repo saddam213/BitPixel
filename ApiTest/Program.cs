@@ -8,9 +8,9 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using DotMatrix.Base;
-using DotMatrix.Common.DataContext;
-using DotMatrix.Data.DataContext;
+using BitPixel.Base;
+using BitPixel.Common.DataContext;
+using BitPixel.Data.DataContext;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Newtonsoft.Json;
@@ -54,10 +54,10 @@ namespace ApiTest
 
 			//	for (int i = 0; i < 600; i++)
 			//	{
-			//		context.Click.Add(new DotMatrix.Entity.Click
+			//		context.Click.Add(new BitPixel.Entity.Click
 			//		{
 			//			GameId = 1,
-			//			Type = DotMatrix.Enums.PixelClickType.GetPixel,
+			//			Type = BitPixel.Enums.PixelClickType.GetPixel,
 			//			UserId = 1,
 			//			Y = i,
 			//			X = 4,
@@ -175,7 +175,7 @@ namespace ApiTest
 
 		private static async Task<PixelResponse> SendPixel(PixelRequest pixel)
 		{
-			string apiHost = "https://dotmatrix.chainstack.nz";
+			string apiHost = "https://BitPixel.chainstack.nz";
 			string apiPublicKey = "1a4cfeed5aea423c942142e88d8f5033";
 			string apiPrivateKey = "8thxiu2FuuFoRnfgDCL+R1EH/ZZ8V0eoPCPp8AYIndQ=";
 

@@ -95,29 +95,29 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DotMatrix.Base\DotMatrix.Base.csproj">
+    <ProjectReference Include="..\BitPixel.Base\BitPixel.Base.csproj">
       <Project>{D5029E7C-EFD9-4C90-99AB-6FB08601ECCC}</Project>
-      <Name>DotMatrix.Base</Name>
+      <Name>BitPixel.Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotMatrix.Common\DotMatrix.Common.csproj">
+    <ProjectReference Include="..\BitPixel.Common\BitPixel.Common.csproj">
       <Project>{0aeab0f6-db8a-4d61-ac8a-597bc227eeb3}</Project>
-      <Name>DotMatrix.Common</Name>
+      <Name>BitPixel.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotMatrix.Core\DotMatrix.Core.csproj">
+    <ProjectReference Include="..\BitPixel.Core\BitPixel.Core.csproj">
       <Project>{968682fb-a576-4f7f-9c74-a4c88aae147c}</Project>
-      <Name>DotMatrix.Core</Name>
+      <Name>BitPixel.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotMatrix.Data\DotMatrix.Data.csproj">
+    <ProjectReference Include="..\BitPixel.Data\BitPixel.Data.csproj">
       <Project>{ef3991dd-8a15-4c0f-9d31-d3565c067639}</Project>
-      <Name>DotMatrix.Data</Name>
+      <Name>BitPixel.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotMatrix.Entity\DotMatrix.Entity.csproj">
+    <ProjectReference Include="..\BitPixel.Entity\BitPixel.Entity.csproj">
       <Project>{272067d0-df82-4ea2-a8ed-187b7462dfcf}</Project>
-      <Name>DotMatrix.Entity</Name>
+      <Name>BitPixel.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotMatrix.Enums\DotMatrix.Enums.csproj">
+    <ProjectReference Include="..\BitPixel.Enums\BitPixel.Enums.csproj">
       <Project>{0748a30e-4cf8-4f2e-8369-76f8cb4f3467}</Project>
-      <Name>DotMatrix.Enums</Name>
+      <Name>BitPixel.Enums</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

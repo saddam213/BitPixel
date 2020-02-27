@@ -1,0 +1,123 @@
+﻿@model BitPixel.Common.Award.AwardModalViewModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+
+<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h5 class="modal-title">Award Information</h5>
+			<a class="simplemodal-close" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+
+		<div class="modal-body">
+
+			<div class="d-flex flex-column align-items-center">
+				<h3 class="text-primary"><i class="@Model.Icon"></i> @Model.Name award!</h3>
+
+				<div class="d-flex justify-content-around">
+					<div class="mr-4">
+						<span class="p-1 text-dark award-badge-@Model.Level"><i class="fa fa-trophy"></i> @Model.Level Award</span>
+					</div>
+
+					<div>
+						@switch (Model.TriggerType)
+						{
+							case BitPixel.Enums.AwardTriggerType.Once:
+							case BitPixel.Enums.AwardTriggerType.OncePerUser:
+							case BitPixel.Enums.AwardTriggerType.OncePerGame:
+							case BitPixel.Enums.AwardTriggerType.OncePerUserPerGame:
+								<h5>Points: <b class="text-info">@Model.Points</b></h5>
+								break;
+							case BitPixel.Enums.AwardTriggerType.MultiPerUser:
+							case BitPixel.Enums.AwardTriggerType.MultiPerUserPerGame:
+								<h5>Points: <b class="text-info">@Model.Points</b> <small>(each time)</small></h5>
+								break;
+							default:
+								break;
+						}
+					</div>
+				</div>
+
+				<div>
+
+					@if (string.IsNullOrEmpty(Model.Description))
+					{
+						<p>
+							<i>This award has no description so may be elusive to find :)</i>
+						</p>
+					}
+					else
+					{
+						<p>
+							<i>@Model.Description</i>
+						</p>
+					}
+				</div>
+
+				<div>
+					<small>
+						@switch (Model.ClickType)
+						{
+							case BitPixel.Enums.ClickType.Click:
+								<span>This award can be won by drawing or clicking pixels</span>
+								break;
+							case BitPixel.Enums.ClickType.Pixel:
+								<span>This award can be won by drawing pixels only</span>
+								break;
+							default:
+								break;
+						}
+					</small>
+				</div>
+
+				<div>
+					<small>
+						@switch (Model.TriggerType)
+						{
+							case BitPixel.Enums.AwardTriggerType.Once:
+								<span>This award can only be won by one player</span>
+								break;
+							case BitPixel.Enums.AwardTriggerType.OncePerUser:
+								<span>This award can be won once per player</span>
+								break;
+							case BitPixel.Enums.AwardTriggerType.MultiPerUser:
+								<span>This award can be won multiple times per player</span>
+								break;
+							case BitPixel.Enums.AwardTriggerType.OncePerGame:
+								<span>This award can only be won by one player each game</span>
+								break;
+							case BitPixel.Enums.AwardTriggerType.OncePerUserPerGame:
+								<span>This award can be won once per player each game</span>
+								break;
+							case BitPixel.Enums.AwardTriggerType.MultiPerUserPerGame:
+								<span>This award can be won multiple times per player each game</span>
+								break;
+							default:
+								break;
+						}
+					</small>
+				</div>
+
+
+
+
+			</div>
+
+		</div>
+
+		<div class="modal-footer btn-group">
+			<button type="button" class="simplemodal-close btn btn-success">Close</button>
+		</div>
+
+	</div>
+</div>
+
+<script>
+	(async ($) => {
+
+	})(jQuery);
+</script>
