@@ -24436,3 +24436,73 @@ table.dataTable thead .sorting_desc_disabled {
 		.award-main-container .award-badge > i {
 			font-size: 20px
 		}
+
+
+
+
+
+
+
+
+.game-wrapper {
+	position: relative;
+	width: 100%;
+	max-width: 100%;
+	height: 100%;
+	max-height: 100%;
+	display: flex;
+	overflow: hidden;
+}
+
+.game-container {
+	width: 100%;
+	overflow: hidden;
+}
+
+.menu-container {
+	width: 100%;
+	max-width: 400px;
+	min-width: 320px;
+	overflow: hidden;
+}
+
+#pixel-finder {
+	position: absolute;
+	display: none;
+	width: 16px;
+	height: 16px;
+	text-align: center;
+	z-index: 11;
+}
+
+#pixel-overlay {
+	position: absolute;
+	z-index: 10;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+}
+
+#canvas-container {
+	position: relative;
+	margin: auto;
+}
+
+.canvas-scroll-wrapper {
+	height: 100%;
+	overflow: hidden;
+}
+
+#canvas-scroll-container {
+	height: 100%;
+	overflow: auto;
+	scrollbar-width: unset;
+}
+
+#mainCanvas {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-color: rgba(238, 232, 213, 0.125);
+}

@@ -6,7 +6,6 @@
 	var gameId = Model.Game.Id;
 	var width = Model.Game.Width;
 	var height = Model.Game.Height;
-	var cacheBreak = DateTime.UtcNow.ToUnixMin();
 	var teamColor = Model.Team?.Color;
 	var teamRequired = Model.Game.Type == DotMatrix.Enums.GameType.TeamBattle && Model.Team == null;
 	var gameEndTimeUnix = Model.Game.EndTime?.ToUnixMs() ?? 0;
@@ -17,74 +16,12 @@
 @Html.AntiForgeryToken()
 
 <style>
-	.game-wrapper {
-		position: relative;
-		width: 100%;
-		max-width: 100%;
-		height: 100%;
-		max-height: 100%;
-		display: flex;
-		overflow: hidden;
-	}
-
-	.game-container {
-		width: 100%;
-		overflow: hidden;
-	}
-
-	.menu-container {
-		width: 100%;
-		max-width: 400px;
-		min-width: 320px;
-		overflow: hidden;
-	}
-
-	#pixel-finder {
-		position: absolute;
-		display: none;
-		width: 16px;
-		height: 16px;
-		text-align: center;
-		z-index: 11;
-	}
-
-	#pixel-overlay {
-		position: absolute;
-		z-index: 10;
-		left:0;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		pointer-events: none;
-	}
-
-	#canvas-container {
-		position: relative;
-		margin: auto;
-	}
-
-	.canvas-scroll-wrapper {
-		height: 100%;
-		overflow: hidden;
-	}
-
-	#canvas-scroll-container {
-		height: 100%;
-		overflow: auto;
-		scrollbar-width: unset;
-	}
 
 		#canvas-scroll-container::-webkit-scrollbar {
 			width: 12px !important;
 			height: 12px !important;
 		}
 
-	#mainCanvas {
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-image: url('../Content/Images/Games/@Model.Game.Id/background.png?v=@cacheBreak');
-		background-color: rgba(238, 232, 213, 0.125);
-	}
 
 	#toolbar-window {
 		display: flex;
@@ -107,7 +44,7 @@
 			<div class="d-flex flex-column pt-2 pb-2">
 				<div class="d-flex flex-column align-items-center">
 					<h2 class="mb-0 text-primary">@Model.Game.Name</h2>
-					<small class="text-muted" style="margin-top:-5px">
+					<small class="text-muted" style="margin-top: -5px">
 						@Model.Game.Description
 					</small>
 				</div>
@@ -724,14 +661,15 @@
 				});
 			}
 
-
 			const resetCanvas = async () => {
 				gameCanvas.height = gameSettings.height * gameScale;
 				gameCanvas.width = gameSettings.width * gameScale;
+				gameCanvas.style.backgroundImage = `url('../Content/Images/Games/${gameSettings.gameId}/background.png?v=${getCacheVersion()}')`;
 				canvasContainer.css({ width: gameCanvas.width, height: gameCanvas.height });
 				gameCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
 				gameCanvasContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 				gameCanvasContext.scale(gameScale, gameScale);
+
 				await getServerPixels();
 			}
 

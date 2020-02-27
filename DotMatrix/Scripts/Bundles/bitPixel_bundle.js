@@ -44707,6 +44707,11 @@ const getCanvasLocation = (canvas, scale, mouseEvent) => {
 	}
 }
 
+const getCacheVersion = () => {
+	const milliseconds = new Date().getTime();
+	return ~~((milliseconds / 1000) / 60);
+}
+
 
 String.prototype.paddingLeft = function (paddingValue) {
 	return String(paddingValue + this).slice(-paddingValue.length);
