@@ -1,7 +1,7 @@
 ﻿@using BitPixel.Base.Extensions
 @{
 	Layout = "~/Views/Shared/_Modal.cshtml";
-	var cacheBreak = DateTime.UtcNow.ToUnixMin();
+	var cacheBreak = DateTime.UtcNow.ToUnixMs();
 	var isMobile = Request.Browser.IsMobileDevice;
 	var width = isMobile ? "160" : "100";
 }
@@ -97,6 +97,12 @@
 				const pozX = parseInt(mousePos.x / scale);
 				const pozY = parseInt(mousePos.y / scale);
 
+				if (pozX < 0 || pozY < 0)
+					return;
+
+				if (pozX > 9 || pozY > 9)
+					return;
+
 				if (isEraserEnabled) {
 					removeRequestPixel(pozX, pozY);
 					removeCanvasPixel(pozX, pozY);
@@ -116,23 +122,17 @@
 				y: y,
 				color: color
 			};
-
-			console.log("add: ", avatarPixels)
 		}
 
 		const removeRequestPixel = (x, y) => {
 			// remove from array
 			const key = x + "-" + y;
 			delete avatarPixels[key];
-
-			console.log("remove: ", avatarPixels)
 		}
 
 		const addCanvasPixel = async (x, y, color) => {
-			context.beginPath();
 			context.fillStyle = color,
-				context.fillRect(x, y, 1, 1);
-			context.closePath();
+			context.fillRect(x, y, 1, 1);
 		}
 
 		const removeCanvasPixel = (x, y) => {
