@@ -1,0 +1,79 @@
+﻿@model BitPixel.Common.Award.AwardViewModel
+@{
+	ViewBag.Title = "Awards";
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:340px;max-width:1032px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0"><i class="fa fa-award mr-1"></i>Awards</h2>
+			<span class="ml-1">Awards that can be won playing BitPixel</span>
+		</div>
+	</div>
+
+
+	<div class="card" style="min-width:350px;max-width:1032px;width:100%">
+
+		<div class="card-body p-2">
+
+			<div class="d-flex mb-3">
+				<div class="d-flex w-50">
+					@if (User.Identity.IsAuthenticated)
+					{
+						<a href="/Awards/UserHistory" class="btn btn-sm btn-outline-primary w-50">View My Awards</a>
+					}
+				</div>
+				<div class="d-flex justify-content-end w-50">
+					<a href="/Awards/History" class="btn btn-sm btn-outline-success w-50  mr-1">Recent Winners</a>
+					<a href="/Awards/Search" class="btn btn-sm btn-outline-primary w-50">Award Directory</a>
+				</div>
+			</div>
+
+			<div class="award-main-container">
+				@foreach (var awardLevel in Model.AwardList.GroupBy(x => x.Level).OrderByDescending(x => x.Key))
+				{
+					<small>@awardLevel.Key Awards</small>
+					<div class="d-flex flex-wrap">
+						@foreach (var award in awardLevel.OrderByDescending(x => x.ClickType).ThenBy(x => x.Rank).ThenBy(x => x.Name))
+						{
+							<div class="award-view" data-awardid="@award.AwardId" style="cursor:pointer">
+								<div class="text-dark award-badge award-badge-@award.Level">
+									<div class="text-center cell-elipsis">
+										<strong>
+											<i class="@award.Icon"></i>
+											<span class="ml-1 mr-1">@award.Name</span>
+										</strong>
+									</div>
+									<div class="d-flex justify-content-between">
+										<small>@award.ClickType</small>
+										<small>@award.Points points</small>
+									</div>
+								</div>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+
+	<script>
+		(async ($) => {
+
+			$(".award-view").on("click", async function () {
+				const awardid = $(this).data("awardid");
+				await openModalGet('/Awards/ViewAwardModal', { awardid: awardid });
+			});
+
+		})(jQuery);
+
+	</script>
+}

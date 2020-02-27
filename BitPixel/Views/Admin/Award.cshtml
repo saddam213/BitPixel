@@ -1,0 +1,76 @@
+﻿@model BitPixel.Common.Admin.AdminAwardViewModel
+	@{
+		ViewBag.Title = "Award Admin";
+	}
+
+	<div class="d-flex flex-column align-items-center">
+		<div class="d-flex" style="max-width:1000px;">
+
+			<div class="card w-100 m-3">
+				<div class="card-body">
+					<h5 class="card-title text-primary">Award Management</h5>
+					<h6 class="card-subtitle mb-2 text-muted">Award Management Description</h6>
+					<div>
+
+						<table class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+							<thead>
+								<tr>
+									<th width="45">Id</th>
+									<th width="110">Name</th>
+									<th width="60%">Description</th>
+									<th width="40%">Icon</th>
+									<th width="60">Level</th>
+									<th width="50" class="cell-elipsis">ClickType</th>
+									<th width="120">Trigger</th>
+									<th width="60">Points</th>
+									<th width="70">Status</th>
+									<th width="30" class="cell-elipsis">Rank</th>
+									<th width="30"></th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var award in Model.Awards)
+								{
+									<tr>
+										<td>@award.Id</td>
+										<td>@award.Name</td>
+										<td class="cell-elipsis" title="@award.Description">@award.Description</td>
+										<td class="cell-elipsis">@award.Icon</td>
+										<td>@award.Level</td>
+										<td>@award.ClickType</td>
+										<td class="cell-elipsis">@award.TriggerType</td>
+										<td class="text-right">@award.Points</td>
+										<td>@award.Status</td>
+										<td class="text-right">@award.Rank</td>
+										<td>
+											<div class="d-flex justify-content-around align-items-center">
+												<i style="cursor:pointer" class="fa fa-edit award-update" data-awardid="@award.Id"></i>
+											</div>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	@section Scripts {
+		<script>
+			(async ($) => {
+
+				$(".award-update").on("click", async function () {
+					const awardId = $(this).data("awardid");
+					const result = await openModalGet("/Admin/UpdateAwardModal", { awardId: awardId });
+					if (result.Cancel === true) {
+						return;
+					}
+					location.reload();
+				});
+			})(jQuery);
+		</script>
+	}

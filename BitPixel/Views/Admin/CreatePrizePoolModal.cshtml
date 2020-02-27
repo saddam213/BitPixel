@@ -1,0 +1,106 @@
+﻿@model BitPixel.Common.Prize.CreatePrizePoolModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+@using (Ajax.BeginForm("CreatePrizePoolModal", "Admin", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "simplemodal-data", InsertionMode = InsertionMode.Replace }))
+{
+	@Html.AntiForgeryToken()
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Create Prize Pool</h5>
+				<a class="simplemodal-close" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">
+
+				@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+				<div class="form-group w-100">
+					<small>Game</small>
+					@Html.DropDownListFor(m => m.GameId, new SelectList(Model.Games, "Id", "Name"), "Please select", new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.GameId, "", new { @class = "text-danger" })
+				</div>
+
+				<div class="d-flex">
+					<div class="form-group w-100 mr-1">
+						<small>Prize Count</small>
+						@Html.TextBoxFor(m => m.Count, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Count, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group w-100 ml-1">
+						<small>Max Points</small>
+						@Html.TextBoxFor(m => m.MaxPoints, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.MaxPoints, "", new { @class = "text-danger" })
+					</div>
+				</div>
+				<div class="d-flex">
+					<div class="form-group w-100 mr-1">
+						<small>Type</small>
+						@Html.EnumDropDownListFor(m => m.Type, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group w-100 ml-1">
+						<small>Points</small>
+						@Html.TextBoxFor(m => m.Points, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Points, "", new { @class = "text-danger" })
+					</div>
+				</div>
+				<div class="form-group">
+					<small>Name</small>
+					@Html.TextBoxFor(m => m.Name, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+				</div>
+				<div class="form-group">
+					<small>Description</small>
+					@Html.TextBoxFor(m => m.Description, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+				</div>
+
+
+				<div class="prize-options prize-options-1" style="display:none">
+					<div class="d-flex">
+						<div class="form-group w-100 mr-1">
+							<small>Symbol</small>
+							@Html.TextBoxFor(m => m.Data, new { @class = "form-control form-control-sm" })
+							@Html.ValidationMessageFor(m => m.Data, "", new { @class = "text-danger" })
+						</div>
+						<div class="form-group w-100 ml-1">
+							<small>Amount Each</small>
+							@Html.TextBoxFor(m => m.Data2, "0.00000000", new { @class = "form-control form-control-sm" })
+							@Html.ValidationMessageFor(m => m.Data2, "", new { @class = "text-danger" })
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer btn-group">
+				<button id="submit" type="submit" class="btn btn-outline-success">Submit</button>
+				<button type="button" class="simplemodal-close btn btn-outline-secondary">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script>
+	(async ($) => {
+
+		$("#Type").on("change", function () {
+			const selection = $(this).val();
+			console.log(selection);
+			$(`.prize-options`).hide();
+			$(`.prize-options-${selection}`).show();
+		}).trigger("change");
+
+		$('form').submit(function () {
+			const form = $(this);
+			if (form.valid()) {
+				$("#submit").attr("disabled", "disabled").text("Generating...");
+			}
+		});
+
+	})(jQuery);
+</script>

@@ -1,0 +1,49 @@
+﻿@model BitPixel.Common.Account.LoginViewModel
+@{
+	ViewBag.Title = "Log in";
+}
+
+<div class="d-flex justify-content-center p-5">
+	<div class="card" style="width:100%;min-width:320px;max-width:400px">
+		<div class="card-body">
+			<h5 class="card-title">Login</h5>
+			<h6 class="card-subtitle mb-2 text-muted">Please fill in the form below to login.</h6>
+			<div>
+				@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+				{
+					@Html.AntiForgeryToken()
+					@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					<div class="form-group">
+						<small>Email Address</small>
+						@Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group">
+						<small>Password</small>
+						@Html.PasswordFor(m => m.Password, new { @class = "form-control  form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+					</div>
+
+					<div class="form-group">
+						<div class="d-flex justify-content-center">
+							@hbehr.recaptcha.ReCaptcha.GetCaptcha()
+						</div>
+					</div>
+
+					<div class="form-group">
+						<input type="submit" value="Log in" class="btn btn-primary w-100" />
+					</div>
+					<div class="d-flex justify-content-between">
+						<small>@Html.ActionLink("Register New Account", "Register")</small>
+						<small>@Html.ActionLink("Forgot Your Password?", "ForgotPassword")</small>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/Scripts/jquery.validate.js"></script>
+	<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+}

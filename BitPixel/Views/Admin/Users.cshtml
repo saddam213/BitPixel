@@ -1,0 +1,165 @@
+﻿@{
+	ViewBag.Title = "User Admin";
+}
+
+<div class="d-flex flex-column align-items-center">
+
+	<div class="d-flex" style="max-width:1000px;">
+		<div class="card w-100 m-3">
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<h5 class="card-title text-primary">User Management</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Manage user and user settings</h6>
+					</div>
+					<div>
+						<div class="input-group input-group-sm ">
+							<input id="filter-search" type="text" class="filter-input form-control" placeholder="Search...">
+							<div class="input-group-append">
+								<button id="filter-clear" class="btn btn-outline-danger" type="button" style="display:none">
+									<i class="fa fa-times"></i>
+								</button>
+							</div>
+							<div class="input-group-append">
+								<button id="filter-apply" class="btn btn-outline-secondary" type="button" disabled="disabled">
+									<i class="fa fa-search"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<table id="table-users" class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Points</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+@section Scripts {
+
+	<script id="editCellTemplate" type="text/html">
+		<div class="text-center text-primary">
+			<i class="fa fa-edit user-update" data-userid="{{.}}"></i>
+		</div>
+	</script>
+
+	<script>
+		(async ($) => {
+
+			const editCellTemplate = $("#editCellTemplate").html();
+			const table = $("#table-users");
+			const dataTable = table.DataTable({
+				"dom": datatable_Layout,
+				"order": [[0, "desc"]],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": true,
+				"searching": true,
+				"paging": true,
+				"pagingType": "simple_numbers",
+				"info": true,
+				"autoWidth": false,
+				"displayLength": 20,
+				"language": {
+					emptyTable: "No users found",
+					zeroRecords: "No users found",
+				},
+				"ajaxSource": '/Admin/GetUsers',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": 0,
+					"width": 80
+				},
+				{
+					"targets": 1,
+					"width": "100%",
+				},
+				{
+					"targets": 2,
+					"width": "100%",
+				},
+				{
+					"targets": 3,
+					"width": 180,
+					"className": 'text-right',
+				},
+				{
+					"targets": 4,
+					"width": 30,
+					"orderable": false,
+					"searchable": false,
+					"render": function (data, type, full, meta) {
+						return Mustache.render(editCellTemplate, full[0]);
+					}
+				}]
+			});
+
+			$('#filter-apply').on('click', function () {
+				const _this = $(this);
+				_this.attr("disabled", "disabled");
+				dataTable.draw();
+				if (isFilterApplied()) {
+					$("#filter-clear").show();
+				}
+			});
+
+			$('#filter-clear').on('click', function () {
+				$(this).hide();
+				$(".filter-input").val(null);
+				$("#filter-apply").trigger("click");
+			});
+
+			$('#filter-search').on('keyup', function (e) {
+				if (isFilterApplied()) {
+					if (e.keyCode == 13) {
+						$("#filter-apply").trigger("click");
+						return;
+					}
+				}
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			$(".filter-input").on("change paste keyup", function () {
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			const isFilterApplied = () => {
+				const filter_search = $("#filter-search").val();
+				if (filter_search) {
+					return true;
+				}
+				return false;
+			}
+
+
+			$("#table-users").on("click", ".user-update", async function () {
+				const userId = $(this).data("userid");
+				const result = await openModalGet("/Admin/UpdateUserModal", { userId: userId });
+				if (result.Cancel === true) {
+					return;
+				}
+				dataTable.draw();
+			});
+
+		})(jQuery);
+	</script>
+}

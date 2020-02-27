@@ -1,0 +1,70 @@
+﻿@model BitPixel.Common.Team.ChangeTeamModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+@using (Ajax.BeginForm("ChangeTeamModal", "Game", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "simplemodal-data", InsertionMode = InsertionMode.Replace }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(m => m.GameId)
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Select Team</h5>
+				<a class="simplemodal-close" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">
+				@Html.ModelValidationSummary()
+
+				<div class="d-flex flex-column">
+
+					@foreach (var team in Model.Teams.OrderBy(x => x.Rank))
+					{
+						<div style="margin:3px">
+							<div class="input-group align-items-center">
+								<div class="form-control border-1 border-info" style="padding-top:0;height:44px">
+									<div class="d-flex align-items-center" style="height:42px">
+										<div class="d-flex justify-content-center" style="">
+											<i style="font-size:26px;color:@team.Color" class="@(string.IsNullOrEmpty(team.Icon) ? "fa fa-square-full" : team.Icon)"></i>
+										</div>
+										<div class="d-flex flex-column ml-3" style="vertical-align:top">
+											<span style="font-weight:600">@team.Name</span>
+											<small style="line-height:13px;margin-left:1px;margin-bottom:4px">@team.Description</small>
+										</div>
+									</div>
+								</div>
+
+								<div class="input-group-append">
+									<button name="TeamId" value="@team.Id" class="btn btn-info" type="submit" style="height:44px">
+										Select Team
+									</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+
+
+			</div>
+			<div class="modal-footer btn-group">
+				<button type="button" class="simplemodal-close btn btn-outline-secondary">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script>
+	(async ($) => {
+
+		$('form').submit(function () {
+			const form = $(this);
+			if (form.valid()) {
+				$("#submit").attr("disabled", "disabled");
+			}
+		});
+
+	})(jQuery);
+</script>

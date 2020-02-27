@@ -1,0 +1,541 @@
+﻿@model BitPixel.Common.Points.PointsModel
+@{
+	ViewBag.Title = "Points";
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+
+<div class="d-flex flex-column justify-content-center pt-2">
+
+	<div class="d-flex justify-content-center flex-wrap">
+		<div class="d-flex w-50" style="min-height: 150px;min-width: 350px;">
+			<div class="card w-100 ml-1 mr-1 mb-2">
+				<div class="card-body">
+					<h2 class="card-title text-primary mb-0">
+						<a class="text-primary" href="/Player?name=@User.Identity.Name">@User.Identity.Name</a>
+					</h2>
+					<div class="mb-2">
+						@foreach (var item in Model.AwardList.GroupBy(x => x.Level).OrderByDescending(x => x.Key))
+						{
+							<small class="mr-1">
+								<i class="fa fa-trophy award-icon-@item.Key"></i>
+								<span>@item.Sum(x => x.Count)</span>
+							</small>
+						}
+					</div>
+
+					<div>
+						<div class="d-flex w-100">
+							<div class="w-75">
+								<span>Points: <b class="text-info" style="font-size:22px">@Model.Points</b></span>
+							</div>
+							<div class="w-25" style="padding-top:6px">
+								<a href="/Home" class="btn btn-sm btn-warning w-100">Play Now!</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="d-flex w-50" style="min-height:150px; min-width:350px;">
+
+
+			<div class="card w-100 ml-1 mr-1 mb-2">
+				<div class="card-body">
+					<h5 class="card-title text-primary">Need More Points?</h5>
+					<h6 class="card-subtitle mb-2 text-muted">Are you all out of points? you can earn more by winning awards, alternatively you can top up your points using one of the payment options provided</h6>
+					<div>
+						<div class="d-flex">
+							<div class="d-flex w-50">
+								<div class="w-100 mr-1">
+									<a href="/Awards" class="btn btn-block btn-sm btn-success">Win Points!</a>
+								</div>
+								<div class="w-100 mr-1">
+									<a href="/Payment" class="btn btn-block btn-sm btn-primary">Buy Points!</a>
+								</div>
+							</div>
+							<div class="d-flex w-50 justify-content-end">
+								<div class="w-50 ml-1">
+									<a href="/Payment/History" class="btn btn-block btn-sm btn-secondary">Payment History</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+	<div class="d-flex justify-content-center flex-wrap" style="min-height: 180px">
+		<div class="d-flex w-50" style="min-width:350px;">
+
+
+			<div class="card w-100 ml-1 mr-1 mb-2">
+				<div class="card-body">
+					<h5 class="card-title text-primary mb-0">Prizes</h5>
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<h6 class="card-subtitle text-muted">Latest 10 Prizes you have won playing BitPixel</h6>
+						<a class="btn btn-sm btn-outline-primary" href="/Prizes/UserHistory" style="width:150px">
+							View All Prize Details
+						</a>
+					</div>
+					<div class="d-flex flex-column">
+						<div class="flex-grow-1">
+							<table id="table-prizes" class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>GameId</th>
+										<th>IsUnclaimed</th>
+										<th>Game</th>
+										<th>Prize</th>
+										<th>Description</th>
+										<th>X</th>
+										<th>Y</th>
+										<th>Points</th>
+										<th>Status</th>
+										<th>Time</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+		<div class="d-flex w-50" style="min-width:350px;">
+
+
+			<div class="card w-100 ml-1 mr-1 mb-2">
+				<div class="card-body">
+					<h5 class="card-title text-primary mb-0">Awards</h5>
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<h6 class="card-subtitle text-muted">Awards you have won playing BitPixel</h6>
+						<a class="btn btn-sm btn-outline-primary" href="/Awards/UserHistory" style="width:150px">
+							View All Award Details
+						</a>
+					</div>
+
+					<div class="d-flex flex-column">
+						<div class="flex-grow-1">
+
+							<div class="award-view-container">
+								@foreach (var awardLevel in Model.AwardList.GroupBy(x => x.Level).OrderByDescending(x => x.Key))
+								{
+									<small>@awardLevel.Key Awards</small>
+									<div class="d-flex flex-wrap">
+										@foreach (var award in awardLevel.OrderByDescending(x => x.ClickType).ThenBy(x => x.Rank).ThenBy(x => x.Name))
+										{
+											<div class="award-view" data-awardid="@award.AwardId" style="cursor:pointer">
+												<div class="text-dark award-badge award-badge-@award.Level">
+													<div class="text-center cell-elipsis">
+														<i class="@award.Icon"></i>
+														<span class="ml-1 mr-1">@award.Name</span>
+														<small>@(award.Count > 1 ? $" ({award.Count})" : "")</small>
+													</div>
+												</div>
+											</div>
+										}
+									</div>
+								}
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+
+
+
+	<div class="d-flex justify-content-center flex-wrap" style="min-height: 180px">
+		<div class="d-flex w-50" style="min-width:350px;">
+
+
+			<div class="card w-100 ml-1 mr-1 mb-2">
+				<div class="card-body">
+					<h5 class="card-title text-primary mb-0">Clicks</h5>
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<h6 class="card-subtitle text-muted">Latest 10 clicks you have entered playing BitPixel</h6>
+						<a class="btn btn-sm btn-outline-primary" href="/Points/ClickHistory" style="width:150px">
+							View All Click Details
+						</a>
+					</div>
+					<div class="d-flex flex-column">
+						<div class="flex-grow-1">
+							<table id="table-clicks" class="table table-sm table-bordered" style="table-layout: fixed;font-size: 13px">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>GameId</th>
+										<th>Game</th>
+										<th>X</th>
+										<th>Y</th>
+										<th>Type</th>
+										<th>Time</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+		<div class="d-flex w-50" style="min-width:350px;">
+
+
+			<div class="card w-100 ml-1 mr-1 mb-2">
+				<div class="card-body">
+					<h5 class="card-title text-primary mb-0">Pixels</h5>
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<h6 class="card-subtitle text-muted">Latest 10 Pixels you have drawn playing BitPixel</h6>
+						<a class="btn btn-sm btn-outline-primary" href="/Points/PixelHistory" style="width:150px">
+							View All Pixel Details
+						</a>
+					</div>
+					<div class="d-flex flex-column">
+						<div class="flex-grow-1">
+							<table id="table-pixels" class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>GameId</th>
+										<th>Game</th>
+										<th>X</th>
+										<th>Y</th>
+										<th>Color</th>
+										<th>Points</th>
+										<th>Time</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+
+
+</div>
+
+@section Scripts {
+
+	<script id="claimCellTemplate" type="text/html">
+		{{#IsUnclaimed}}
+		<a class="prize-claim text-primary" data-prizeid="{{Id}}" style="cursor:pointer">
+			<strong>Claim Now!</strong>
+		</a>
+		{{/IsUnclaimed}}
+		{{^IsUnclaimed}}
+		<a class="prize-claim text-muted" data-prizeid="{{Id}}" style="cursor:pointer">
+			<span>{{Status}}</span>
+		</a>
+		{{/IsUnclaimed}}
+	</script>
+
+	<script>
+		(async ($) => {
+			const isMobile = @Json.Encode(isMobile);
+			
+
+			$(".award-view").on("click", async function () {
+				const awardid = $(this).data("awardid");
+				await openModalGet('/Awards/ViewUserAwardModal', { awardid: awardid });
+			});
+
+			$("#table-prizes").on("click", ".prize-claim", async function () {
+				const prizeid = $(this).data("prizeid");
+				const result = await openModalGet('/Prizes/ClaimPrizeModal', { prizeid: prizeid });
+				if (result.Success === true) {
+					location.reload();
+				}
+			});
+
+			$("#table-prizes").on("click", ".prize-view", async function () {
+				const prizeid = $(this).data("prizeid");
+				const result = await openModalGet('/Prizes/ViewUserPrizeModal', { prizeid: prizeid });
+				if (result.ClaimPrize === true) {
+					const claimresult = await openModalGet('/Prizes/ClaimPrizeModal', { prizeid: result.PrizeId });
+					if (claimresult.Success === true) {
+						location.reload();
+					}
+				}
+			});
+
+			const viewPrizeCellTemplate = $("#viewPrizeCellTemplate").html();
+			const linkCellTemplate = $("#linkCellTemplate").html();
+			const claimCellTemplate = $("#claimCellTemplate").html();
+			const colorCellTemplate = $("#colorCellTemplate").html();
+
+
+			const tablePrizes = $("#table-prizes");
+			const dataTablePrizes = tablePrizes.DataTable({
+				"dom": datatable_Layout,
+				"order": [],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": false,
+				"searching": false,
+				"paging": false,
+				"info": false,
+				"autoWidth": false,
+				"displayLength": 10,
+				"language": {
+					emptyTable: "No prizes found",
+					zeroRecords: "No prizes found",
+				},
+				"ajaxSource": '/Points/GetPrizeSummary',
+				"serverMethod": "POST",
+				"columnDefs": [{
+					"targets": [0, 1, 2],
+					"searchable": false,
+					"visible": false
+				},
+				{
+					"targets": 3,
+					"width": "30%",
+					"visible": !isMobile,
+					"orderable": false,
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Game?gameId=" + full[1]
+						});
+					}
+				},
+				{
+					"targets": 4,
+					"width": "30%",
+					"orderable": false,
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(viewPrizeCellTemplate, {
+							Id: full[0],
+							Name: data
+						});
+					}
+				},
+				{
+					"targets": 5,
+					"width": "40%",
+					"visible": !isMobile,
+					"orderable": false,
+					"className": 'cell-elipsis'
+				},
+				{
+					"targets": 6,
+					"width": 45,
+					"visible": !isMobile,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 7,
+					"width": 45,
+					"visible": !isMobile,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 8,
+					"width": isMobile ? 50 : 80,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 9,
+					"width": isMobile ? 70 : 100,
+					"orderable": false,
+					"className": 'text-center',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(claimCellTemplate, {
+							Id: full[0],
+							Status: data,
+							IsUnclaimed: full[2]
+						});
+					}
+				},
+				{
+					"targets": 10,
+					"orderable": false,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+			const tableClicks = $("#table-clicks");
+			const dataTableClicks = tableClicks.DataTable({
+				"dom": datatable_Layout,
+				"order": [],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": false,
+				"searching": false,
+				"paging": false,
+				"info": false,
+				"autoWidth": false,
+				"displayLength": 10,
+				"language": {
+					emptyTable: "No clicks found",
+					zeroRecords: "No clicks found",
+				},
+				"ajaxSource": '/Points/GetClickSummary',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": [0, 1],
+					"searchable": false,
+					"visible": false,
+					"orderable": false,
+				},
+				{
+					"targets": 2,
+					"width": "30%",
+					"orderable": false,
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Game?gameId=" + full[1]
+						});
+					}
+				},
+				{
+					"targets": 3,
+					"width": isMobile ? 30 : 45,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 4,
+					"width": isMobile ? 30 : 45,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 5,
+					"width": isMobile ? 50 : 100,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 6,
+					"orderable": false,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+			const tablePixels = $("#table-pixels");
+			const dataTablePixels = tablePixels.DataTable({
+				"dom": datatable_Layout,
+				"order": [],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": false,
+				"searching": false,
+				"paging": false,
+				"info": false,
+				"autoWidth": false,
+				"displayLength": 10,
+				"language": {
+					emptyTable: "No pixels found",
+					zeroRecords: "No pixels found",
+				},
+
+				"ajaxSource": '/Points/GetPixelSummary',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": [0, 1],
+					"searchable": false,
+					"visible": false,
+					"orderable": false,
+				},
+				{
+					"targets": 2,
+					"width": "30%",
+					"orderable": false,
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Game?gameId=" + full[1]
+						});
+					}
+				},
+				{
+					"targets": 3,
+					"width": isMobile ? 30 : 45,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 4,
+					"width": isMobile ? 30 : 45,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 5,
+					"width": isMobile ? 50 : 120,
+					"orderable": false,
+					"className": "cell-elipsis",
+					"render": function (data, type, full, meta) {
+						return Mustache.render(colorCellTemplate, data);
+					}
+				},
+				{
+					"targets": 6,
+					"width": isMobile ? 50 : 120,
+					"orderable": false,
+					"className": 'text-right'
+				},
+				{
+					"targets": 7,
+					"orderable": false,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+
+
+		})(jQuery);
+	</script>
+}

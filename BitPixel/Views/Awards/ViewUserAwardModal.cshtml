@@ -1,0 +1,42 @@
+﻿@model BitPixel.Common.Award.AwardUserModalViewModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+
+<div class="modal-dialog" role="document">
+	<div class="modal-content">
+		<div class="modal-header">
+			<h5 class="modal-title">Award Information</h5>
+			<a class="simplemodal-close" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</a>
+		</div>
+
+		<div class="modal-body">
+
+			<div class="d-flex flex-column align-items-center">
+				<h5 class="text-primary"><i class="@Model.Icon"></i> You have won the @Model.Name award!</h5>
+				<span class="mt-1">@Model.Points points have been credited to your account</span>
+				@if (Model.Count > 1)
+				{
+					<small class="mt-3">
+						<i>You have won this award <a href="/Awards/UserHistory?award=@Model.Name">multiple times</a></i>
+					</small>
+				}
+			</div>
+
+		</div>
+
+		<div class="modal-footer btn-group">
+			<button type="button" class="simplemodal-close btn btn-success">Close</button>
+		</div>
+
+	</div>
+</div>
+
+<script>
+	(async ($) => {
+
+	})(jQuery);
+</script>

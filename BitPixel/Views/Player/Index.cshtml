@@ -1,0 +1,86 @@
+﻿@model BitPixel.Common.Users.UserProfileViewModel
+@using BitPixel.Base.Extensions
+@{
+	ViewBag.Title = "Player";
+	var cacheBreak = DateTime.UtcNow.ToUnixMin();
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:340px;max-width:1015px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0">Player Profile</h2>
+		</div>
+	</div>
+
+	<div class="card" style="min-width:350px;max-width:1015px;width:100%">
+		<div class="d-flex @(isMobile ? "flex-column align-items-center" : "")">
+			<div class="m-4">
+				<img src="~/Content/Images/Avatar/@(Model.UserName).png?v=@cacheBreak" onerror="this.src='/Content/Images/Avatar.png'" class="card-img" alt="User profile Picture" width="100" height="100" style="min-width:100px;border:solid 1px rgba(238, 232, 213, 0.325)">
+			</div>
+
+			<div class="card-body p-2">
+				<h2 class="card-title text-primary mb-0">@Model.UserName</h2>
+				<div class="mb-2">
+					@foreach (var item in Model.AwardList.GroupBy(x => x.Level).OrderByDescending(x => x.Key))
+					{
+						<small class="mr-1">
+							<i class="fa fa-trophy award-icon-@item.Key"></i>
+							<span>@item.Sum(x=> x.Count)</span>
+						</small>
+					}
+				</div>
+				<div>
+					<span>Clicks: <strong class="text-primary">@Model.Clicks</strong></span>
+				</div>
+				<div>
+					<span>Pixels: <strong class="text-primary">@Model.Pixels</strong></span>
+				</div>
+				<div>
+					<span>Awards: <strong class="text-primary">@Model.Awards</strong></span>
+				</div>
+
+
+				<div class="award-view-container mt-3">
+					@foreach (var awardLevel in Model.AwardList.GroupBy(x => x.Level).OrderByDescending(x => x.Key))
+					{
+						<small>@awardLevel.Key Awards</small>
+						<div class="d-flex flex-wrap">
+							@foreach (var award in awardLevel.OrderByDescending(x => x.ClickType).ThenBy(x => x.Rank).ThenBy(x => x.Name))
+							{
+								<div class="award-view" data-awardid="@award.AwardId" style="cursor:pointer">
+									<div class="text-dark award-badge award-badge-@award.Level">
+										<div class="text-center cell-elipsis">
+											<i class="@award.Icon"></i>
+											<span class="ml-1 mr-1">@award.Name</span>
+											<small>@(award.Count > 1 ? $" ({award.Count})" : "")</small>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+					}
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+
+	<script>
+		(async ($) => {
+
+			$(".award-view").on("click", async function () {
+				const awardid = $(this).data("awardid");
+				await openModalGet('/Awards/ViewAwardModal', { awardid: awardid });
+			});
+
+		})(jQuery);
+
+	</script>
+}

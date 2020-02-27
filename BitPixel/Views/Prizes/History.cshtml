@@ -1,0 +1,211 @@
+﻿@{
+	ViewBag.Title = "Prize History";
+	var isMobile = Request.Browser.IsMobileDevice;
+}
+@Html.AntiForgeryToken()
+<div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:340px;max-width:1000px">
+		<div class="w-100">
+			<h2 class="card-title text-primary mb-0"><i class="fa fa-trophy mr-1"></i>Overall Prizeboard</h2>
+			<span class="ml-1">Overall prizeboard for BitPixel</span>
+		</div>
+	</div>
+
+	<div class="card" style="min-width:350px;max-width:1000px">
+		<div class="card-body">
+			<div class="d-flex justify-content-between align-items-center mb-2">
+				<div class="d-flex">
+					@if (User.Identity.IsAuthenticated)
+					{
+						<a href="/Prizes/UserHistory" class="btn btn-sm btn-outline-primary" style="width:200px">View My Prizes</a>
+					}
+				</div>
+				<div class="d-flex">
+					<div>
+						<div class="input-group input-group-sm ">
+							<input id="filter-search" type="text" class="filter-input form-control" placeholder="Search...">
+							<div class="input-group-append">
+								<button id="filter-clear" class="btn btn-outline-danger" type="button" style="display:none">
+									<i class="fa fa-times"></i>
+								</button>
+							</div>
+							<div class="input-group-append">
+								<button id="filter-apply" class="btn btn-outline-secondary" type="button" disabled="disabled">
+									<i class="fa fa-search"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div>
+				<table id="table-history" class="dataTable table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>GameId</th>
+							<th>Game</th>
+							<th>Prize</th>
+							<th>Description</th>
+							<th>X</th>
+							<th>Y</th>
+							<th>Points</th>
+							<th>Player</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+@section Scripts {
+	<script>
+		(async ($) => {
+			const isMobile = @Json.Encode(isMobile);
+			const linkCellTemplate = $("#linkCellTemplate").html();
+			const viewPrizeCellTemplate = $("#viewPrizeCellTemplate").html();
+			const table = $("#table-history");
+			const dataTable = table.DataTable({
+				"dom": datatable_Layout,
+				"order": [[9, "desc"]],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": true,
+				"searching": true,
+				"paging": true,
+				"pagingType": isMobile ? "simple" : "simple_numbers",
+				"info": !isMobile,
+				"autoWidth": false,
+				"displayLength": isMobile ? 12 : 15,
+				"language": {
+					emptyTable: "No prizes found",
+					zeroRecords: "No prizes found",
+				},
+				"ajaxSource": '/Prizes/GetHistory',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": [0, 1],
+					"searchable": false,
+					"visible": false
+				},
+				{
+					"targets": 2,
+					"width": isMobile ? "33%" : "22%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Game?gameId=" + full[1]
+						});
+					}
+				},
+				{
+					"targets": 3,
+					"width": isMobile ? "33%" : "22%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(viewPrizeCellTemplate, {
+							Id: full[0],
+							Name: data
+						});
+					}
+				},
+				{
+					"targets": 4,
+					"width": "36%",
+					"visible": !isMobile,
+					"className": 'cell-elipsis'
+				},
+				{
+					"targets": 5,
+					"width": 45,
+					"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 6,
+					"width": 45,
+					"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 7,
+					"width": 80,
+					"visible": !isMobile,
+					"className": 'text-right'
+				},
+				{
+					"targets": 8,
+					"width": isMobile ? "33%" : "20%",
+					"className": 'cell-elipsis',
+					"render": function (data, type, full, meta) {
+						return Mustache.render(linkCellTemplate, {
+							Label: data,
+							Link: "/Player?name=" + data
+						});
+					}
+				},
+				{
+					"targets": 9,
+					"width": isMobile ? 50 : 160,
+					"className": isMobile ? 'cell-elipsis text-right' : 'text-right text-nowrap',
+					"render": isMobile ? toLocalDateShort : toLocalTime
+				}]
+			});
+
+			$('#filter-apply').on('click', function () {
+				const _this = $(this);
+				_this.attr("disabled", "disabled");
+				dataTable.draw();
+				if (isFilterApplied()) {
+					$("#filter-clear").show();
+				}
+			});
+
+			$('#filter-clear').on('click', function () {
+				$(this).hide();
+				$(".filter-input").val(null);
+				$("#filter-apply").trigger("click");
+			});
+
+			$('#filter-search').on('keyup', function (e) {
+				if (isFilterApplied()) {
+					if (e.keyCode == 13) {
+						$("#filter-apply").trigger("click");
+						return;
+					}
+				}
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			$(".filter-input").on("change paste keyup", function () {
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			const isFilterApplied = () => {
+				const filter_search = $("#filter-search").val();
+				if (filter_search) {
+					return true;
+				}
+				return false;
+			}
+
+			$("#table-history").on("click", ".prize-view", async function () {
+				const prizeid = $(this).data("prizeid");
+				await openModalGet('/Prizes/ViewPrizeModal', { prizeid: prizeid });
+			});
+		})(jQuery);
+
+	</script>
+}

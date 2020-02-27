@@ -1,0 +1,177 @@
+﻿@model BitPixel.Common.Score.GameScoresViewModel
+@{
+	ViewBag.Title = "Scoreboard";
+}
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+
+	<div class="d-flex justify-content-center w-100 flex-wrap mt-2" style="max-width:1300px">
+		<div class="mr-3 ml-3" style="min-width:300px;max-width:600px;width:100%;">
+			<h2 class="card-title text-primary mb-0">@Model.Game.Name Scoreboard</h2>
+			<span class="ml-1">Current scoreboard for @Model.Game.Name game</span>
+		</div>
+		<div class="mr-3 ml-3" style="min-width:300px;max-width:600px;width:100%;"></div>
+	</div>
+
+
+	<div class="d-flex justify-content-center flex-wrap" style="max-width:1300px">
+
+		<div class="card m-3" style="min-width:300px;max-width:600px">
+			<div class="card-body">
+				<h5 class="card-title text-primary mb-1">Pixel Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Players with the most pixels created</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">Player</th>
+								<th class="text-right" width="120">Pixel Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.Scores.PixelBoard.Any())
+							{
+								<tr>
+									<td colspan="2">No scores found.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.Scores.PixelBoard)
+								{
+									<tr class="@(prize.UserName == User.Identity.Name ? "table-active text-primary" : "")">
+										<td class="cell-elipsis">
+											<a class="@(prize.UserName == User.Identity.Name ? "text-primary" : "text-muted")" href="/Player?name=@prize.UserName">@prize.UserName</a>
+										</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="card m-3" style="min-width:300px;max-width:600px">
+			<div class="card-body">
+				<h5 class="card-title text-primary mb-1">Click Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Players with the most clicks recorded</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">Player</th>
+								<th class="text-right" width="120">Click Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.Scores.ClickBoard.Any())
+							{
+								<tr>
+									<td colspan="2">No scores found.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.Scores.ClickBoard)
+								{
+									<tr class="@(prize.UserName == User.Identity.Name ? "table-active text-primary" : "text-muted")">
+										<td class="cell-elipsis">
+											<a class="@(prize.UserName == User.Identity.Name ? "text-primary" : "text-muted")" href="/Player?name=@prize.UserName">@prize.UserName</a>
+										</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="card m-3" style="min-width:300px;max-width:600px">
+			<div class="card-body">
+				<h5 class="card-title text-primary mb-1">Prize Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Players with the most prizes won</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">Player</th>
+								<th class="text-right" width="120">Prize Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.Scores.PrizeBoard.Any())
+							{
+								<tr>
+									<td colspan="2">No scores found.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.Scores.PrizeBoard)
+								{
+									<tr class="@(prize.UserName == User.Identity.Name ? "table-active text-primary" : "")">
+										<td class="cell-elipsis">
+											<a class="@(prize.UserName == User.Identity.Name ? "text-primary" : "text-muted")" href="/Player?name=@prize.UserName">@prize.UserName</a>
+										</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="card m-3" style="min-width:300px;max-width:600px">
+			<div class="card-body">
+				<h5 class="card-title text-primary mb-1">Award Leaderboard</h5>
+				<h6 class="card-subtitle mb-2 text-muted">Players with the most awards won</h6>
+				<div>
+					<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+						<thead>
+							<tr>
+								<th width="100%">Player</th>
+								<th class="text-right" width="120">Award Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (!Model.Scores.AwardBoard.Any())
+							{
+								<tr>
+									<td colspan="2">No scores found.</td>
+								</tr>
+							}
+							else
+							{
+								foreach (var prize in Model.Scores.AwardBoard)
+								{
+									<tr class="@(prize.UserName == User.Identity.Name ? "table-active text-primary" : "")">
+										<td class="cell-elipsis">
+											<a class="@(prize.UserName == User.Identity.Name ? "text-primary" : "text-muted")" href="/Player?name=@prize.UserName">@prize.UserName</a>
+										</td>
+										<td class="text-right">@prize.Count</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+
+
+	</div>
+</div>
+@section Scripts {
+	<script>
+
+	</script>
+}

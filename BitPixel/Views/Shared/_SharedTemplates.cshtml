@@ -1,0 +1,82 @@
+﻿
+<script id="modalConfirmTemplate" type="text/html">
+	<div class="modalform modal-dialog modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">{{Header}}</h5>
+					<a class="simplemodal-close" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</a>
+				</div>
+				<div class="modal-body">
+					<p>{{Body}}</p>
+				</div>
+				<div class="modal-footer btn-group">
+					<a class="btn btn-outline-success simplemodal-yes">{{ButtonYes}}</a>
+					<a class="btn btn-outline-secondary simplemodal-no">{{ButtonNo}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script id="modalNotifyTemplate" type="text/html">
+	<div class="modalform modal-dialog modal" data-easein="bounce" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">{{Header}}</h5>
+					<a class="simplemodal-close">
+						<span aria-hidden="true">&times;</span>
+					</a>
+				</div>
+				<div class="modal-body">
+					<p>{{Body}}</p>
+				</div>
+				<div class="modal-footer btn-group">
+					<a class="btn btn-outline-primary simplemodal-close">{{Button}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script id="linkCellTemplate" type="text/html">
+	<a class="text-primary" href="{{Link}}" style="cursor:pointer">
+		{{Label}}
+	</a>
+</script>
+
+<script id="nameCellTemplate" type="text/html">
+	<span>
+		<i class="{{Icon}}"></i>
+		<span class="ml-1">{{Name}}</span>
+	</span>
+</script>
+
+<script id="awardModalCellTemplate" type="text/html">
+	<a href="#" class="award-modal-link text-primary" data-awardid="{{AwardId}}">
+		<i class="{{Icon}}"></i>
+		<span class="ml-1">{{Name}}</span>
+	</a>
+</script>
+
+<script id="prizeModalCellTemplate" type="text/html">
+	<a href="#" class="award-modal-link text-primary" data-prizeid="{{PrizeId}}">
+		<span>{{Name}}</span>
+	</a>
+</script>
+
+<script id="colorCellTemplate" type="text/html">
+	<span>
+		<i class="fa fa-square-full" style="color:{{.}}"></i>
+		<span class="ml-1">{{.}}</span>
+	</span>
+</script>
+
+<script id="viewPrizeCellTemplate" type="text/html">
+	<a class="prize-view text-primary" data-prizeid="{{Id}}" style="cursor:pointer">
+		{{Name}}
+	</a>
+</script>

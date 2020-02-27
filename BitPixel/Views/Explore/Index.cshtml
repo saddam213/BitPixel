@@ -1,0 +1,142 @@
+﻿@model BitPixel.Common.Explore.ExploreViewModel
+@using BitPixel.Base.Extensions
+@{
+	ViewBag.Title = "Explore";
+	var cacheBreak = DateTime.UtcNow.ToUnixMin();
+	var width = Model.Game.Width;
+	var height = Model.Game.Height;
+	var previewWidth = width;
+	var previewHeight = height;
+	if (width > 400)
+	{
+		previewWidth = previewWidth / 3 * 2;
+		previewHeight = previewHeight / 3 * 2;
+	}
+}
+<style>
+
+	.magnifier-thumb-wrapper {
+		position: relative;
+		display: block;
+		top: 0;
+		left: 0;
+		border: solid 1px rgba(238, 232, 213, 0.325);
+	}
+
+	.magnifier-lens {
+		position: absolute;
+		border: solid 1px green;
+		z-index: 1000;
+		top: 0;
+		left: 0;
+		overflow: hidden
+	}
+
+	.magnifier-loader {
+		position: absolute;
+		top: 0;
+		left: 0;
+		border: solid 1px #ccc;
+		color: #fff;
+		text-align: center;
+		background: transparent;
+		background: rgba(50, 50, 50, 0.5);
+		z-index: 1000;
+		-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F323232,endColorstr=#7F323232)";
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F323232,endColorstr=#7F323232)
+	}
+
+	.magnifier-loader-text {
+		font: 13px Arial;
+		margin-top: 10px
+	}
+
+	.magnifier-large {
+		position: absolute;
+		z-index: 100
+	}
+
+	.magnifier-preview {
+		padding: 0;
+		margin-left:5px;
+		width: @(previewWidth)px;
+		height:@(previewHeight)px;
+		position: relative;
+		overflow: hidden;
+		@*max-width: calc(@(width)px + 2px);
+		max-height: calc(@(height)px + 2px);*@
+		border: solid 1px rgba(238, 232, 213, 0.325);
+				image-rendering: -moz-crisp-edges;
+		image-rendering: -webkit-crisp-edges;
+		image-rendering: pixelated;
+		image-rendering: crisp-edges;
+	}
+
+		.magnifier-preview img {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+
+	.magnifier-thumb-wrapper .opaque {
+		opacity: .5;
+		filter: alpha(opacity=50);
+		-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50)
+	}
+
+	.magnifier-thumb-wrapper .hidden {
+		display: none
+	}
+</style>
+
+<div class="d-flex flex-column">
+
+
+	<div class="d-flex justify-content-center align-items-center  mt-3">
+		<div class="card" style="min-width:300px;max-width:1000px;width:100%">
+			<div class="card-body pt-2 pb-2">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<h4 class="card-title text-primary">Explore @Model.Game.Name</h4>
+						<h6 class="card-subtitle mb-2 text-muted">Zoom in and view the pictures and artwork users have drawn.</h6>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div class="d-flex justify-content-center  mt-3">
+		<div class="magnifier-thumb-wrapper" style="background-color:rgba(238, 232, 213, 0.125)">
+			<img id="background-small" src="@string.Format("/Content/Images/Games/{0}/background.png?v={1}", Model.Game.Id, cacheBreak)">
+		</div>
+		<div class="magnifier-preview" id="background-large" style="background-color:rgba(238, 232, 213, 0.125)">
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/Scripts/Event.js"></script>
+	<script src="~/Scripts/Magnifier.js"></script>
+	<script>
+		(async ($) => {
+
+			$( document ).ready(function() {
+				const evt = new Event();
+				const m = new Magnifier(evt);
+				m.attach({
+					zoom: 2,
+					zoomable: true,
+					thumb: '#background-small',
+					largeWrapper: 'background-large',
+					large: '@string.Format("/Content/Images/Games/{0}/background.png?v={1}", Model.Game.Id, cacheBreak)',
+				});
+
+			//m.setZoomIn()
+			//m.setZoomOut()
+			});
+
+		})(jQuery);
+	</script>
+}

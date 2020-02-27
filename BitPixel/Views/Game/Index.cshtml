@@ -1,0 +1,1210 @@
+﻿@using BitPixel.Base.Extensions
+@model BitPixel.Common.Pixel.PixelViewlModel
+@{
+	ViewBag.Title = Model.Game.Name;
+
+	var gameId = Model.Game.Id;
+	var width = Model.Game.Width;
+	var height = Model.Game.Height;
+	var teamColor = Model.Team?.Color;
+	var teamRequired = Model.Game.Type == BitPixel.Enums.GameType.TeamBattle && Model.Team == null;
+	var gameEndTimeUnix = Model.Game.EndTime?.ToUnixMs() ?? 0;
+	var dateTimeNowUnix = DateTime.UtcNow.ToUnixMs();
+}
+
+
+@Html.AntiForgeryToken()
+
+<style>
+
+		#canvas-scroll-container::-webkit-scrollbar {
+			width: 12px !important;
+			height: 12px !important;
+		}
+
+
+	#toolbar-window {
+		display: flex;
+		height: 100%;
+		border: solid 1px rgba(238, 232, 213, 0.325);
+		background-color: rgba(238, 232, 213, 0.1);
+	}
+
+	.game-link {
+		margin-left: 30px;
+		margin-right: 30px;
+	}
+</style>
+
+
+<div class="game-wrapper">
+	<div class="game-container">
+		<div class="d-flex flex-column w-100 h-100">
+
+			<div class="d-flex flex-column pt-2 pb-2">
+				<div class="d-flex flex-column align-items-center">
+					<h2 class="mb-0 text-primary">@Model.Game.Name</h2>
+					<small class="text-muted" style="margin-top: -5px">
+						@Model.Game.Description
+					</small>
+				</div>
+
+
+
+				<div class="d-flex justify-content-center">
+					<div class="d-flex flex-wrap justify-content-center" style="font-size: 20px ">
+						<a id="prizes-modal" href="#" class="game-link text-primary"><i class="fa fa-gift mr-1"></i>Prizes</a>
+						<a href="/Scores/Game?gameId=@Model.Game.Id" class="game-link  text-primary"><i class="fa fa-list-ol mr-1"></i>Scoreboard</a>
+						<a href="/Prizes/GameHistory?gameId=@Model.Game.Id" class="game-link  text-primary"><i class="fa fa-trophy"></i> Prizeboard</a>
+						<a href="/Explore?gameId=@Model.Game.Id" class="game-link  text-primary"><i class="fa fa-search"></i> Explore</a>
+						<a href="/Replay?gameId=@Model.Game.Id" class="game-link  text-primary"><i class="fa fa-film"></i> Replay</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="canvas-scroll-wrapper">
+				<div id="canvas-scroll-container">
+					<div id="canvas-container" style="width:@(width)px;height:@(height)px" class="scale-1">
+						<div id="pixel-finder">
+							<i class="fa fa-map-marker-alt" style="color: #ff0000; text-shadow: 1px 1px 1px black"></i>
+						</div>
+						<div id="pixel-overlay" class="scale-1"></div>
+						<canvas id="mainCanvas" width="@width" height="@height"></canvas>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+	<div class="menu-container">
+
+		<div id="toolbar-window">
+			<div class="d-flex flex-column">
+
+
+				<div class="pl-2 pr-2">
+					<div class="d-flex justify-content-between">
+						<div class=" w-100">
+							<i style="font-size:11px">@(string.IsNullOrEmpty(User.Identity.Name) ? "Guest" : User.Identity.Name)</i>
+							<div class="d-flex flex-column justify-content-center align-items-center">
+
+								<h5 class="mb-0">Points: <b id="user-points" class=" text-warning">@Model.Points</b></h5>
+								<div class="d-flex">
+
+									<div class="d-flex">
+										<div style="width:50px">
+											<span>X: <b class="text-primary" id="location-x">0</b></span>
+										</div>
+										<div style="width:50px;">
+											<span>Y: <b class="text-primary" id="location-y">0</b></span>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<div class="w-100 pl-2 pb-2 pr-2" style="border-left:solid 1px rgba(238, 232, 213, 0.325)">
+							<i style="font-size:11px">Selected Pixel</i>
+							<div class="" style="font-size:14px">
+								<div class="d-flex selected-pos">
+									<div style="width:50px">
+										<span>X: <b class="text-primary" id="selected-x">0</b></span>
+									</div>
+									<div style="width:50px">
+										<span>Y: <b class="text-primary" id="selected-y">0</b></span>
+									</div>
+
+
+								</div>
+								<div>
+									<span>Points: <b class="text-primary" id="selected-points">0</b></span>
+								</div>
+								<div>
+									<span>Player: <b class="text-primary" id="selected-user">-</b></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+
+				<div class="pl-2 pr-2" style="border-top: solid 1px rgba(238, 232, 213, 0.325)">
+
+					<div class="d-flex flex-column">
+
+						<div class="d-flex  justify-content-between">
+							<div class="w-100">
+								<div>
+									<i style="font-size:11px">Zoom</i>
+								</div>
+								<div class="btn-toolbar" role="toolbar">
+									<div class="btn-group" role="group">
+										<button data-scale="1" type="button" class="pixel-zoom btn btn-sm btn-secondary btn-warning p-1" disabled="disabled" style="border-radius:0">
+											<div class="d-flex justify-content-center align-items-center" style="width:22px;height:21px;font-size:9px">
+												<i class="fal fa-search"></i>
+											</div>
+										</button>
+										<button data-scale="5" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
+											<div class="d-flex justify-content-center align-items-center" style="width: 22px;height:21px;font-size: 12px">
+												<i class="fal fa-search"></i>
+											</div>
+										</button>
+										<button data-scale="10" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
+											<div class="d-flex justify-content-center align-items-center" style="width:22px;height:21px;font-size:14px">
+												<i class="fal fa-search"></i>
+											</div>
+										</button>
+										<button data-scale="15" type="button" class="pixel-zoom btn btn-sm btn-secondary p-1" style="border-radius:0">
+											<div class="d-flex justify-content-center align-items-center" style="width:22px;height:21px;font-size:16px">
+												<i class="fal fa-search"></i>
+											</div>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="w-100 ml-2 mr-2 ">
+								<div>
+									<i style="font-size:11px">Find</i>
+								</div>
+
+								<div>
+									<div class="input-group input-group-sm align-items-center">
+										<input id="jump-x" type="text" class="form-control form-control border-1 border-secondary" placeholder="X" style="border-radius:0">
+										<div class="input-group-append">
+											<button id="jump-send" class="btn btn-secondary" type="button" style="margin-left:1px">
+												<i class="fa fa-map-marker-alt"></i>
+											</button>
+										</div>
+										<input id="jump-y" type="text" class="form-control form-control-sm border-1 border-secondary" placeholder="Y" style="border-radius:0">
+
+									</div>
+								</div>
+
+
+							</div>
+
+							<div class="w-100">
+								<div>
+									<i style="font-size:11px;">Spend Limit</i>
+								</div>
+								<input id="max-points" type="number" class="form-control form-control-sm btn-secondary" min="1" value="4" style="border-radius:0;" />
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class="d-flex flex-column">
+
+						<div class="d-flex justify-content-between">
+							<div class="w-100">
+								@if (Model.Game.Type == BitPixel.Enums.GameType.TeamBattle)
+								{
+									<div>
+										<div>
+											<i style="font-size:11px">Team</i>
+										</div>
+										<div class="d-flex">
+
+											<div class="input-group input-group-sm align-items-center">
+												@if (Model.Team == null)
+												{
+													<span class="change-team form-control border-1 border-secondary" style="border-radius:0">Please Select Team</span>
+												}
+												else
+												{
+													<div class="form-control border-1 border-secondary" style="border-radius:0">
+														<div class="d-flex align-items-center">
+															<i style="font-size:22px;color:@Model.Team.Color" class="@(string.IsNullOrEmpty( Model.Team.Icon) ? "fa fa-square-full" : Model.Team.Icon)"></i>
+															<span class="ml-2">@Model.Team.Name</span>
+														</div>
+													</div>
+												}
+												<div class="input-group-append">
+													<button class="change-team btn btn-secondary" type="button" style="border-radius:0">
+														<i class="fa fa-exchange"></i>
+													</button>
+												</div>
+											</div>
+										</div>
+
+									</div>
+								}
+								else
+								{
+									<div>
+										<div>
+											<i style="font-size:11px">Pixel Color</i>
+										</div>
+										<div class="d-flex">
+											<div id="color-picker" class="btn-toolbar" role="toolbar">
+												<div class="btn-group btn-group-sm" role="group">
+													<button id="color-dropdown" type="button" class="btn btn-secondary p-1" style="border-radius:0">
+														<div class="d-flex justify-content-between align-content-center align-items-center">
+															<div id="color-dropdown-selected" style="width:20px;height:20px;background-color:#000000"></div>
+															<i class="fa fa-caret-down ml-1" style="font-size:larger"></i>
+														</div>
+													</button>
+												</div>
+											</div>
+											<div class="btn-toolbar" role="toolbar">
+												<div class="btn-group btn-group-sm ml-1" role="group">
+													<button id="eyedrop-toggle" type="button" class="btn btn-secondary p-1 disabled" style="border-radius:0">
+														<div style="width:20px;height:20px;">
+															<i class="fal fa-eye-dropper"></i>
+														</div>
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								}
+								<div>
+									<span>
+										<i style="font-size:11px">Finish:</i>
+										@if (Model.Game.EndType == BitPixel.Enums.GameEndType.LastPixel)
+										{
+											<small><i class="text-primary">Last Pixel Filled</i></small>
+										}
+										else
+										{
+											<span id="gameTimer" class="countdown text-primary ml-2" title="@Model.Game.EndTime.Value.ToLongDateString() @Model.Game.EndTime.Value.ToLongTimeString() (UTC)">00:00:00</span>
+										}
+									</span>
+								</div>
+							</div>
+
+
+
+							<div class="ml-3 w-75" style="font-size:12px">
+								<div class="custom-control custom-checkbox" style="margin-top:12px">
+									<input type="checkbox" class="custom-control-input" id="transparent-toggle">
+									<label class="custom-control-label" for="transparent-toggle" style="padding-top:2px">Show Empty</label>
+								</div>
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input" id="overlay-toggle">
+									<label class="custom-control-label" for="overlay-toggle" style="padding-top:2px">Show Overlay</label>
+								</div>
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input" id="notifications-toggle">
+									<label class="custom-control-label" for="notifications-toggle" style="padding-top:2px">Show Notifications</label>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="d-flex flex-column flex-grow-1" style="border-top:solid 1px rgba(238, 232, 213, 0.325);border-bottom:solid 1px purple;overflow:hidden">
+
+					<div class="d-flex flex-column flex-fill" style="overflow:hidden">
+
+						<nav>
+							<div class="nav nav-tabs text-primary">
+								<a class="game-tab-item nav-item nav-link active" data-tab="log" data-toggle="tab" role="tab" style="width:33%;text-align:center;border-radius:0"><i class="fad fa-info-square mr-1"></i>Info</a>
+								<a class="game-tab-item nav-item nav-link" data-tab="stats" data-toggle="tab" role="tab" style="width:34%;text-align:center;border-radius:0;border-left:solid 1px rgba(238, 232, 213, 0.325);border-right:solid 1px rgba(238, 232, 213, 0.325)"><i class="fad fa-tachometer-alt-fast mr-1"></i>Stats</a>
+								<a class="game-tab-item nav-item nav-link" data-tab="chat" data-toggle="tab" role="tab" style="width:33%;text-align:center;border-radius:0;"><i class="fad fa-comments-alt mr-1"></i>Chat</a>
+							</div>
+						</nav>
+
+						<div class="d-flex flex-fill overflow-hidden">
+
+
+							<div id="log-window" class="game-tab game-tab-log w-100 h-100">
+
+								<div class="d-flex flex-column justify-content-between w-100 h-100">
+									<div class="d-flex flex-grow-1" style="overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;">
+										<ul id="infolog" style="font-size:11px;list-style:none;padding-inline-start:0px;width:100%"></ul>
+									</div>
+
+									<div class="d-flex justify-content-around w-100 p-2" style="font-size:14px;border-top:solid 1px rgba(238, 232, 213, 0.325);">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="log-toggle-pixel">
+											<label class="custom-control-label" for="log-toggle-pixel">Show Pixels</label>
+										</div>
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="log-toggle-prize">
+											<label class="custom-control-label" for="log-toggle-prize">Show Prizes</label>
+										</div>
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="log-toggle-error">
+											<label class="custom-control-label" for="log-toggle-error">Show Errors</label>
+										</div>
+									</div>
+								</div>
+
+
+							</div>
+
+
+							<div id="stats-window" class="game-tab game-tab-stats w-100 h-100" style="display:none">
+
+							</div>
+
+
+							<div id="chat-window" class="game-tab game-tab-chat w-100 h-100" style="display:none">
+								<div class="d-flex flex-column justify-content-between w-100 h-100">
+									<div class="d-flex flex-grow-1" style="overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;">
+										<ul id="chatlog" style="font-size:12px;list-style:none;padding-inline-start:0px;width:100%">
+										</ul>
+									</div>
+									<div class="d-flex w-100 p-2" style="border-top:solid 1px rgba(238, 232, 213, 0.325);">
+
+										<textarea id="chat-message" type="text" class="form-control w-100 border-1 border-secondary" placeholder="Chat message..." style="border-radius:0;resize:none;max-width:100%;font-size:12px" rows="1"></textarea>
+										<button id="chat-send" class="btn btn-secondary" type="button" style="border-radius:0;border:none;">
+											Send
+										</button>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+
+
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<script id="gameStatsTemplate" type="text/html">
+	<div class="p-2">
+		<div class="d-flex justify-content-between">
+			<span class="text-primary">@Model.Game.Name Stats</span>
+			<button class="stats-sync btn btn-sm btn-secondary" style="border-radius:0">
+				<i class="fad fa-sync"></i>
+			</button>
+		</div>
+
+		<table style="font-size:14px;width:100%">
+
+			<tr>
+				<td><small>Platform:</small></td>
+				<td width="100%" class="text-primary pl-2">@Model.Game.Platform</td>
+				<td><small>Status:</small></td>
+				<td width="100%" class="text-primary pl-2">@Model.Game.Status</td>
+			</tr>
+
+			<tr>
+				<td><small>Gameboard:</small></td>
+				<td class="text-primary pl-2">@Model.Game.Width x @Model.Game.Height</td>
+				<td><small>Rate Limit:</small></td>
+				<td class="text-primary pl-2 cell-elipsis">@Model.Game.ClicksPerSecond clicks/second</td>
+			</tr>
+
+			<tr>
+				<td><small>Finish:</small></td>
+				<td colspan="3" class="text-primary pl-2">@(Model.Game.EndType == BitPixel.Enums.GameEndType.LastPixel ? "Last Pixel Filled" : Model.Game.EndTime.Value.ToString("dd/MM/yy hh:mm tt (UTC)"))</td>
+			</tr>
+
+			<tr>
+				<td colspan="4" class="pt-2">
+					<i class="text-primary" style="font-size:10px">Pixel Stats</i>
+				</td>
+			</tr>
+			<tr>
+				<td><small>Total:</small></td>
+				<td class="text-primary pl-2">{{TotalPixels}}</td>
+				<td><small>Fixed:</small></td>
+				<td class="text-primary pl-2">{{FixedPixels}}</td>
+			</tr>
+			<tr>
+				<td><small>Game:</small></td>
+				<td class="text-primary pl-2">{{GamePixels}}</td>
+				<td><small>Remaining:</small></td>
+				<td class="text-primary pl-2 d-flex justify-content-between align-items-center">{{PixelsRemaining}} <small>({{PixelsRemainingPercent}}%)</small></td>
+			</tr>
+
+			<tr>
+				<td colspan="4" class="pt-2">
+					<i class="text-primary" style="font-size:10px">Prize Stats</i>
+				</td>
+			</tr>
+
+			<tr>
+				<td><small>Total:</small></td>
+				<td class="text-primary pl-2">{{Prizes}}</td>
+				<td><small>Remaining:</small></td>
+				<td class="text-primary pl-2 d-flex justify-content-between align-items-center">{{PrizesRemaining}} <small>({{PrizesRemainingPercent}}%)</small></td>
+			</tr>
+
+		</table>
+
+
+
+
+		@if (Model.Game.Type == BitPixel.Enums.GameType.TeamBattle)
+		{
+			<table style="table-layout:fixed;width:100%;font-size:14px">
+				<tr>
+					<td colspan="3" class="pt-2">
+						<i class="text-primary" style="font-size:10px">Team Stats</i>
+					</td>
+				</tr>
+				{{#TeamStats}}
+				<tr>
+					<td style="white-space:nowrap">
+						{{#Icon}}
+						<i class="{{Icon}}" style="color:{{Color}}"></i>
+						{{/Icon}}
+						{{^Icon}}
+						<i class="fa fa-square-full" style="color:{{Color}}"></i>
+						{{/Icon}}
+						<span class="pl-1">{{Name}}</span>
+					</td>
+					<td class="text-right text-primary pl-2">{{Members}} players</td>
+					<td class="text-right text-primary pl-2">{{Pixels}} pixels</td>
+					<td class="text-right text-primary pl-2">{{Percent}}%</td>
+				</tr>
+				{{/TeamStats}}
+			</table>
+		}
+	</div>
+</script>
+
+
+<script id="logPixelTemplate" type="text/html">
+	<li class="location-jump bg-dark" style="margin:1px;padding:1px" data-x="{{X}}" data-y="{{Y}}">
+		<span class="text-light"><i class="fa fa-stop" style="margin-right:4px;width:14px;text-align:center;color:{{Color}}"></i>{{Player}} added new pixel at <u class="text-info" style="cursor:pointer">X: {{X}} Y: {{Y}}</u></span>
+	</li>
+</script>
+
+<script id="logPrizeTemplate" type="text/html">
+	<li class="location-jump bg-dark" style="margin: 1px;padding: 1px" data-x="{{X}}" data-y="{{Y}}">
+		<span class="text-warning"><i class="fa fa-star" style="width:14px;text-align:center;margin-right:4px"></i>{{Player}} won a <b>{{Name}}</b> prize at <u class="text-info" style="cursor:pointer">X: {{X}} Y: {{Y}}</u></span>
+	</li>
+</script>
+
+<script id="logAwardTemplate" type="text/html">
+	<li class="bg-dark" style="margin:1px;padding:1px">
+		<span class="text-warning"><i class="fa fa-star" style="width:14px;text-align:center;margin-right:4px"></i>{{Player}} won the <b>{{Name}}</b> award</span>
+	</li>
+</script>
+
+<script id="logErrorTemplate" type="text/html">
+	<li class="bg-dark" style="margin:1px;padding:1px">
+		<span class="text-danger"><i class="fa fa-exclamation-square" style="width: 14px; text-align: center;margin-right:4px"></i>Error: {{Message}}</span>
+	</li>
+</script>
+
+<script id="logChatTemplate" type="text/html">
+	<li class="bg-dark" style="margin:1px;padding:1px">
+		<div class="d-flex" style="padding:3px">
+			<div>
+				<span style="white-space:nowrap">
+					<img width="20" height="20" src="/Content/Images/Avatar/{{Sender}}.png" onerror="this.src='/Content/Images/Avatar.png'" />
+					<span class="ml-1 text-primary">{{Sender}}</span>
+				</span>
+			</div>
+			<div class="ml-2" style="word-break: break-word">
+				{{Message}}
+			</div>
+		</div>
+	</li>
+</script>
+
+<script id="errorNotifyTemplate" type="text/html">
+	<div class="toast bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2500">
+		<div class="toast-header">
+			<strong class="mr-auto">Error</strong>
+			<small class="text-muted">just now</small>
+			<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="toast-body">
+			<div class="text-center">
+				{{Message}}
+			</div>
+		</div>
+	</div>
+</script>
+
+<script id="prizeNotifyTemplate" type="text/html">
+	<div class="toast bg-warning" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000">
+		<div class="toast-header">
+			<strong class="mr-auto text-warning"><i class="fa fa-trophy"></i> {{Name}}</strong>
+			<small class="text-muted">just now</small>
+			<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="toast-body">
+			<div class="text-center text-light">
+				Congratulations you have won!
+			</div>
+			<div class="text-center text-light">
+				<b style="font-size: larger">{{Description}}</b>
+			</div>
+		</div>
+	</div>
+</script>
+
+
+<script id="awardNotifyTemplate" type="text/html">
+	<div class="toast bg-warning" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000">
+		<div class="toast-header">
+			<strong class="mr-auto text-warning"><i class="fa fa-trophy"></i> {{Level}} Award</strong>
+			<small class="text-muted">just now</small>
+			<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="toast-body">
+			<div class="text-center text-light">
+				Congratulations you have won!
+			</div>
+			<div class="text-center text-light">
+				<b style="font-size: larger">{{Name}} - {{Points}} points</b>
+			</div>
+		</div>
+	</div>
+</script>
+
+
+@section Scripts {
+
+
+	<script>
+		(async ($) => {
+
+			const gameSettings = {
+				gameId: @gameId,
+				width: @width,
+				height: @height,
+				player: '@User.Identity.Name',
+				teamRequired: @Json.Encode(teamRequired),
+				teamColor: '@teamColor',
+				gameEndTime: @gameEndTimeUnix,
+				dateTimeNow: @dateTimeNowUnix,
+			};
+
+			const userSettings = store.get("gameSettings")	|| {
+				color: '#000000',
+				maxPoints: 2,
+				showNotifications: true,
+				showTransparent: true,
+				showOverlay: false,
+
+				showPixelLog: true,
+				showPrizeLog: true,
+				showErrorLog: true
+			};
+
+			const saveSettings = () => {
+				store.set("gameSettings", userSettings);
+			}
+
+			const loadSettings = () => {
+				setSelectedColor(gameSettings.teamColor || userSettings.color);
+				$("#max-points").val(userSettings.maxPoints);
+
+
+				$("#log-toggle-pixel").prop("checked", userSettings.showPixelLog);
+				$("#log-toggle-prize").prop("checked", userSettings.showPrizeLog);
+				$("#log-toggle-error").prop("checked", userSettings.showErrorLog);
+
+				$("#transparent-toggle").prop("checked", userSettings.showTransparent);
+				$("#overlay-toggle").prop("checked", userSettings.showOverlay);
+				$("#notifications-toggle").prop("checked", userSettings.showNotifications);
+				$("#jump-x, #jump-y").val(null);
+
+				toggleOverlay();
+				toggleTransparentBackground();
+			}
+
+
+			const pixelHub = $.connection.pixelHub;
+			const gameCanvas = document.getElementById('mainCanvas');
+			const gameCanvasContext = gameCanvas.getContext('2d');
+			const canvasContainer = $("#canvas-container");
+			const canvasScrollContainer = $("#canvas-scroll-container");
+			const locationMarker = $("#pixel-finder");
+			const pixelOverlay = $("#pixel-overlay");
+
+			let gameScale = 1;
+			let eyedropperEnabled = false;
+
+
+			const initializeGame = async () => {
+				setGameCountDown();
+				await resetCanvas()
+
+				pixelHub.client.OnNotifyPixel = onNotifyPixel;
+				pixelHub.client.OnNotifyPrize = onNotifyPrize;
+				pixelHub.client.OnNotifyAward = onNotifyAward;
+				pixelHub.client.OnUserNotifyPoints = onUserNotifyPoints;
+				pixelHub.client.OnUserNotifyPrize = onUserNotifyPrize;
+				pixelHub.client.OnUserNotifyAward = onUserNotifyAward;
+				pixelHub.client.OnChatMessage = onChatMessage;
+				await $.connection.hub.start();
+				await pixelHub.server.joinGame(gameSettings.gameId);
+				await updateGameStats();
+				await updateChatHistory();
+
+				// Setup Mouse Events
+				gameCanvas.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
+				gameCanvas.addEventListener('click', processLeftClick);
+				gameCanvas.addEventListener('contextmenu', processRightClick, false);
+				gameCanvas.addEventListener('mousemove', processMove, false);
+
+				locationMarker.on("click", function () {
+					locationMarker.hide();
+				});
+			}
+
+			const resetCanvas = async () => {
+				gameCanvas.height = gameSettings.height * gameScale;
+				gameCanvas.width = gameSettings.width * gameScale;
+				gameCanvas.style.backgroundImage = `url('../Content/Images/Games/${gameSettings.gameId}/background.png?v=${getCacheVersion()}')`;
+				canvasContainer.css({ width: gameCanvas.width, height: gameCanvas.height });
+				gameCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
+				gameCanvasContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+				gameCanvasContext.scale(gameScale, gameScale);
+
+				await getServerPixels();
+			}
+
+			const scaleCanvas = async (scaleValue) => {
+				gameScale = scaleValue
+				await resetCanvas();
+				canvasContainer.removeClass("scale-1 scale-5 scale-10 scale-15");
+				canvasContainer.addClass("scale-" + gameScale);
+
+				pixelOverlay.removeClass("scale-1 scale-5 scale-10 scale-15");
+				pixelOverlay.addClass("scale-" + gameScale);
+			}
+
+
+			const processLeftClick = async (mouseEvent) => {
+				mouseEvent.preventDefault();
+				mouseEvent.stopImmediatePropagation();
+
+				const location = getCanvasLocation(gameCanvas, gameScale, mouseEvent);
+				const getPixelRequest = {
+					gameId: gameSettings.gameId,
+					x: location.x,
+					y: location.y
+				}
+
+				const pixelResponse = await getServerPixel(getPixelRequest);
+				if (pixelResponse === undefined) {
+					return;
+				}
+				setSelectedPixel(pixelResponse);
+			}
+
+
+			const processRightClick =  async (mouseEvent) => {
+				mouseEvent.preventDefault();
+				mouseEvent.stopImmediatePropagation();
+
+				const location = getCanvasLocation(gameCanvas, gameScale, mouseEvent);
+				let addPixelRequest = {
+					gameId: gameSettings.gameId,
+					x: location.x,
+					y: location.y,
+					color: userSettings.color,
+					maxPoints: userSettings.maxPoints
+				}
+				await addServerPixel(addPixelRequest);
+			}
+
+
+			const processMove = async (mouseEvent) => {
+				const location = getCanvasLocation(gameCanvas, gameScale, mouseEvent);
+				setLocation(location)
+			}
+
+			const addServerPixel = async (data) => {
+				if (gameSettings.player.length == 0) {
+					logError("You must be logged in to create pixels.");
+					return;
+				}
+				if (gameSettings.teamRequired === true) {
+					logError("Please choose a team.");
+					return;
+				}
+				const result = await pixelHub.server.addPixel(data);
+				if (result.Success == false) {
+					logError(result.Message);
+				}
+			}
+
+			const getServerPixel = async (data) => {
+				const result = await pixelHub.server.getPixel(data);
+				if (result.Success == false) {
+					logError(result.Message);
+					return;
+				}
+				return result.Data;
+			}
+
+			const addServerChatMessage = async (message) => {
+				const dataMessage = message.substring(0, Math.min(240, message.length));
+				await pixelHub.server.sendChatMessage(dataMessage);
+			}
+
+
+
+			const getServerPixels = async () => {
+				const pixelUpdates = await getJson('/Game/GetPixels?gameId=' + gameSettings.gameId) || [];
+				for (let pixel of pixelUpdates) {
+					addCanvasPixel(gameCanvasContext, pixel.X, pixel.Y, pixel.Color);
+				}
+			}
+
+
+			const updateGameStats = async () => {
+				const gameStatsResponse = await pixelHub.server.gameStats(gameSettings.gameId);
+				if (gameStatsResponse.Success === false) {
+					return;
+				}
+
+				const gameStats = gameStatsResponse.Data;
+				gameStats.PixelsRemainingPercent = gameStats.PixelsRemainingPercent.toFixed(2);
+				gameStats.PrizesRemainingPercent = gameStats.PrizesRemainingPercent.toFixed(2);
+				for (let team of gameStats.TeamStats || []) {
+					team.Percent = ((team.Pixels / gameStats.GamePixels) * 100).toFixed(2);
+				}
+				$("#stats-window").html($(Mustache.render(gameStatsTemplate, gameStats)));
+			}
+
+			const updateChatHistory = async () => {
+				const chatMessages = await pixelHub.server.getChatMessages() || [];
+				for (let message of chatMessages) {
+					logChat(message)
+				}
+			}
+
+
+			const onNotifyPixel = async (notification) => {
+				addCanvasPixel(gameCanvasContext, notification.X, notification.Y, notification.Color);
+				updateSelectedPixel(notification);
+				logPixel(notification);
+			}
+
+			const onNotifyPrize = async (notification) => {
+				logPrize(notification);
+			}
+
+			const onNotifyAward = async (notification) => {
+				logAward(notification);
+			}
+
+			const onUserNotifyPoints = async (notification) => {
+				$("#user-points").text(notification.Points);
+			}
+
+			const onUserNotifyPrize = async (notification) => {
+				notifyPrize(notification);
+			}
+
+			const onUserNotifyAward = async (notification) => {
+				notifyAward(notification);
+			}
+
+			const onChatMessage = async (message) => {
+				logChat(message);
+			}
+
+
+
+			const toggleTransparentBackground = () => {
+				canvasContainer.removeClass("checker-board");
+				if (userSettings.showTransparent === true) {
+					canvasContainer.addClass("checker-board");
+				}
+			}
+
+			const toggleOverlay = () => {
+				pixelOverlay.removeClass("grid-board");
+				if (userSettings.showOverlay === true) {
+					pixelOverlay.addClass("grid-board");
+				}
+			}
+
+			const jumpToLocation = (x, y) => {
+				const posx = x * gameScale;
+				const posy = y * gameScale;
+				const containerWidth = canvasScrollContainer.width();
+				const containerHeight = canvasScrollContainer.height();
+
+				const deltaX = containerWidth / 8;
+				const deltaY = containerHeight / 8;
+				if (posx > (containerWidth - deltaX) || posx < (containerWidth - deltaX)) {
+						canvasScrollContainer.scrollLeft(posx - (containerWidth / 2));
+				}
+
+				if (posy > (containerHeight - deltaY) || posy < (containerHeight - deltaY)) {
+				 canvasScrollContainer.scrollTop(posy - (containerHeight / 2));
+				}
+
+				if (gameScale == 1) {
+					locationMarker.css({ left: posx - 7, top: posy - 17, "font-size": "14px" }).show();
+				}
+				else if (gameScale == 5) {
+					locationMarker.css({ left: posx - 5, top: posy - 20, "font-size": "18px" }).show();
+				}
+				else if (gameScale == 10) {
+					locationMarker.css({ left: posx - 2, top: posy - 20, "font-size": "20px" }).show();
+				}
+				else if (gameScale == 15) {
+					locationMarker.css({ left: posx, top: posy - 20, "font-size": "22px" }).show();
+				}
+			}
+
+			let maxLogLength = 100;
+			const chatWindow = $("#chatlog");
+			const loggingWindow = $("#infolog");
+			const logChatTemplate = $("#logChatTemplate").html();
+			const logPixelTemplate = $("#logPixelTemplate").html();
+			const logPrizeTemplate = $("#logPrizeTemplate").html();
+			const logAwardTemplate = $("#logAwardTemplate").html();
+			const logErrorTemplate = $("#logErrorTemplate").html();
+			const prizeNotifyTemplate = $("#prizeNotifyTemplate").html();
+			const awardNotifyTemplate = $("#awardNotifyTemplate").html();
+			const errorNotifyTemplate = $("#errorNotifyTemplate").html();
+			const gameStatsTemplate = $("#gameStatsTemplate").html();
+
+
+
+
+			const setLocation = (location) => {
+				$("#location-x").text(location.x);
+				$("#location-y").text(location.y);
+			}
+
+			const setSelectedPixel = (pixel) => {
+				$("#selected-x").text(pixel.X);
+				$("#selected-y").text(pixel.Y);
+				$("#selected-color").text(pixel.Color);
+				if (eyedropperEnabled === true) {
+					setSelectedColor(pixel.Color);
+				}
+
+				if (pixel.Type == 2) {
+					$("#selected-points,#selected-user").html("<small><i>Game Pixel</i></small>");
+					return;
+				}
+
+				$("#selected-points").html(pixel.Points);
+				if (pixel.Type == 0) {
+					$("#selected-user").html("<small><i>Empty Pixel</i></small>");
+					return;
+				}
+
+				$("#selected-user").html(pixel.Player);
+			}
+
+			const updateSelectedPixel = (pixel) => {
+				const selectedX = $("#selected-x").text();
+				const selectedY = $("#selected-y").text();
+				if (selectedX == pixel.X && selectedY == pixel.Y) {
+					$("#selected-owner").text(pixel.Player);
+					$("#selected-points").text(pixel.Points);
+				}
+			}
+
+
+
+
+			const notifyPixel = (notification) => {
+				if (userSettings.showNotifications === false) {
+					return;
+				}
+				//$("#toast-container").prepend($(Mustache.render(pixelNotifyTemplate, notification)).toast('show'));
+			};
+
+			const notifyPrize = (notification) => {
+				if (userSettings.showNotifications === false) {
+					return;
+				}
+				$("#toast-container").prepend($(Mustache.render(prizeNotifyTemplate, notification)).toast('show'));
+			};
+
+			const notifyAward = (notification) => {
+				if (userSettings.showNotifications === false) {
+					return;
+				}
+				notification.Level = Enums.GetName(Enums.AwardType, notification.Level);
+				$("#toast-container").prepend($(Mustache.render(awardNotifyTemplate, notification)).toast('show'));
+			};
+
+			const notifyError = (error) => {
+				if (userSettings.showNotifications === false) {
+					return;
+				}
+				$("#toast-container").prepend($(Mustache.render(errorNotifyTemplate, {Message: error})).toast('show'));
+			};
+
+
+
+
+
+
+
+
+
+
+			const logPixel = (pixel) => {
+				if (userSettings.showPixelLog === false) {
+					return;
+				}
+				logItem(loggingWindow, Mustache.render(logPixelTemplate, pixel));
+			}
+
+			const logPrize = (prize) => {
+				if (userSettings.showPrizeLog === false) {
+					return;
+				}
+				logItem(loggingWindow, Mustache.render(logPrizeTemplate, prize));
+			}
+
+			const logAward = (award) => {
+				if (userSettings.showPrizeLog === false) {
+					return;
+				}
+				logItem(loggingWindow, Mustache.render(logAwardTemplate, award));
+			}
+
+			const logError = (error) => {
+				if (userSettings.showErrorLog === false) {
+					return;
+				}
+				logItem(loggingWindow, Mustache.render(logErrorTemplate, { Message: error }))
+			}
+
+			const logChat = (message) => {
+				logItem(chatWindow, Mustache.render(logChatTemplate, message))
+			}
+
+			const logItem = (logger, html) => {
+				const items = logger.find("li");
+				if (items.length > maxLogLength + 20) {
+					items.slice(-20).remove();
+				}
+				logger.prepend(html);
+			}
+
+
+			$("#log-toggle-pixel").on("click", function () {
+				userSettings.showPixelLog = $(this).is(":checked");
+				saveSettings();
+			});
+
+			$("#log-toggle-prize").on("click", function () {
+				userSettings.showPrizeLog = $(this).is(":checked");
+				saveSettings();
+			});
+
+
+
+			$("#log-toggle-error").on("click", function () {
+				userSettings.showErrorLog = $(this).is(":checked");
+				saveSettings();
+			});
+
+
+
+
+
+			const setSelectedColor = (color) => {
+				userSettings.color = color;
+				saveSettings();
+				$("#color-dropdown").spectrum("set", color);
+				$("#color-picker-selected, #color-dropdown-selected").css("background-color", color);
+			}
+
+
+			$(".pixel-zoom").on("click", async function () {
+				$(".pixel-zoom").attr("disabled", "disabled");
+				locationMarker.hide();
+				const _this = $(this);
+				await scaleCanvas(_this.data("scale"));
+				$(".pixel-zoom").removeAttr("disabled").removeClass("btn-warning");
+				_this.attr("disabled", "disabled").addClass("btn-warning");
+			});
+
+
+			$("#transparent-toggle").on("click", async function () {
+				userSettings.showTransparent = $(this).is(":checked");
+				saveSettings();
+				toggleTransparentBackground();
+			})
+
+			$("#overlay-toggle").on("click", async function () {
+				userSettings.showOverlay = $(this).is(":checked");
+				saveSettings();
+				toggleOverlay();
+			})
+
+			$("#notifications-toggle").on("click", async function () {
+				userSettings.showNotifications = $(this).is(":checked");
+				saveSettings();
+			})
+
+
+			$(".color-picker-item").on("click", function () {
+				setSelectedColor($(this).data("color"));
+			});
+
+			$("#color-dropdown").spectrum({
+				showPalette: true,
+				showSelectionPalette: true,
+				hideAfterPaletteSelect:true,
+				preferredFormat: "hex",
+				showInput: true,
+				palette: [ "#FFFFFF","#000000","#FF0000","#00FF00","#0000FF","#FFFF00"],
+				change: function(color) {
+					setSelectedColor(color.toHexString());
+				}
+			});
+
+
+
+			$("#eyedrop-toggle").on("click", function () {
+				const _this = $(this);
+				const isDisabled = _this.hasClass("disabled");
+				if (isDisabled === true) {
+					_this.removeClass("disabled").addClass("btn-warning");
+					eyedropperEnabled = true;
+					return;
+				}
+
+				_this.addClass("disabled").removeClass("btn-warning");
+					eyedropperEnabled = false;
+			});
+
+
+			$("#prizes-modal").on("click", async function () {
+				await openModalGet("/Prizes/ViewPrizesModal", { gameId: gameSettings.gameId });
+			});
+
+
+
+
+
+
+
+
+
+			$("#chat-send").on("click", async function () {
+				const _this = $(this);
+				const messageBox = $("#chat-message");
+				const message = messageBox.val();
+				if (message.length == 0) {
+					return;
+				}
+				_this.attr("disabled", "disabled");
+				messageBox.attr("disabled", "disabled");
+
+				await addServerChatMessage(message);
+				messageBox.val(null);
+				messageBox.removeAttr("disabled");
+				_this.removeAttr("disabled");
+			})
+
+			$("#chat-message").on("keyup", function (e) {
+				if (e.keyCode == 13) {
+					$("#chat-send").trigger("click");
+				}
+			});
+
+
+
+
+
+			$("#log-window").on("click",".location-jump" ,function () {
+				const _this = $(this);
+				const x = _this.data("x");
+				const y = _this.data("y");
+				jumpToLocation(x, y);
+			});
+
+			$("#jump-send").on("click", function () {
+				const posX = Number($("#jump-x").val()) || 0;
+				const posY = Number($("#jump-y").val() || 0);
+				if (posX < 0 || posX > (gameSettings.width - 1)) {
+					$("#jump-x").addClass("text-danger");
+					locationMarker.hide();
+					return;
+				}
+				if (posY < 0 || posY > (gameSettings.height - 1)) {
+					$("#jump-y").addClass("text-danger");
+					locationMarker.hide();
+					return;
+				}
+
+				$("#jump-x, #jump-y").removeClass("text-danger")
+				jumpToLocation(posX, posY);
+			});
+
+			$("#max-points").on("keyup change paste", function () {
+				const value = Number($(this).val()) || 1;
+				userSettings.maxPoints = Math.max(1, value);
+				saveSettings();
+			});
+
+			$(".selected-pos").on("click", function () {
+				$("#jump-x").val($("#selected-x").text());
+				$("#jump-y").val($("#selected-y").text());
+			})
+
+
+			$(".change-team").on("click", async function () {
+				const result = await openModalGet("/Game/ChangeTeamModal", { gameId: gameSettings.gameId });
+				if (result.Success === true) {
+					location.reload();
+				}
+			});
+
+			$(".game-tab-item").on("click", function () {
+				const _this = $(this);
+				const selection = _this.data("tab");
+				$(".game-tab").hide();
+				$(".game-tab-" + selection).show();
+			});
+
+
+			$("#stats-window").on("click", ".stats-sync", async function () {
+				await updateGameStats();
+			});
+
+
+			const setGameCountDown = () => {
+				if (gameSettings.gameEndTime == 0 || gameSettings.dateTimeNow == 0) {
+					return;
+				}
+
+				const interval = 1000;
+				const diffTime = gameSettings.gameEndTime - gameSettings.dateTimeNow;
+				let duration = moment.duration(diffTime, 'milliseconds');
+				setInterval(() => {
+					duration = moment.duration(duration - interval, 'milliseconds');
+					let output = '';
+					const days = Math.floor(duration.asDays());
+					if (days > 0) {
+						output += `${days.toString().paddingLeft(days > 99 ? "000" : "00")}:`;
+					}
+					output += `${duration.hours().toString().paddingLeft("00")}:${duration.minutes().toString().paddingLeft("00")}:${duration.seconds().toString().paddingLeft("00")}`;
+					$('.countdown').text(output);
+				}, interval);
+			}
+
+
+			loadSettings();
+			initializeGame();
+
+		})(jQuery);
+
+	</script>
+}

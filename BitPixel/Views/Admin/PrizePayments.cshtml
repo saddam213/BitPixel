@@ -1,0 +1,197 @@
+﻿@{
+	ViewBag.Title = "Prize Payment Admin";
+}
+
+<div class="d-flex justify-content-center">
+
+	<div class="d-flex" style="min-width:500px;max-width:1600px">
+		<div class="card w-100 m-3">
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<h5 class="card-title text-primary">Prize Payment Management</h5>
+						<h6 class="card-subtitle mb-2 text-muted">Manage prize payment details</h6>
+					</div>
+					<div>
+						<div class="input-group input-group-sm ">
+							<input id="filter-search" type="text" class="filter-input form-control" placeholder="Search...">
+							<div class="input-group-append">
+								<button id="filter-clear" class="btn btn-outline-danger" type="button" style="display:none">
+									<i class="fa fa-times"></i>
+								</button>
+							</div>
+							<div class="input-group-append">
+								<button id="filter-apply" class="btn btn-outline-secondary" type="button" disabled="disabled">
+									<i class="fa fa-search"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<table id="table-prizepayment" class="table table-sm table-bordered" style="table-layout:fixed;font-size:13px">
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Game</th>
+								<th>Name</th>
+								<th>Player</th>
+								<th>Symbol</th>
+								<th>Amount</th>
+								<th>Transaction</th>
+								<th>Status</th>
+								<th>ClaimTime</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+@section Scripts {
+
+
+	<script id="editCellTemplate" type="text/html">
+		<div class="text-center text-primary">
+			<i class="fa fa-edit prize-payment-update" data-prizeId="{{.}}"></i>
+		</div>
+	</script>
+
+	<script>
+		(async ($) => {
+
+			const editCellTemplate = $("#editCellTemplate").html();
+			const table = $("#table-prizepayment");
+			const dataTable = table.DataTable({
+				"dom": datatable_Layout,
+				"order": [[8, "desc"]],
+				"stateSave": false,
+				"processing": true,
+				"serverSide": true,
+				"searching": true,
+				"paging": true,
+				"pagingType": "simple_numbers",
+				"info": true,
+				"autoWidth": false,
+				"displayLength": 15,
+				"language": {
+					emptyTable: "No prizes found",
+					zeroRecords: "No prizes found",
+				},
+				"ajaxSource": '/Admin/GetPrizePayments',
+				"serverMethod": "POST",
+				"serverParams": function (data) {
+					if (Array.isArray(data)) {
+						data.push({ "name": "sSearch", "value": $("#filter-search").val() });
+					}
+				},
+				"columnDefs": [{
+					"targets": 0,
+					"width": 80
+				},
+				{
+					"targets": 1,
+					"width": 180,
+					"className": 'cell-elipsis',
+				},
+				{
+					"targets": 2,
+					"width": 180,
+					"className": 'cell-elipsis',
+				},
+				{
+					"targets": 3,
+					"width": 180,
+					"className": 'cell-elipsis',
+				},
+				{
+					"targets": 4,
+					"width": 100
+				},
+				{
+					"targets": 5,
+					"width": 140,
+					"className": 'text-right',
+				},
+				{
+					"targets": 6,
+					"width": "100%",
+					"className": 'cell-elipsis',
+				},
+				{
+					"targets": 7,
+					"width": 120
+				},
+				{
+					"targets": 8,
+					"width": 160,
+					"className": 'text-right text-nowrap',
+					"render": toLocalTime
+				},
+				{
+					"targets": 9,
+					"width": 30,
+					"orderable": false,
+					"searchable": false,
+					"render": function (data, type, full, meta) {
+						return Mustache.render(editCellTemplate, full[0]);
+					}
+				}]
+			});
+
+			$('#filter-apply').on('click', function () {
+				const _this = $(this);
+				_this.attr("disabled", "disabled");
+				dataTable.draw();
+				if (isFilterApplied()) {
+					$("#filter-clear").show();
+				}
+			});
+
+			$('#filter-clear').on('click', function () {
+				$(this).hide();
+				$(".filter-input").val(null);
+				$("#filter-apply").trigger("click");
+			});
+
+			$('#filter-search').on('keyup', function (e) {
+				if (isFilterApplied()) {
+					if (e.keyCode == 13) {
+						$("#filter-apply").trigger("click");
+						return;
+					}
+				}
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			$(".filter-input").on("change paste keyup", function () {
+				$("#filter-apply").removeAttr("disabled");
+			});
+
+			const isFilterApplied = () => {
+				const filter_search = $("#filter-search").val();
+				if (filter_search) {
+					return true;
+				}
+				return false;
+			}
+
+			$("#table-prizepayment").on("click", ".prize-payment-update", async function () {
+				const prizeId = $(this).data("prizeid");
+				const result = await openModalGet("/Admin/UpdatePrizePaymentModal", { prizeId: prizeId });
+				if (result.Cancel === true) {
+					return;
+				}
+				dataTable.draw();
+			});
+
+		})(jQuery);
+	</script>
+}

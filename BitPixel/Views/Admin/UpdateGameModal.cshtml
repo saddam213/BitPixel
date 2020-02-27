@@ -1,0 +1,77 @@
+﻿@model BitPixel.Common.Game.UpdateGameModel
+@{
+	Layout = "~/Views/Shared/_Modal.cshtml";
+}
+
+@using (Ajax.BeginForm("UpdateGameModal", "Admin", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "simplemodal-data", InsertionMode = InsertionMode.Replace }))
+{
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(m => m.Id)
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Update Game</h5>
+				<a class="simplemodal-close" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</a>
+			</div>
+			<div class="modal-body">
+				@Html.ModelValidationSummary()
+				<div class="form-group">
+					<small>Name</small>
+					@Html.TextBoxFor(m => m.Name, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+				</div>
+				<div class="form-group">
+					<small>Description</small>
+					@Html.TextBoxFor(m => m.Description, new { @class = "form-control form-control-sm" })
+					@Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+				</div>
+				<div class="d-flex">
+					<div class="form-group w-100 mr-1">
+						<small>Status</small>
+						@Html.EnumDropDownListFor(m => m.Status, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group w-100 mr-1">
+						<small>Platform</small>
+						@Html.EnumDropDownListFor(m => m.Platform, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Platform, "", new { @class = "text-danger" })
+					</div>
+				</div>
+
+				<div class="d-flex">
+					<div class="form-group w-100 mr-1">
+						<small>Clicks/Second</small>
+						@Html.TextBoxFor(m => m.ClicksPerSecond, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.ClicksPerSecond, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group w-100 mr-1">
+						<small>Rank</small>
+						@Html.TextBoxFor(m => m.Rank, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.Rank, "", new { @class = "text-danger" })
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer btn-group">
+				<button id="submit" type="submit" class="btn btn-outline-success">Update</button>
+				<button type="button" class="simplemodal-close btn btn-outline-secondary">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script>
+	(async ($) => {
+
+		$('form').submit(function () {
+			const form = $(this);
+			if (form.valid()) {
+				$("#submit").attr("disabled", "disabled");//.text("Generating...");
+			}
+		});
+
+	})(jQuery);
+</script>

@@ -1,0 +1,15 @@
+﻿<!--
+    You can find existing browser definitions at
+    <windir>\Microsoft.NET\Framework\<ver>\CONFIG\Browsers
+-->
+<browsers>
+  <browser id="FirefoxMobile" parentID="firefox3plus">
+    <identification>
+      <userAgent match="Mozilla.+\(Android.+Mobile.*\)" />
+    </identification>
+
+    <capabilities>
+			<capability name="isMobileDevice" value="true" />
+    </capabilities>
+  </browser>
+</browsers>
