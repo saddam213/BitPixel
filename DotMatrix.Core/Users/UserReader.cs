@@ -61,9 +61,6 @@ namespace DotMatrix.Core.Users
 				Id = x.Id,
 				UserName = x.UserName,
 				Email = x.Email,
-				ApiKey = x.ApiKey,
-				ApiSecret = x.ApiSecret,
-				IsApiEnabled = x.IsApiEnabled,
 				Points = x.Points,
 				IsEmailConfirmed = x.EmailConfirmed,
 				IsLocked = x.LockoutEndDateUtc.HasValue

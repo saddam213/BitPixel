@@ -79,10 +79,6 @@
     <Compile Include="Admin\AdminViewModel.cs" />
     <Compile Include="Admin\IAdminReader.cs" />
     <Compile Include="Admin\IAdminWriter.cs" />
-    <Compile Include="Api\ApiResponse.cs" />
-    <Compile Include="Api\UpdateApiModel.cs" />
-    <Compile Include="Api\UserApiAuthKey.cs" />
-    <Compile Include="Api\UserApiKeyPair.cs" />
     <Compile Include="Award\AddUserAwardModel.cs" />
     <Compile Include="Award\AwardGameHistoryViewModel.cs" />
     <Compile Include="Award\AwardListItemModel.cs" />
@@ -101,8 +97,10 @@
     <Compile Include="DataContext\StoredProcedure.cs" />
     <Compile Include="Explore\ExploreViewModel.cs" />
     <Compile Include="Gallery\GalleryViewModel.cs" />
+    <Compile Include="Game\TeamStatsModel.cs" />
     <Compile Include="Game\CreateGameModel.cs" />
     <Compile Include="Game\GameModel.cs" />
+    <Compile Include="Game\GameStatsModel.cs" />
     <Compile Include="Game\IGameWriter.cs" />
     <Compile Include="Game\IGameReader.cs" />
     <Compile Include="Game\UpdateGameModel.cs" />
@@ -156,6 +154,10 @@
     <Compile Include="Score\IScoreReader.cs" />
     <Compile Include="Score\ScoresModel.cs" />
     <Compile Include="Score\ScoresViewModel.cs" />
+    <Compile Include="Team\ChangeTeamModel.cs" />
+    <Compile Include="Team\CreateTeamModel.cs" />
+    <Compile Include="Team\TeamModel.cs" />
+    <Compile Include="Team\UpdateTeamModel.cs" />
     <Compile Include="Users\IUserWriter.cs" />
     <Compile Include="Users\UpdateAvatarModel.cs" />
     <Compile Include="Users\UpdateUserModal.cs" />

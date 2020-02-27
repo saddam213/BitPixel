@@ -3,6 +3,7 @@
 	ViewBag.Title = "Game Admin";
 }
 
+
 <div class="d-flex justify-content-between">
 
 
@@ -30,13 +31,14 @@
 								<th width="50">H</th>
 								<th width="100">Type</th>
 								<th width="100">Status</th>
+								<th width="60">Rank</th>
 								<th width="60"></th>
 							</tr>
 
 						</thead>
 						<tbody>
 
-							@foreach (var game in Model.Games)
+							@foreach (var game in Model.Games.OrderBy(x => x.Status))
 							{
 								<tr>
 									<td>@game.Id</td>
@@ -46,6 +48,7 @@
 									<td>@game.Height</td>
 									<td>@game.Type</td>
 									<td>@game.Status</td>
+									<td>@game.Rank</td>
 									<td>
 										<div class="d-flex justify-content-around align-items-center">
 											<i style="cursor:pointer" class="fa fa-edit game-update" data-gameid="@game.Id"></i>
@@ -90,7 +93,7 @@
 						</thead>
 						<tbody>
 
-							@foreach (var game in Model.Prizes)
+							@foreach (var game in Model.Prizes.Where(x => x.GameStatus != DotMatrix.Enums.GameStatus.Deleted && x.GameStatus != DotMatrix.Enums.GameStatus.Finished))
 							{
 								<tr>
 									<td class="cell-elipsis">@game.Game</td>

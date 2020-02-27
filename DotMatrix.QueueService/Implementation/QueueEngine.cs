@@ -38,7 +38,6 @@ namespace DotMatrix.QueueService.Implementation
 				var stopwatch = GetStopwatch();
 				try
 				{
-
 					IQueueResponse queueResponse = null;
 					using (var connection = new SqlConnection(ConnectionString.DefaultConnection))
 					{
@@ -53,10 +52,6 @@ namespace DotMatrix.QueueService.Implementation
 						}
 						transactionScope.Complete();
 					}
-
-					if (!queueResponse.Success)
-						Log.Message(LogLevel.Error, $"[QueueError] - Error: {queueResponse.Message}, {GetElapsedTime(stopwatch)}");
-
 					return queueResponse;
 				}
 				catch (QueueException tex)
@@ -86,14 +81,18 @@ namespace DotMatrix.QueueService.Implementation
 				Type = pixelRequest.Type,
 				Color = pixelRequest.Color,
 				Points = pixelRequest.Points,
-				MaxPoints = pixelRequest.MaxPoints
+				MaxPoints = pixelRequest.MaxPoints,
+				GameType = pixelRequest.GameType
 			}, commandType: CommandType.StoredProcedure);
 
 			if (addPixelResult == null)
 				throw new QueueException("Failed to update pixel");
 
 			if (!string.IsNullOrEmpty(addPixelResult.Error))
+			{
+				Log.Message(LogLevel.Error, $"[AddPixel] - GameId: {pixelRequest.GameId.ToString().PadRight(3)}, UserId: {pixelRequest.UserId.ToString().PadRight(3)}, X: {pixelRequest.X.ToString().PadRight(3)}, Y: {pixelRequest.Y.ToString().PadRight(3)}, Error: {addPixelResult.Error}, {GetElapsedTime(stopwatch)}");
 				return new SubmitPixelResponse { Success = false, Message = addPixelResult.Error };
+			}
 
 			var addClickResult = await connection.QueryFirstAsync<AddClickResult>(StoredProcedure.Game_AddClick, new
 			{
@@ -104,11 +103,14 @@ namespace DotMatrix.QueueService.Implementation
 				Y = pixelRequest.Y
 			}, commandType: CommandType.StoredProcedure);
 
-			if (addClickResult == null)
+			if (addClickResult == null || addClickResult.ClickId <= 0)
 				throw new QueueException("Failed to add click");
 
 			if (!string.IsNullOrEmpty(addClickResult.Error))
+			{
+				Log.Message(LogLevel.Error, $"[AddPixel] - GameId: {pixelRequest.GameId.ToString().PadRight(3)}, UserId: {pixelRequest.UserId.ToString().PadRight(3)}, X: {pixelRequest.X.ToString().PadRight(3)}, Y: {pixelRequest.Y.ToString().PadRight(3)}, Error: {addClickResult.Error}, {GetElapsedTime(stopwatch)}");
 				return new SubmitPixelResponse { Success = false, Message = addClickResult.Error };
+			}
 
 			var response = new SubmitPixelResponse
 			{
@@ -157,7 +159,7 @@ namespace DotMatrix.QueueService.Implementation
 				};
 			}
 
-			Log.Message(LogLevel.Info, $"[AddPixel] - GameId: {pixelRequest.GameId.ToString().PadRight(5)}, UserId: {pixelRequest.UserId.ToString().PadRight(5)}, X: {pixelRequest.X.ToString().PadRight(5)}, Y: {pixelRequest.Y.ToString().PadRight(5)}, Color: {pixelRequest.Color}, {GetElapsedTime(stopwatch)}");
+			Log.Message(LogLevel.Info, $"[AddPixel] - GameId: {pixelRequest.GameId.ToString().PadRight(3)}, UserId: {pixelRequest.UserId.ToString().PadRight(3)}, X: {pixelRequest.X.ToString().PadRight(3)}, Y: {pixelRequest.Y.ToString().PadRight(3)}, Color: {pixelRequest.Color}, {GetElapsedTime(stopwatch)}");
 			return response;
 		}
 
@@ -166,7 +168,7 @@ namespace DotMatrix.QueueService.Implementation
 		private async Task<SubmitClickResponse> ProcessSubmitClickRequest(SqlConnection connection, SubmitClickRequest clickRequest)
 		{
 			var stopwatch = GetStopwatch();
-			var result = await connection.QueryFirstAsync<AddClickResult>(StoredProcedure.Game_AddClick, new
+			var clickResult = await connection.QueryFirstAsync<AddClickResult>(StoredProcedure.Game_AddClick, new
 			{
 				GameId = clickRequest.GameId,
 				UserId = clickRequest.UserId,
@@ -175,11 +177,14 @@ namespace DotMatrix.QueueService.Implementation
 				Y = clickRequest.Y
 			}, commandType: CommandType.StoredProcedure);
 
-			if (result == null)
+			if (clickResult == null)
 				throw new QueueException("Failed to add click");
 
-			if (!string.IsNullOrEmpty(result.Error))
-				return new SubmitClickResponse { Success = false, Message = result.Error };
+			if (!string.IsNullOrEmpty(clickResult.Error))
+			{
+				Log.Message(LogLevel.Error, $"[AddClick] - GameId: {clickRequest.GameId.ToString().PadRight(3)}, UserId: {clickRequest.UserId.ToString().PadRight(3)}, X: {clickRequest.X.ToString().PadRight(3)}, Y: {clickRequest.Y.ToString().PadRight(3)}, Error: {clickResult.Error}, {GetElapsedTime(stopwatch)}");
+				return new SubmitClickResponse { Success = false, Message = clickResult.Error };
+			}
 
 			Log.Message(LogLevel.Info, $"[AddClick] - GameId: {clickRequest.GameId.ToString().PadRight(3)}, UserId: {clickRequest.UserId.ToString().PadRight(3)}, X: {clickRequest.X.ToString().PadRight(3)}, Y: {clickRequest.Y.ToString().PadRight(3)}, {GetElapsedTime(stopwatch)}");
 			return new SubmitClickResponse

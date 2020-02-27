@@ -12,6 +12,7 @@ namespace DotMatrix.Entity
 		public int PixelId { get; set; }
 		public int GameId { get; set; }
 		public int UserId { get; set; }
+		public int? TeamId { get; set; }
 
 		public string Color { get; set; }
 		public PixelType Type { get; set; }
@@ -27,5 +28,8 @@ namespace DotMatrix.Entity
 
 		[ForeignKey("UserId")]
 		public virtual User User { get; set; }
+
+		[ForeignKey("TeamId")]
+		public virtual Team Team { get; set; }
 	}
 }

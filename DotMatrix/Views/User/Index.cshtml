@@ -15,7 +15,7 @@
 					<h6 class="card-subtitle mb-2 text-muted">Create your own unique avatar</h6>
 					<div>
 						<div class="d-flex justify-content-center mb-3">
-							<img id="avatar-img" src="~/Content/Images/Avatar/@(User.Identity.Name)-large.png" onerror="this.src='/Content/Images/Avatar-large.png'" width="200" height="200" style="border:solid 1px rgba(238, 232, 213, 0.325)" />
+							<img id="avatar-img" src="~/Content/Images/Avatar/@(User.Identity.Name).png" onerror="this.src='/Content/Images/Avatar.png'" width="200" height="200" style="border:solid 1px rgba(238, 232, 213, 0.325)" />
 						</div>
 						<button id="update-avatar" class="btn btn-sm btn-primary w-50">Build Avatar</button>
 					</div>
@@ -27,10 +27,6 @@
 	<div id="passwordTarget" class="d-flex m-4 w-100" style="max-width:400px;min-width:320px;">
 		@{ Html.RenderPartial("_UpdatePassword", new DotMatrix.Common.Account.ChangePasswordViewModel());}
 	</div>
-	@*<div id="apiTarget" class="d-flex m-4 w-100" style="max-width:400px;min-width:300px;">
-			@{ Html.RenderPartial("_UpdateApi", Model.ApiModel);}
-		</div>*@
-
 </div>
 
 @section Scripts {
@@ -42,7 +38,7 @@
 				const result = await openModalGet('/User/UpdateAvatarModal');
 				if (result.Success === true) {
 					const cacheBreak = Math.round((new Date()).getTime());
-					$("#avatar-img").attr("src", "/Content/Images/Avatar/@(User.Identity.Name)-large.png?v=" + cacheBreak)
+					$("#avatar-img").attr("src", "/Content/Images/Avatar/@(User.Identity.Name).png?v=" + cacheBreak)
 				}
 			});
 

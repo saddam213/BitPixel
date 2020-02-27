@@ -46,6 +46,8 @@
     <Compile Include="Base\IDynamicTableCacheItem.cs" />
     <Compile Include="Game\GameCacheItem.cs" />
     <Compile Include="Game\IGameCache.cs" />
+    <Compile Include="Game\IPixelCache.cs" />
+    <Compile Include="Game\PixelCacheItem.cs" />
     <Compile Include="Throttle\IThrottleCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

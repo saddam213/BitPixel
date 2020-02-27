@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -10,6 +11,7 @@ using DotMatrix.Common.Game;
 using DotMatrix.Common.Image;
 using DotMatrix.Common.Payment;
 using DotMatrix.Common.Prize;
+using DotMatrix.Common.Team;
 using DotMatrix.Common.Users;
 using DotMatrix.Datatables;
 using DotMatrix.Enums;
@@ -106,7 +108,7 @@ namespace DotMatrix.Controllers
 		{
 			return View(new CreatePrizePoolModel
 			{
-				Games = await GameReader.GetGames(Enums.GameStatus.NotStarted)
+				Games = await GetPendingGames()
 			});
 		}
 
@@ -116,7 +118,7 @@ namespace DotMatrix.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				model.Games = await GameReader.GetGames(Enums.GameStatus.NotStarted);
+				model.Games = await GetPendingGames();
 				return View(model);
 			}
 
@@ -145,7 +147,7 @@ namespace DotMatrix.Controllers
 
 				if (!isValid)
 				{
-					model.Games = await GameReader.GetGames(Enums.GameStatus.NotStarted);
+					model.Games = await GetPendingGames();
 					return View(model);
 				}
 			}
@@ -153,7 +155,7 @@ namespace DotMatrix.Controllers
 			var result = await PrizeWriter.CreatePrizePool(model);
 			if (!ModelState.IsWriterResultValid(result))
 			{
-				model.Games = await GameReader.GetGames(Enums.GameStatus.NotStarted);
+				model.Games = await GetPendingGames();
 				return View(model);
 			}
 			return CloseModalSuccess();
@@ -292,7 +294,6 @@ namespace DotMatrix.Controllers
 				Id = user.Id,
 				UserName = user.UserName,
 				Email = user.Email,
-				IsApiEnabled = user.IsApiEnabled,
 				Points = user.Points,
 				IsEmailConfirmed = user.IsEmailConfirmed,
 				IsLocked = user.IsLocked
@@ -419,5 +420,98 @@ namespace DotMatrix.Controllers
 			return CloseModalSuccess();
 		}
 
+
+
+
+
+
+
+
+
+
+
+
+
+		[HttpGet]
+		public Task<ActionResult> Teams()
+		{
+			return Task.FromResult<ActionResult>(View());
+		}
+
+
+
+		[HttpPost]
+		public async Task<ActionResult> GetTeams(DataTablesParam model)
+		{
+			return DataTable(await GameReader.GetTeams(model));
+		}
+
+
+		[HttpGet]
+		public async Task<ActionResult> CreateTeamModal()
+		{
+			return View(new CreateTeamModel
+			{
+				Games = await GetPendingGames()
+			});
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> CreateTeamModal(CreateTeamModel model)
+		{
+			if (!ModelState.IsValid)
+			{
+				model.Games = await GetPendingGames();
+				return View(model);
+			}
+
+			var result = await GameWriter.CreateTeam(model);
+			if (!ModelState.IsWriterResultValid(result))
+			{
+				model.Games = await GetPendingGames();
+				return View(model);
+			}
+
+			return CloseModalSuccess();
+		}
+
+
+		private async Task<List<GameModel>> GetPendingGames()
+		{
+			var games = await GameReader.GetGames();
+			return games
+					.Where(x => x.Status == GameStatus.NotStarted || x.Status == GameStatus.Paused)
+					.ToList();
+		}
+
+		[HttpGet]
+		public async Task<ActionResult> UpdateTeamModal(int teamId)
+		{
+			var team = await GameReader.GetTeam(teamId);
+			return View(new UpdateTeamModel
+			{
+				Id = team.Id,
+				Name = team.Name,
+				Description = team.Description,
+				Icon = team.Icon,
+				Color = team.Color,
+				Rank = team.Rank
+			});
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> UpdateTeamModal(UpdateTeamModel model)
+		{
+			if (!ModelState.IsValid)
+				return View(model);
+
+			var result = await GameWriter.UpdateTeam(model);
+			if (!ModelState.IsWriterResultValid(result))
+				return View(model);
+
+			return CloseModalSuccess();
+		}
 	}
 }

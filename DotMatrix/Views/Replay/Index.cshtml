@@ -4,6 +4,16 @@
 }
 
 @Html.AntiForgeryToken()
+
+<style>
+	#replayCanvas {
+		image-rendering: -moz-crisp-edges;
+		image-rendering: -webkit-crisp-edges;
+		image-rendering: pixelated;
+		image-rendering: crisp-edges;
+	}
+</style>
+
 <div class="d-flex flex-column justify-content-center align-items-center pl-3 pr-3">
 
 	<div class="d-flex justify-content-center w-100 flex-wrap mt-2 mb-3" style="min-width:300px;max-width:850px">
@@ -61,7 +71,7 @@
 					</div>
 
 				</div>
-				<canvas id="replayCanvas" width="@Model.Width" height="@Model.Height" style="border:solid 1px rgba(238, 232, 213, 0.325);background-image: url('/Content/Images/Games/@Model.GameId/background-fixed-small.png');"></canvas>
+				<canvas id="replayCanvas" width="@Model.Width" height="@Model.Height" style="border:solid 1px rgba(238, 232, 213, 0.325);background-image: url('/Content/Images/Games/@Model.GameId/background-fixed.png');"></canvas>
 			</div>
 		</div>
 	</div>
@@ -96,10 +106,8 @@
 			}
 
 			const addCanvasPixel = async (x, y, color) => {
-				context.beginPath();
 				context.fillStyle = color;
 				context.fillRect(x, y, 1, 1);
-				context.closePath();
 			}
 
 			const getPixels = async () => {

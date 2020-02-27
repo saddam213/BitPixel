@@ -83,6 +83,14 @@
       <Project>{d5029e7c-efd9-4c90-99ab-6fb08601eccc}</Project>
       <Name>DotMatrix.Base</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.Cache.Common\DotMatrix.Cache.Common.csproj">
+      <Project>{19e68ee5-e46c-4d6c-b7c3-d2e8750e0456}</Project>
+      <Name>DotMatrix.Cache.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotMatrix.Cache\DotMatrix.Cache.csproj">
+      <Project>{a77d1355-31ca-4ee4-b696-6c90baf5e640}</Project>
+      <Name>DotMatrix.Cache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DotMatrix.Common\DotMatrix.Common.csproj">
       <Project>{0AEAB0F6-DB8A-4D61-AC8A-597BC227EEB3}</Project>
       <Name>DotMatrix.Common</Name>

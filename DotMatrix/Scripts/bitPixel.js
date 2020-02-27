@@ -218,10 +218,10 @@ const loadBackgroundImage = (imageName) => {
 
 
 const addCanvasPixel = async (context, x, y, color) => {
-	context.beginPath();
-	context.fillStyle = color,
+	//context.beginPath();
+	context.fillStyle = color;
 	context.fillRect(x, y, 1, 1);
-	context.closePath();
+	//context.closePath();
 }
 
 const getCanvasLocation = (canvas, scale, mouseEvent) => {
@@ -231,6 +231,11 @@ const getCanvasLocation = (canvas, scale, mouseEvent) => {
 		y: parseInt((mouseEvent.clientY - rect.top) / scale)
 	}
 }
+
+
+String.prototype.paddingLeft = function (paddingValue) {
+	return String(paddingValue + this).slice(-paddingValue.length);
+};
 
 
 

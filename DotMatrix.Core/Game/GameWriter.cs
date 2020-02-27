@@ -8,6 +8,7 @@ using DotMatrix.Cache.Common;
 using DotMatrix.Common.DataContext;
 using DotMatrix.Common.Game;
 using DotMatrix.Common.Results;
+using DotMatrix.Common.Team;
 
 namespace DotMatrix.Core.Game
 {
@@ -79,6 +80,97 @@ namespace DotMatrix.Core.Game
 				game.Description = model.Description;
 				game.ClicksPerSecond = model.ClicksPerSecond;
 
+				await context.SaveChangesAsync();
+				return new WriterResult(true);
+			}
+		}
+
+		public async Task<IWriterResult> CreateTeam(CreateTeamModel model)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				var game = await context.Games.FirstOrDefaultAsync(x => x.Id == model.GameId);
+				if (game == null)
+					return new WriterResult(false, $"Game not found");
+
+				if (game.Status != Enums.GameStatus.NotStarted && game.Status != Enums.GameStatus.Paused)
+					return new WriterResult(false, $"Unable to add team to game in {game.Status} status");
+
+				if (await context.Team.AnyAsync(x => x.GameId == game.Id && x.Name == model.Name))
+					return new WriterResult(false, $"Game with name already exists");
+
+				if (await context.Team.AnyAsync(x => x.GameId == game.Id && x.Color == model.Color))
+					return new WriterResult(false, $"Game with color already exists");
+
+				context.Team.Add(new Entity.Team
+				{
+					GameId = game.Id,
+					Name = model.Name,
+					Description = model.Description,
+					Icon = model.Icon,
+					Color = model.Color,
+					Rank = model.Rank,
+					Timestamp = DateTime.UtcNow
+				});
+				await context.SaveChangesAsync();
+				return new WriterResult(true);
+			}
+		}
+
+		public async Task<IWriterResult> UpdateTeam(UpdateTeamModel model)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				var team = await context.Team
+					.Include(x => x.Game)
+					.FirstOrDefaultAsync(x => x.Id == model.Id);
+				if (team == null)
+					return new WriterResult(false, $"Team not found");
+
+				if (team.Game.Status != Enums.GameStatus.NotStarted && team.Game.Status != Enums.GameStatus.Paused)
+					return new WriterResult(false, $"Unable to update team to game in {team.Game.Status} status");
+
+				if (await context.Team.AnyAsync(x => x.GameId == team.GameId && x.Name == model.Name && x.Id != model.Id))
+					return new WriterResult(false, $"Game with name already exists");
+
+				if (await context.Team.AnyAsync(x => x.GameId == team.GameId && x.Color == model.Color && x.Id != model.Id))
+					return new WriterResult(false, $"Game with color already exists");
+
+				team.Name = model.Name;
+				team.Description = model.Description;
+				team.Color = model.Color;
+				team.Icon = model.Icon;
+				team.Rank = model.Rank;
+				await context.SaveChangesAsync();
+				return new WriterResult(true);
+			}
+		}
+
+		public async Task<IWriterResult> ChangeTeam(int userId, ChangeTeamModel model)
+		{
+			using (var context = DataContextFactory.CreateContext())
+			{
+				var team = await context.Team.FirstOrDefaultAsync(x => x.Id == model.TeamId && x.GameId == model.GameId);
+				if (team == null)
+					return new WriterResult(false, $"Team not found");
+
+				var teamMember = await context.TeamMember.FirstOrDefaultAsync(x => x.UserId == userId && x.Team.GameId == model.GameId);
+				if (teamMember != null)
+				{
+					if (teamMember.TeamId == model.TeamId)
+						return new WriterResult(false, $"Already member of team {teamMember.Team.Name}");
+
+					teamMember.TeamId = team.Id;
+					await context.SaveChangesAsync();
+					return new WriterResult(true);
+				}
+
+				context.TeamMember.Add(new Entity.TeamMember
+				{
+					UserId = userId,
+					TeamId = team.Id,
+					Timestamp = DateTime.UtcNow
+				});
 				await context.SaveChangesAsync();
 				return new WriterResult(true);
 			}

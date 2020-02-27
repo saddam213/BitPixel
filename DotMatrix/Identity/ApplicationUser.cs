@@ -35,10 +35,6 @@ namespace DotMatrix.Identity
 		public bool LockoutEnabled { get; set; }
 		public int AccessFailedCount { get; set; }
 
-
-		public string ApiKey { get; set; }
-		public string ApiSecret { get; set; }
-		public bool IsApiEnabled { get; set; }
 		public int Points { get; set; }
 
 		public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser, int> manager)

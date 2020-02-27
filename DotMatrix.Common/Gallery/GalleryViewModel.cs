@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DotMatrix.Common.Game;
+using DotMatrix.Common.Team;
 
 namespace DotMatrix.Common.Gallery
 {
@@ -16,5 +17,7 @@ namespace DotMatrix.Common.Gallery
 	{
 		public GameModel Game { get; set; }
 		public List<string> Players { get; set; }
+		public TeamModel Team { get; set; }
+		public List<TeamModel> Teams { get; set; }
 	}
 }

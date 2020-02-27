@@ -29,32 +29,14 @@ namespace DotMatrix.Core.Image
 				}
 
 				using (var bitmapSmall = new Bitmap(10, 10))
-				using (var bitmapMedium = new Bitmap(100, 100))
-				using (var bitmapLarge = new Bitmap(200, 200))
 				{
 					foreach (var pixel in model.Pixels)
 					{
-						var color = ColorTranslator.FromHtml(pixel.Color);
-						bitmapSmall.SetPixel(pixel.X, pixel.Y, color);
-
-						var medX = pixel.X * 10;
-						var medY = pixel.Y * 10;
-						for (int x = 0; x < 10; x++)
-							for (int y = 0; y < 10; y++)
-								bitmapMedium.SetPixel(medX + x, medY + y, color);
-
-						var lrgX = pixel.X * 20;
-						var lrgY = pixel.Y * 20;
-						for (int x = 0; x < 20; x++)
-							for (int y = 0; y < 20; y++)
-								bitmapLarge.SetPixel(lrgX + x, lrgY + y, color);
+						bitmapSmall.SetPixel(pixel.X, pixel.Y, ColorTranslator.FromHtml(pixel.Color));
 					}
-
-					bitmapSmall.Save(Path.Combine(model.AvatarPath, $"{model.UserName}-small.png"), System.Drawing.Imaging.ImageFormat.Png);
-					bitmapMedium.Save(Path.Combine(model.AvatarPath, $"{model.UserName}-medium.png"), System.Drawing.Imaging.ImageFormat.Png);
-					bitmapLarge.Save(Path.Combine(model.AvatarPath, $"{model.UserName}-large.png"), System.Drawing.Imaging.ImageFormat.Png);
-					return new WriterResult(true);
+					bitmapSmall.Save(Path.Combine(model.AvatarPath, $"{model.UserName}.png"), System.Drawing.Imaging.ImageFormat.Png);
 				}
+				return new WriterResult(true);
 			}
 			catch (Exception)
 			{
@@ -88,7 +70,8 @@ namespace DotMatrix.Core.Image
 					for (int y = 0; y < height; y++)
 					{
 						var color = bitmap.GetPixel(x, y);
-						if(color.A == 0){
+						if (color.A == 0)
+						{
 							continue;
 						}
 

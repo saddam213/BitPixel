@@ -2,7 +2,6 @@
 using System.Web;
 using System.Web.Mvc;
 
-using DotMatrix.Api;
 using DotMatrix.Common.Account;
 using DotMatrix.Common.Award;
 using DotMatrix.Common.Email;
@@ -143,15 +142,12 @@ namespace DotMatrix.Controllers
 
 			if (ModelState.IsValid)
 			{
-				var apiKeyResult = ApiKeyStore.GenerateApiKeyPair();
 				var user = new ApplicationUser
 				{
 					UserName = model.UserName,
 					Email = model.Email,
 					EmailConfirmed = false,
-					Points = 0,
-					ApiKey = apiKeyResult.Key,
-					ApiSecret = apiKeyResult.Secret
+					Points = 0
 				};
 
 				var result = await UserManager.CreateAsync(user, model.Password);

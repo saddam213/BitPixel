@@ -174,9 +174,6 @@
   <ItemGroup>
     <Compile Include="ActionResults\DataTablesResult.cs" />
     <Compile Include="ActionResults\CloseModalResult.cs" />
-    <Compile Include="Api\ApiKeyStore.cs" />
-    <Compile Include="Api\ApiResultWithChallenge.cs" />
-    <Compile Include="Api\ApiAuthenticationAttribute.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AwardsController.cs" />
     <Compile Include="Controllers\GalleryController.cs" />
@@ -195,9 +192,7 @@
     <Compile Include="Identity\ApplicationUserManager.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
-    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\ApiPrivateController.cs" />
     <Compile Include="Controllers\PaymentController.cs" />
     <Compile Include="Controllers\PointsController.cs" />
     <Compile Include="Controllers\ExploreController.cs" />
@@ -310,12 +305,10 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Account\ConfirmEmailSuccess.cshtml" />
-    <Content Include="Views\User\_UpdateApi.cshtml" />
     <Content Include="Views\User\_UpdatePassword.cshtml" />
     <Content Include="Views\Game\Index.cshtml" />
     <Content Include="Views\Points\Index.cshtml" />
     <Content Include="Views\Explore\Index.cshtml" />
-    <Content Include="Views\Home\Api.cshtml" />
     <Content Include="Views\Payment\MethodModal.cshtml" />
     <Content Include="Views\Payment\History.cshtml" />
     <Content Include="Views\Payment\Index.cshtml" />
@@ -365,6 +358,10 @@
     <Content Include="Views\Admin\Payments.cshtml" />
     <Content Include="Views\Gallery\Game.cshtml" />
     <Content Include="Views\Gallery\Index.cshtml" />
+    <Content Include="Views\Admin\CreateTeamModal.cshtml" />
+    <Content Include="Views\Admin\UpdateTeamModal.cshtml" />
+    <Content Include="Views\Admin\Teams.cshtml" />
+    <Content Include="Views\Game\ChangeTeamModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

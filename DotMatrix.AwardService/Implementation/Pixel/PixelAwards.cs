@@ -13,6 +13,9 @@ namespace DotMatrix.AwardService.Implementation
 		{
 			foreach (var game in games)
 			{
+				if (game.EndType != GameEndType.LastPixel)
+					continue;
+
 				if (awards.Any(x => x.AwardType == AwardType.PixelLastPixel && x.GameId == game.Id))
 					continue;
 

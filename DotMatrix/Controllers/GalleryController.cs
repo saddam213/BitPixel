@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using DotMatrix.Common.Gallery;
 using DotMatrix.Common.Game;
+using DotMatrix.Common.Team;
+using DotMatrix.Enums;
 
 namespace DotMatrix.Controllers
 {
@@ -23,13 +26,22 @@ namespace DotMatrix.Controllers
 
 		public async Task<ActionResult> Game(int gameId)
 		{
+			var teams = new List<TeamModel>();
 			var game = await GameReader.GetGame(gameId);
 			var players = await GameReader.GetPlayers(gameId);
+			if (game.Type == GameType.TeamBattle)
+				teams = await GameReader.GetTeams(game.Id);
+
 			return View(new GalleryGameViewModel
 			{
 				Game = game,
-				Players = players
+				Players = players,
+				Teams = teams,
+				Team = teams
+					.OrderBy(x => x.Result)
+					.FirstOrDefault()
 			});
+
 		}
 	}
 }

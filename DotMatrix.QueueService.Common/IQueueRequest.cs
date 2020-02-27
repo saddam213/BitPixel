@@ -2,6 +2,6 @@
 {
 	public interface IQueueRequest
 	{
-		bool IsApi { get; set; }
+	
 	}
 }

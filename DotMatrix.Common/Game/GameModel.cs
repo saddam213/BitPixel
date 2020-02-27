@@ -17,5 +17,7 @@ namespace DotMatrix.Common.Game
 		public int Rank { get; set; }
 		public int ClicksPerSecond { get; set; }
 		public GamePlatform Platform { get; set; }
+		public GameEndType EndType { get; set; }
+		public DateTime? EndTime { get; set; }
 	}
 }

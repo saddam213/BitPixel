@@ -55,7 +55,7 @@ namespace DotMatrix.AwardService.Implementation
 			using (var context = DataContextFactory.CreateReadOnlyContext())
 			{
 				pixels = await context.PixelHistory
-					.Where(x => x.Game.Status == GameStatus.Started)
+					//.Where(x => x.Game.Status == GameStatus.Started)
 					.Select(x => new PixelModel
 					{
 						Id = x.Id,
@@ -88,7 +88,7 @@ namespace DotMatrix.AwardService.Implementation
 				);
 
 				clicks = await context.Click
-					.Where(x => x.Game.Status == GameStatus.Started)
+					//.Where(x => x.Game.Status == GameStatus.Started)
 					.Select(x => new ClickModel
 					{
 						Id = x.Id,
@@ -120,14 +120,17 @@ namespace DotMatrix.AwardService.Implementation
 					{
 						Id = x.Id,
 						Width = x.Width,
-						Height = x.Height
+						Height = x.Height,
+						EndType = x.EndType,
+						EndTime = x.EndTime,
+						Status = x.Status
 					}).ToListAsync();
 			}
 			Log.Message(LogLevel.Info, "[ProcessAwards] - Get process data complete.");
 
 			await ClickAwardProcessor.ProcessClicks(games, clicks, awards);
 			await PixelAwardProcessor.ProcessPixels(games, pixels, awards);
-
+			await CheckGameEnd(games);
 			Log.Message(LogLevel.Info, "[ProcessAwards] - ProcessAwards complete.");
 		}
 
@@ -183,13 +186,27 @@ namespace DotMatrix.AwardService.Implementation
 		{
 			try
 			{
-
 				Log.Message(LogLevel.Info, $"[UpdateGameStatus] - Updating game status, GameId: {gameId}, Status: {status}");
 				using (var context = DataContextFactory.CreateContext())
 				{
 					var game = await context.Games.FirstOrDefaultAsync(x => x.Id == gameId);
 					if (game == null)
 						return false;
+
+					if (status == GameStatus.Finished && game.Type == GameType.TeamBattle)
+					{
+						var result = 1;
+						var teams = await context.Team
+							.Where(x => x.GameId == game.Id)
+							.OrderByDescending(x => x.Pixels.Count)
+							.ThenBy(x => x.Name)
+							.ToListAsync();
+						foreach (var team in teams)
+						{
+							team.Result = result;
+							result++;
+						}
+					}
 
 					game.Status = status;
 					await context.SaveChangesAsync();
@@ -202,6 +219,27 @@ namespace DotMatrix.AwardService.Implementation
 				Log.Message(LogLevel.Error, $"[UpdateGameStatus] - Exception updating game status, Error: {ex.Message}");
 			}
 			return false;
+		}
+
+		public static async Task CheckGameEnd(List<GameModel> games)
+		{
+			foreach (var game in games)
+			{
+				if (game.Status != GameStatus.Started)
+					continue;
+
+				if (game.EndType != GameEndType.Timestamp)
+					continue;
+
+				if (!game.EndTime.HasValue)
+					continue;
+
+				if (game.EndTime.Value > DateTime.UtcNow)
+					continue;
+
+				await UpdateGameStatus(game.Id, GameStatus.Finished);
+			}
+
 		}
 	}
 }

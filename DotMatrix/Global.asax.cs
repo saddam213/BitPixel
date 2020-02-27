@@ -24,7 +24,6 @@ namespace DotMatrix
 			DependencyRegistrar.Register();
 			InitializeCache("WEB");
 
-			GlobalConfiguration.Configure(WebApiConfig.Register);
 			RouteConfig.RegisterRoutes(RouteTable.Routes);
 			ModelBinders.Binders.Add(typeof(DataTablesParam), new DataTablesModelBinder());
 
@@ -43,6 +42,7 @@ namespace DotMatrix
 			Task.WaitAll(new[]
 			{
 				Task.Run(async () => DependencyRegistrar.RegisterSingletonComponent<IGameCache>(await GameCache.BuildCache(nodeKey))),
+				Task.Run(async () => DependencyRegistrar.RegisterSingletonComponent<IPixelCache>(await PixelCache.BuildCache(nodeKey))),
 			}, TimeSpan.FromMinutes(10));
 		}
 	}

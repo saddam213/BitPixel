@@ -90,6 +90,10 @@
     <Build Include="Stored Procedures\WalletService_GetWithdrawals.sql" />
     <Build Include="Stored Procedures\WalletService_UpdateWithdraw.sql" />
     <Build Include="Stored Procedures\Award_AddAwardHistory.sql" />
+    <Build Include="Tables\Team.sql" />
+    <Build Include="Tables\TeamMember.sql" />
+    <Build Include="Stored Procedures\Cache_Pixel_GetInitial.sql" />
+    <Build Include="Stored Procedures\Cache_Pixel_GetUpdates.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DotMatrix.Database.refactorlog" />

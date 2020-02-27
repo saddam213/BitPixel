@@ -7,10 +7,13 @@
  ,@Color NVARCHAR(7)
  ,@Points INT
  ,@MaxPoints INT
+ ,@GameType TINYINT
 AS
 
 	DECLARE @UserPoints INT;
 	DECLARE @UserName NVARCHAR(128);
+
+	DECLARE @TeamId INT;
 
 	DECLARE @PixelId INT;
 	DECLARE @PixelType TINYINT;
@@ -20,16 +23,16 @@ AS
 	DECLARE @Timestamp DATETIME2(7) = SYSUTCDATETIME();
 
 	SELECT 
-		@PixelId = [Id],
-		@PixelType = [Type],
-		@PixelPoints = [Points]
-	FROM [dbo].[Pixel]
+		@PixelId = p.[Id],
+		@PixelType = p.[Type],
+		@PixelPoints = p.[Points]
+	FROM [dbo].[Pixel] p
 	WHERE [GameId] = @GameId
 	AND [X] = @X AND [Y] = @Y
 
 	IF(@PixelId IS NOT NULL AND @PixelType = 2)-- Fixed
 	BEGIN
-		SELECT 'Cannot overwrite fixed pixel' AS [Error]
+		SELECT 'Cannot overwrite gameboard pixel' AS [Error]
 		RETURN;
 	END
 
@@ -39,25 +42,43 @@ AS
 	FROM [dbo].[Users] u
 	WHERE u.[Id] = @UserId
 
+	IF(@GameType = 1)-- TeamBattle
+	BEGIN
+			SELECT 
+				@TeamId = t.[Id],
+				@Color = t.Color
+			FROM [dbo].[TeamMember] tm 
+			JOIN [dbo].[Team] t ON t.[Id] = tm.[TeamId]
+			WHERE t.[GameId] = @GameId 
+			AND tm.[UserId] = @UserId
+
+			IF(@TeamId IS NULL)
+			BEGIN
+				SELECT 'Please select a team to play' AS [Error]
+				RETURN;
+			END
+	END
+
+
 	SELECT @PixelPoints = ISNULL(@PixelPoints, @Points);
 
 	IF(@UserPoints < @PixelPoints)
 	BEGIN
-		SELECT 'Insufficient points to set pixel' AS [Error]
+		SELECT 'Insufficient points to create pixel' AS [Error]
 		RETURN;
 	END
 
 	IF(@PixelPoints > @MaxPoints)
 	BEGIN
-		SELECT 'Points are greater than MaxPoints' AS [Error]
+		SELECT 'Pixel points are greater than Spend Limit' AS [Error]
 		RETURN;
 	END
 
 	IF(@PixelId IS NULL)
 		BEGIN
 			SELECT @NewPixelPoints = @Points + @Points;
-			INSERT INTO [dbo].[Pixel]([GameId], [UserId], [X], [Y], [Type], [Color], [Points], [LastUpdate])
-			VALUES(@GameId, @UserId, @X, @Y, @Type, @Color, @NewPixelPoints, @Timestamp)
+			INSERT INTO [dbo].[Pixel]([GameId], [UserId], [TeamId], [X], [Y], [Type], [Color], [Points], [LastUpdate])
+			VALUES(@GameId, @UserId, @TeamId, @X, @Y, @Type, @Color, @NewPixelPoints, @Timestamp)
 			SELECT @PixelId = SCOPE_IDENTITY()
 		END
 	ELSE
@@ -65,6 +86,7 @@ AS
 			SELECT @NewPixelPoints = @PixelPoints + @PixelPoints;
 			UPDATE [dbo].[Pixel]
 			SET [UserId] = @UserId
+				,[TeamId] = @TeamId
 				,[Type] = @Type
 				,[Color] = @Color
 				,[Points] = @NewPixelPoints
@@ -72,8 +94,8 @@ AS
 			WHERE [Id] = @PixelId
 		END
 
-	INSERT INTO [dbo].[PixelHistory]([PixelId], [GameId], [UserId], [Type], [Color], [Points], [Timestamp])
-	VALUES(@PixelId, @GameId, @UserId, @Type, @Color, @PixelPoints, @Timestamp)
+	INSERT INTO [dbo].[PixelHistory]([PixelId], [GameId], [UserId], [Type], [Color], [Points],[TeamId], [Timestamp])
+	VALUES(@PixelId, @GameId, @UserId, @Type, @Color, @PixelPoints, @TeamId, @Timestamp)
 
 	--EXEC @UserPoints = [dbo].[User_AuditPoints] @UserId
 	UPDATE [dbo].[Users]

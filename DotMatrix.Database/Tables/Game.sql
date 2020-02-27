@@ -5,6 +5,8 @@
     [Type]        TINYINT        NOT NULL,
     [Status]      TINYINT        NOT NULL,
     [Platform]    TINYINT        NOT NULL,
+    [EndType]     TINYINT        NOT NULL,
+    [EndTime]     DATETIME2 (7)  NULL,
     [Width]       INT            NOT NULL,
     [Height]      INT            NOT NULL,
     [ClicksPerSecond] INT        NOT NULL,

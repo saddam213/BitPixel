@@ -12,7 +12,7 @@
 		None = 0,
 		Crypto = 1
 	}
-
+	
 	public enum PaymentMethodStatus : byte
 	{
 		Ok = 0,
@@ -146,7 +146,8 @@
 
 	public enum GameType : byte
 	{
-		TreasureHunt = 0
+		TreasureHunt = 0,
+		TeamBattle = 1
 	}
 
 	public enum GameStatus : byte
@@ -162,5 +163,11 @@
 	{
 		Desktop = 0,
 		Mobile = 1
+	}
+
+	public enum GameEndType : byte
+	{
+		LastPixel = 0,
+		Timestamp = 1
 	}
 }

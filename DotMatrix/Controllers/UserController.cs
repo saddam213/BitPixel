@@ -2,14 +2,12 @@
 using System.Web;
 using System.Web.Mvc;
 
-using DotMatrix.Api;
 using DotMatrix.Common.Account;
-using DotMatrix.Common.Api;
 using DotMatrix.Common.Award;
 using DotMatrix.Common.Image;
 using DotMatrix.Common.Users;
-using DotMatrix.Helpers;
 using DotMatrix.Identity;
+
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 
@@ -47,15 +45,7 @@ namespace DotMatrix.Controllers
 		public async Task<ActionResult> Index()
 		{
 			var user = await UserReader.GetUser(User.Identity.GetUserId<int>());
-			return View(new UserSettingsModel
-			{
-				ApiModel = new UpdateApiModel
-				{
-					ApiKey = user.ApiKey,
-					ApiSecret = user.ApiSecret,
-					IsApiEnabled = user.IsApiEnabled
-				}
-			});
+			return View(new UserSettingsModel());
 		}
 
 		[HttpPost]
@@ -83,40 +73,6 @@ namespace DotMatrix.Controllers
 			return PartialView("_UpdatePassword", model);
 		}
 
-
-		[HttpPost]
-		[Authorize]
-		public async Task<ActionResult> UpdateApiSettings(UpdateApiModel model)
-		{
-			if (!ModelState.IsValid)
-				return PartialView("_UpdateApi", model);
-
-			var result = await ApiKeyStore.UpdateApiAuthKey(User.Identity.GetUserId<int>(), model);
-			if (!result)
-			{
-				ModelState.AddModelError("Error", "Failed to update API key.");
-				return PartialView("_UpdateApi", model);
-			}
-
-			ModelState.AddModelError("Success", "Successfully updated API key.");
-			return PartialView("_UpdateApi", model);
-		}
-
-		[HttpPost]
-		[Authorize]
-		public ActionResult GenerateApiKey()
-		{
-			var result = ApiKeyStore.GenerateApiKeyPair();
-			if (!result.IsValid)
-				return Json(new { Success = false, Message = "Failed to generate API key, if problem persists please contact Support." });
-
-			return Json(new
-			{
-				Success = true,
-				Key = result.Key,
-				Secret = result.Secret
-			});
-		}
 
 		[HttpGet]
 		[Authorize]

@@ -25,7 +25,6 @@ namespace DotMatrix.Core.Pixel
 
 				var result = await QueueHubClient.SubmitClick(new SubmitClickRequest
 				{
-					IsApi = false,
 					UserId = userId,
 					X = model.X,
 					Y = model.Y,
@@ -63,7 +62,6 @@ namespace DotMatrix.Core.Pixel
 
 				var result = await QueueHubClient.SubmitPixel(new SubmitPixelRequest
 				{
-					IsApi = false,
 					UserId = userId,
 
 					X = model.X,
@@ -72,7 +70,8 @@ namespace DotMatrix.Core.Pixel
 					Type = PixelType.User,
 					Points = Constant.PixelPoints,
 					MaxPoints = model.MaxPoints,
-					GameId = game.Id
+					GameId = game.Id,
+					GameType = game.Type
 				});
 
 				return new AddPixelResponse

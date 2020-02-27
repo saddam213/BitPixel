@@ -13,6 +13,7 @@ namespace DotMatrix.AwardService.Implementation
 		{
 			// VerticalLines
 			var lineGroups = pixels
+				.Where(x => x.Type == PixelType.User)
 				.Select(x => new { X = x.X, Y = x.Y })
 				.GroupBy(x => x.X)
 				.Select(x => new
@@ -42,6 +43,7 @@ namespace DotMatrix.AwardService.Implementation
 		{
 			// HorizontalLines
 			var lineGroups = pixels
+				.Where(x => x.Type == PixelType.User)
 				.Select(x => new { X = x.X, Y = x.Y })
 				.GroupBy(x => x.Y)
 				.Select(x => new

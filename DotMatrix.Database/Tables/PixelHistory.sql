@@ -6,6 +6,7 @@
     [Type]      TINYINT         NOT NULL,
     [Color]     NVARCHAR(7)     NOT NULL,
     [Points]    INT             NOT NULL,
+    [TeamId]    INT             NULL,
     [Timestamp] DATETIME2 (7)   NOT NULL,
     CONSTRAINT [PK_PixelHistory] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

@@ -15,11 +15,15 @@ using Microsoft.AspNet.SignalR.Hubs;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Concurrent;
 
 namespace DotMatrix
 {
 	public class PixelHub : Hub
 	{
+		public IGameCache GameCache { get; set; }
+		public IPixelCache PixelCache { get; set; }
+
 		public IGameReader GameReader { get; set; }
 		public IPixelWriter PixelWriter { get; set; }
 		public IPixelReader PixelReader { get; set; }
@@ -120,48 +124,59 @@ namespace DotMatrix
 			);
 		}
 
-
-		public Task JoinGame(int gameId)
+		public async Task JoinGame(int gameId)
 		{
-			return Groups.Add(Context.ConnectionId, gameId.ToString());
+			var game = await GameCache.GetGame(gameId);
+			if (game != null)
+				await Groups.Add(Context.ConnectionId, game.Id.ToString());
+		}
+
+		public async Task<PixelResult> GameStats(int gameId)
+		{
+			var stats = await GameReader.GetStats(gameId);
+			if (stats == null)
+				return new PixelResult(false, "Game stats not found");
+
+			return new PixelResult(stats);
 		}
 
 
-		[Authorize]
-		public Task SendChatMessage(string message)
-		{
-			return Clients.All.OnChatMessage(new
-			{
-				Sender = Context.GetUserName(),
-				Message = message.Truncate(240)
-			});
-		}
 
 		[Authorize]
 		public async Task<PixelResult> AddPixel(AddPixelRequest model)
 		{
-			var game = await GameReader.GetGame(model.GameId);
+			var game = await GameCache.GetGame(model.GameId);
 			if (game == null)
-				return new PixelResult(false, "Game not found" );
+				return new PixelResult(false, "Game not found");
 
 			if (game.Status != GameStatus.Started)
-				return new PixelResult(false, "Game is not currently active" );
+				return new PixelResult(false, "Game is not currently active");
+
+			var pixel = await PixelCache.GetPixel(game.Id, model.X, model.Y);
+			if (pixel != null)
+			{
+				if (pixel.Type == PixelType.Fixed)
+					return new PixelResult(false, "Cannot overwrite gameboard pixel");
+
+				if (pixel.Points > model.MaxPoints)
+					return new PixelResult(false, "Pixel points are greater than Spend Limit");
+			}
 
 			var userId = Context.GetUserId();
 			var rateLimitResult = await CheckRateLimits(userId, game);
 			if (!string.IsNullOrEmpty(rateLimitResult))
-				return new PixelResult(false, rateLimitResult );
+				return new PixelResult(false, rateLimitResult);
 
 			var result = await PixelWriter.AddPixel(userId, model);
 			if (!result.Success)
-				return new PixelResult(false, result.Message );
+				return new PixelResult(false, result.Message);
 
 			return new PixelResult(result);
 		}
 
 		public async Task<PixelResult> GetPixel(GetPixelRequest model)
 		{
-			var game = await GameReader.GetGame(model.GameId);
+			var game = await GameCache.GetGame(model.GameId);
 			if (game == null)
 				return new PixelResult(false, "Game not found");
 
@@ -189,7 +204,7 @@ namespace DotMatrix
 
 
 
-		private async Task<string> CheckRateLimits(int userId, GameModel game)
+		private async Task<string> CheckRateLimits(int userId, GameCacheItem game)
 		{
 			if (!await ThrottleCache.ShouldExcecute(userId, $"GameClicks:{game.Id}", TimeSpan.FromSeconds(1), game.ClicksPerSecond))
 				return $"Maximum {game.ClicksPerSecond} clicks per second";
@@ -202,8 +217,48 @@ namespace DotMatrix
 
 			return string.Empty;
 		}
+
+
+
+		//Chat-----------------------------
+
+		[Authorize]
+		public async Task SendChatMessage(string message)
+		{
+			var chatMessage = new ChatMessage(Context.GetUserName(), message.Truncate(240));
+			AddChatHistory(chatMessage);
+			await Clients.All.OnChatMessage(chatMessage);
+		}
+
+		public Task<IEnumerable<ChatMessage>> GetChatMessages()
+		{
+			return Task.FromResult<IEnumerable<ChatMessage>>(ChatHistory);
+		}
+
+		private static ConcurrentQueue<ChatMessage> ChatHistory = new ConcurrentQueue<ChatMessage>();
+		private static void AddChatHistory(ChatMessage message)
+		{
+			ChatHistory.Enqueue(message);
+			if (ChatHistory.Count > 50)
+			{
+				ChatHistory.TryDequeue(out _);
+			}
+		}
 	}
 
+	public class ChatMessage
+	{
+		public ChatMessage() { }
+		public ChatMessage(string sender, string message)
+		{
+			Sender = sender;
+			Message = message;
+			Timestamp = DateTime.UtcNow.ToUnixMs();
+		}
+		public string Sender { get; set; }
+		public string Message { get; set; }
+		public long Timestamp { get; set; }
+	}
 
 	public class PixelResult
 	{

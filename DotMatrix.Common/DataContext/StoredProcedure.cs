@@ -11,6 +11,8 @@
 
 		public const string Cache_Game_GetInitial = "[dbo].[Cache_Game_GetInitial]";
 		public const string Cache_Game_GetUpdates = "[dbo].[Cache_Game_GetUpdates]";
+		public const string Cache_Pixel_GetInitial = "[dbo].[Cache_Pixel_GetInitial]";
+		public const string Cache_Pixel_GetUpdates = "[dbo].[Cache_Pixel_GetUpdates]";
 
 		public const string WalletService_UpdateWithdraw = "[dbo].[WalletService_UpdateWithdraw]";
 		public const string WalletService_GetWithdrawals = "[dbo].[WalletService_GetWithdrawals]";
