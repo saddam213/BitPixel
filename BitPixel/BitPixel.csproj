@@ -207,6 +207,7 @@
     <Content Include="Content\Bundles\bitPixel_bundle.min.css">
       <DependentUpon>bitPixel_bundle.css</DependentUpon>
     </Content>
+    <Content Include="Content\Images\Avatar.png" />
     <Content Include="Scripts\Bundles\bitPixel_bundle.js" />
     <Content Include="Scripts\enums.js" />
     <Compile Include="Startup.cs" />
@@ -220,9 +221,6 @@
     <Content Include="Content\fonts\fa-light-300.svg" />
     <Content Include="Content\fonts\fa-regular-400.svg" />
     <Content Include="Content\fonts\fa-solid-900.svg" />
-    <Content Include="Content\Images\Avatar-large.png" />
-    <Content Include="Content\Images\Avatar-medium.png" />
-    <Content Include="Content\Images\Avatar-small.png" />
     <Content Include="Content\Images\Payment\Bitcoin.png" />
     <Content Include="Content\Images\Payment\Dogecoin.png" />
     <Content Include="Content\Images\Payment\Litecoin.png" />
@@ -259,6 +257,7 @@
     <Content Include="App_Browsers\firefox.browser" />
     <None Include="app_offline.htm.off" />
     <None Include="bundleconfig.json" />
+    <None Include="Properties\PublishProfiles\CompileTest.pubxml" />
     <None Include="Properties\PublishProfiles\Production_DEV.pubxml" />
     <None Include="Properties\PublishProfiles\Production_PROD.pubxml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
