@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.ComponentModel.DataAnnotations;
 using BitPixel.Enums;
 
@@ -19,5 +20,7 @@ namespace BitPixel.Common.Game
 		public int Rank { get; set; }
 		public int ClicksPerSecond { get; set; }
 		public GamePlatform Platform { get; set; }
+		public DateTime? EndTime { get; set; }
+		public GameEndType EndType { get; set; }
 	}
 }

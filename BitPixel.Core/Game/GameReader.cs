@@ -192,9 +192,11 @@ namespace BitPixel.Core.Game
 								Icon = p.Icon,
 								Color = p.Color,
 								Members = p.Members.Count,
-								Pixels = p.Pixels.Count
+								Pixels = p.Pixels.Count,
+								Rank = p.Rank
 							})
 							.OrderByDescending(p => p.Pixels)
+							.ThenBy(p => p.Rank)
 							.ToList()
 					}).FirstOrDefaultAsync();
 			}

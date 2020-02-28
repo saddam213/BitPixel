@@ -197,7 +197,9 @@ namespace BitPixel.Controllers
 				Status = game.Status,
 				Rank = game.Rank,
 				ClicksPerSecond = game.ClicksPerSecond,
-				Platform = game.Platform
+				Platform = game.Platform,
+				EndTime = game.EndTime,
+				EndType = game.EndType
 			});
 		}
 

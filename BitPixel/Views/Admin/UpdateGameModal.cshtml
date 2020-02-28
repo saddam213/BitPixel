@@ -42,6 +42,19 @@
 
 				<div class="d-flex">
 					<div class="form-group w-100 mr-1">
+						<small>End Type</small>
+						@Html.EnumDropDownListFor(m => m.EndType, new { @class = "form-control form-control-sm" })
+						@Html.ValidationMessageFor(m => m.EndType, "", new { @class = "text-danger" })
+					</div>
+					<div class="form-group w-100 mr-1">
+						<small>EndTime</small>
+						@Html.TextBoxFor(m => m.EndTime, new { @class = "form-control form-control-sm", data_val = "false" })
+						@Html.ValidationMessageFor(m => m.EndTime, "", new { @class = "text-danger" })
+					</div>
+				</div>
+
+				<div class="d-flex">
+					<div class="form-group w-100 mr-1">
 						<small>Clicks/Second</small>
 						@Html.TextBoxFor(m => m.ClicksPerSecond, new { @class = "form-control form-control-sm" })
 						@Html.ValidationMessageFor(m => m.ClicksPerSecond, "", new { @class = "text-danger" })
@@ -61,8 +74,7 @@
 		</div>
 	</div>
 }
-<script src="~/Scripts/jquery.validate.js"></script>
-<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script src="~/Scripts/Bundles/validation_bundle.js"></script>
 <script>
 	(async ($) => {
 

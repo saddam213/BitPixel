@@ -8,5 +8,6 @@
 		public int Members { get; set; }
 		public string Icon { get; set; }
 		public string Color { get; set; }
+		public int Rank { get; set; }
 	}
 }

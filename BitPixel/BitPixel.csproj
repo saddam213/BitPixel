@@ -209,6 +209,7 @@
     </Content>
     <Content Include="Content\Images\Avatar.png" />
     <Content Include="Scripts\Bundles\bitPixel_bundle.js" />
+    <Content Include="Scripts\Bundles\validation_bundle.js" />
     <Content Include="Scripts\enums.js" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -253,6 +254,7 @@
     <Content Include="Scripts\datatables.js" />
     <Content Include="Scripts\bitPixel.js" />
     <Content Include="Scripts\Event.js" />
+    <Content Include="Scripts\jquery.validate.extras.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="App_Browsers\firefox.browser" />
     <None Include="app_offline.htm.off" />

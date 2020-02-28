@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
-using BitPixel.Cache.Common;
 using BitPixel.Common.DataContext;
 using BitPixel.Common.Game;
 using BitPixel.Common.Results;
 using BitPixel.Common.Team;
+using BitPixel.Enums;
 
 namespace BitPixel.Core.Game
 {
@@ -23,6 +22,9 @@ namespace BitPixel.Core.Game
 				if (await GameNameExists(context, model.Name))
 					return new WriterResult(false, "Game with name already exists");
 
+				if (model.EndType == GameEndType.Timestamp && !model.EndTime.HasValue)
+					return new WriterResult(false, "EndTime must be set for Timestamp games.");
+
 				context.Games.Add(new Entity.Game
 				{
 					Name = model.Name,
@@ -34,7 +36,11 @@ namespace BitPixel.Core.Game
 					Height = model.Height,
 					ClicksPerSecond = model.ClicksPerSecond,
 					Rank = model.Rank,
-					Timestamp = DateTime.UtcNow
+					Timestamp = DateTime.UtcNow,
+					EndTime = model.EndType == GameEndType.Timestamp
+						? model.EndTime
+						: default(DateTime?),
+					EndType = model.EndType,
 				});
 				await context.SaveChangesAsync();
 				return new WriterResult(true);
@@ -74,11 +80,18 @@ namespace BitPixel.Core.Game
 						return new WriterResult(false, $"Finished game cannot be set to {model.Status} status");
 				}
 
+				if (model.EndType == GameEndType.Timestamp && !model.EndTime.HasValue)
+					return new WriterResult(false, "EndTime must be set for Timestamp games.");
+
 				game.Rank = model.Rank;
 				game.Status = model.Status;
 				game.Platform = model.Platform;
 				game.Description = model.Description;
 				game.ClicksPerSecond = model.ClicksPerSecond;
+				game.EndTime = model.EndType == GameEndType.Timestamp
+					? model.EndTime
+					: default(DateTime?);
+				game.EndType = model.EndType;
 
 				await context.SaveChangesAsync();
 				return new WriterResult(true);

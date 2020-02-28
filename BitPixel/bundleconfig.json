@@ -13,7 +13,23 @@
       "Scripts/datatables.js",
       "Scripts/spectrum.js",
       "Scripts/bitPixel.js"
-    ]
+    ],
+    "minify": {
+      "enabled": false,
+      "preserveImportantComments": false
+    }
+  },
+  {
+    "outputFileName": "Scripts/Bundles/validation_bundle.js",
+    "inputFiles": [
+      "Scripts/jquery.validate.js",
+      "Scripts/jquery.validate.extras.js",
+      "Scripts/jquery.validate.unobtrusive.js"
+    ],
+    "minify": {
+      "enabled": false,
+      "preserveImportantComments": false
+    }
   },
   {
     "outputFileName": "Content/Bundles/bitPixel_bundle.css",
