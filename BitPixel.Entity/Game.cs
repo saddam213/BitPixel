@@ -25,5 +25,6 @@ namespace BitPixel.Entity
 		public virtual ICollection<Pixel> Pixels { get; set; }
 		public virtual ICollection<PixelHistory> PixelHistory { get; set; }
 		public virtual ICollection<Prize> Prizes { get; set; }
+		public virtual ICollection<GamePrize> GamePrizes { get; set; }
 	}
 }

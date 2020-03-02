@@ -94,6 +94,7 @@
     <Build Include="Tables\TeamMember.sql" />
     <Build Include="Stored Procedures\Cache_Pixel_GetInitial.sql" />
     <Build Include="Stored Procedures\Cache_Pixel_GetUpdates.sql" />
+    <Build Include="Tables\GamePrize.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\StaticData.sql" />

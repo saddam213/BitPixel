@@ -17,12 +17,11 @@ namespace BitPixel.Common.Prize
 
 	public class ViewPrizesModalModel
 	{
-		public GameModel Game { get; set; }
-		public List<PrizeItemModel> Prizes { get; set; }
+		public GamePrizeViewModel Prizes { get; set; }
 	}
 
 	public class PrizesViewModel
 	{
-		public List<PrizeItemModel> Prizes { get; set; }
+		public List<GamePrizeViewModel> Prizes { get; set; }
 	}
 }

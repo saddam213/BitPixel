@@ -17,16 +17,6 @@ namespace BitPixel.Core.Prize
 	{
 		public IDataContextFactory DataContextFactory { get; set; }
 
-		public async Task<List<PrizeItemModel>> GetPrizes(int gameId)
-		{
-			using (var context = DataContextFactory.CreateReadOnlyContext())
-			{
-				return await MapPrizes(context.Prize.Where(x => x.GameId == gameId))
-					.OrderByDescending(x => x.Unclaimed)
-					.ToListAsync();
-			}
-		}
-
 		public async Task<List<PrizeUserHistoryItemModel>> GetPrizePayments()
 		{
 			using (var context = DataContextFactory.CreateReadOnlyContext())
@@ -71,18 +61,6 @@ namespace BitPixel.Core.Prize
 					.FirstOrDefaultAsync();
 			}
 		}
-
-		public async Task<List<PrizeItemModel>> GetPrizes()
-		{
-			using (var context = DataContextFactory.CreateReadOnlyContext())
-			{
-				return await MapPrizes(context.Prize)
-					.OrderBy(x => x.Game)
-					.ThenBy(x => x.Name)
-					.ToListAsync();
-			}
-		}
-
 
 		public async Task<PrizeUserHistoryItemModel> GetUserPrize(int userId, int prizeId)
 		{
@@ -134,38 +112,6 @@ namespace BitPixel.Core.Prize
 				Data4 = p.Data4
 			};
 		}
-
-		private static IQueryable<PrizeItemModel> MapPrizes(IQueryable<Entity.Prize> query)
-		{
-			return query.GroupBy(x => new
-			{
-				x.Name,
-				x.Description,
-				x.Type,
-				Game = x.Game.Name,
-				x.GameId,
-				GameRank = x.Game.Rank,
-				Symbol = x.Data,
-				GameStatus = x.Game.Status,
-			})
-			.Select(x => new PrizeItemModel
-			{
-				Name = x.Key.Name,
-				Description = x.Key.Description,
-				Type = x.Key.Type,
-				Game = x.Key.Game,
-				GameId = x.Key.GameId,
-				GameRank = x.Key.GameRank,
-				Symbol = x.Key.Symbol,
-				Count = x.Count(),
-				Unclaimed = x.Count(p => !p.IsClaimed),
-				GameStatus = x.Key.GameStatus
-			});
-		}
-
-
-
-
 
 		public async Task<DataTablesResponseData> GetHistory(DataTablesParam model)
 		{

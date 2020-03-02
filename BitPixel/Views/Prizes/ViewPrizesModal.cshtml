@@ -3,30 +3,83 @@
 	Layout = "~/Views/Shared/_Modal.cshtml";
 	var isMobile = Request.Browser.IsMobileDevice;
 }
-<div class="modal-dialog" role="document" style="min-width:300px;max-width:1000px">
+<div class="modal-dialog" role="document" style="min-width:300px;max-width:1000px" data-endtype="@((int)Model.Prizes.EndType)" data-datenow="@DateTime.UtcNow.ToUnixMs()" data-endtime="@(Model.Prizes.EndTime?.ToUnixMs() ?? 0)">
 	<div class="modal-content">
 		<div class="modal-body">
 			<div class="card">
-
 				<div class="card-body">
-
-					<h5 class="card-title text-primary">@Model.Game.Name Prizes</h5>
-					<h6 class="card-subtitle mb-2 text-muted">Listed below are some of the prizes you can win playing @Model.Game.Name</h6>
+					<div class="d-flex justify-content-between align-items-center">
+						<div class="d-flex flex-column mb-1">
+							<h3 class="card-title text-primary mb-0">@Model.Prizes.Name</h3>
+							<small>@Model.Prizes.Description</small>
+						</div>
+						<div>
+							<a href="/Game?gameId=@Model.Prizes.GameId" class="btn btn-sm btn-warning" style="width:150px">Play Now!</a>
+						</div>
+					</div>
+					<hr class="mt-0" />
 					<div>
 
+						@if (Model.Prizes.GamePrizes.Any())
+						{
+							<div class="d-flex flex-column mb-2">
+								<h4 class="text-primary mb-0">Game Prizes</h4>
+								<small>These prizes can by the user or team who completes the pixel game</small>
+							</div>
+							foreach (var prizeTypeGroup in Model.Prizes.GamePrizes.GroupBy(x => x.Type).OrderByDescending(x => x.Key))
+							{
 
-						@foreach (var prizeTypeGroup in Model.Prizes.GroupBy(x => x.Type).OrderByDescending(x => x.Key))
+								<div class="mb-2">
+									<small class="text-primary">@prizeTypeGroup.Key Prizes</small>
+									<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+										<thead>
+											<tr>
+												<th>Name</th>
+												@if (!isMobile)
+												{
+													<th width="60%">Description</th>
+													<th class="text-right" width="80">Type</th>
+												}
+												<th class="text-right" width="120">Prize Draw</th>
+											</tr>
+										</thead>
+										<tbody>
+											@foreach (var prize in prizeTypeGroup.OrderBy(x => x.Rank))
+											{
+
+												<tr>
+													<td class="cell-elipsis" title="@prize.Name">@(isMobile ? prize.Description : prize.Name)</td>
+													@if (!isMobile)
+													{
+														<td class="cell-elipsis" title="@prize.Description">@prize.Description</td>
+														<td class="text-right">@prize.Type</td>
+													}
+													<td class="text-right countdown-modal">@(Model.Prizes.EndType == BitPixel.Enums.GameEndType.LastPixel ? "Last Pixel" : "000:00:00:00")</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								</div>
+
+							}
+						}
+
+						<div class="d-flex flex-column mb-2">
+							<h4 class="text-primary mb-0">Instant Pixel Prizes</h4>
+							<small>These prizes can be one instantly by filling a winning pixel</small>
+						</div>
+						@foreach (var prizeTypeGroup in Model.Prizes.PixelPrizes.GroupBy(x => x.Type).OrderByDescending(x => x.Key))
 						{
 							<div class="mb-2">
-								<h6 class="text-primary">@prizeTypeGroup.Key Prizes</h6>
+								<small class="text-primary">@prizeTypeGroup.Key Prizes</small>
 								<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
 									<thead>
 										<tr>
 											<th>Name</th>
 											@if (!isMobile)
 											{
-												<th width="60%" class="cell-elipsis">Description</th>
-												<th class="text-right" width="60">Type</th>
+												<th width="60%">Description</th>
+												<th class="text-right" width="80">Type</th>
 											}
 											<th class="text-right" width="@(isMobile ? 80 : 100)">Prizes Left</th>
 										</tr>
@@ -60,8 +113,6 @@
 								</table>
 							</div>
 						}
-
-
 					</div>
 				</div>
 			</div>
@@ -72,5 +123,32 @@
 		</div>
 	</div>
 </div>
+
+<script>
+		(async ($) => {
+
+			const startCountdown = () => {
+				const _this = $(".modal-dialog");
+				const now = _this.data("datenow");
+				const end = _this.data("endtime");
+				const type = _this.data("endtype");
+				console.log(type)
+				if (end == 0 || type == 0) {
+					return;
+				}
+
+				const interval = 1000;
+				const diffTime = end - now;
+				let duration = moment.duration(diffTime, 'milliseconds');
+				setInterval(() => {
+					duration = moment.duration(duration - interval, 'milliseconds');
+					_this.find('.countdown-modal').text(formatDuration(duration));
+				}, interval);
+			}
+
+			startCountdown();
+		})(jQuery);
+
+</script>
 
 

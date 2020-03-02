@@ -20,7 +20,7 @@
 		</div>
 
 		<div class="d-flex justify-content-center align-items-center flex-wrap">
-			@foreach (var method in Model.Methods)
+			@foreach (var method in Model.Methods.OrderBy(x => x.Rate))
 			{
 				<div class="card m-2" style="width:300px;">
 					<div class="d-flex justify-content-center align-items-center">

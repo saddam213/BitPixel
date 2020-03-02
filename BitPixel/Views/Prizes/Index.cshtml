@@ -13,22 +13,74 @@
 		</div>
 	</div>
 
-	@foreach (var prizeGameGroup in Model.Prizes.GroupBy(x => new { Id = x.GameId, Name = x.Game, Rank = x.GameRank }).OrderBy(x => x.Key.Rank))
+	@foreach (var game in Model.Prizes.Where(x => x.GamePrizes.Any() || x.PixelPrizes.Any()).OrderBy(x => x.Rank))
 	{
-		<div class="card mb-3" style="min-width:350px;max-width:1000px">
+		<div class="card mb-3 prize-container" style="min-width:350px;max-width:1000px" data-endtype="@((int)game.EndType)" data-datenow="@DateTime.UtcNow.ToUnixMs()" data-endtime="@(game.EndTime?.ToUnixMs() ?? 0)">
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center">
-					<h4 class="card-title text-primary">@prizeGameGroup.Key.Name</h4>
+					<div class="d-flex flex-column mb-1">
+						<h3 class="card-title text-primary mb-0">@game.Name</h3>
+						<small>@game.Description</small>
+					</div>
 					<div>
-						<a href="/Game?gameId=@prizeGameGroup.Key.Id" class="btn btn-sm btn-warning" style="width:150px">Play Now!</a>
+						<a href="/Game?gameId=@game.GameId" class="btn btn-sm btn-warning" style="width:150px">Play Now!</a>
 					</div>
 				</div>
 				<hr class="mt-0" />
 				<div>
-					@foreach (var prizeTypeGroup in prizeGameGroup.GroupBy(x => x.Type).OrderByDescending(x => x.Key))
+
+					@if (game.GamePrizes.Any())
+					{
+						<div class="d-flex flex-column mb-2">
+							<h4 class="text-primary mb-0">Game Prizes</h4>
+							<small>These prizes can by the user or team who completes the pixel game</small>
+						</div>
+						foreach (var prizeTypeGroup in game.GamePrizes.GroupBy(x => x.Type).OrderByDescending(x => x.Key))
+						{
+
+							<div class="mb-2">
+								<small class="text-primary">@prizeTypeGroup.Key Prizes</small>
+								<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
+									<thead>
+										<tr>
+											<th>Name</th>
+											@if (!isMobile)
+											{
+												<th width="60%">Description</th>
+												<th class="text-right" width="80">Type</th>
+											}
+											<th class="text-right" width="120">Prize Draw</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var prize in prizeTypeGroup.OrderBy(x => x.Rank))
+										{
+
+											<tr>
+												<td class="cell-elipsis" title="@prize.Name">@(isMobile ? prize.Description : prize.Name)</td>
+												@if (!isMobile)
+												{
+													<td class="cell-elipsis" title="@prize.Description">@prize.Description</td>
+													<td class="text-right">@prize.Type</td>
+												}
+												<td class="text-right countdown">@(game.EndType == BitPixel.Enums.GameEndType.LastPixel ? "Last Pixel" : "000:00:00:00")</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+
+						}
+					}
+
+					<div class="d-flex flex-column mb-2">
+						<h4 class="text-primary mb-0">Instant Pixel Prizes</h4>
+						<small>These prizes can be one instantly by filling a winning pixel</small>
+					</div>
+					@foreach (var prizeTypeGroup in game.PixelPrizes.GroupBy(x => x.Type).OrderByDescending(x => x.Key))
 					{
 						<div class="mb-2">
-							<h6 class="text-primary">@prizeTypeGroup.Key Prizes</h6>
+							<small class="text-primary">@prizeTypeGroup.Key Prizes</small>
 							<table class="table table-sm table-bordered" style="table-layout:fixed;width:100%;font-size:13px">
 								<thead>
 									<tr>
@@ -75,14 +127,30 @@
 		</div>
 	}
 
+
 </div>
 
 @section Scripts {
 	<script>
 		(async ($) => {
 
+			$(".prize-container").each(function () {
+				const _this = $(this);
+				const now = _this.data("datenow");
+				const end = _this.data("endtime");
+				const type = _this.data("endtype");
+				if (end == 0 || type == 0) {
+					return;
+				}
 
-
+				const interval = 1000;
+				const diffTime = end - now;
+				let duration = moment.duration(diffTime, 'milliseconds');
+				setInterval(() => {
+					duration = moment.duration(duration - interval, 'milliseconds');
+					_this.find('.countdown').text(formatDuration(duration));
+				}, interval);
+			});
 
 		})(jQuery);
 

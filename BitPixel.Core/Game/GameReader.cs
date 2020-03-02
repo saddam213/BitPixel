@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using BitPixel.Common.DataContext;
 using BitPixel.Common.Game;
+using BitPixel.Common.Prize;
 using BitPixel.Common.Team;
 using BitPixel.Datatables;
 using BitPixel.Datatables.Models;
@@ -161,7 +164,6 @@ namespace BitPixel.Core.Game
 			}
 		}
 
-
 		public async Task<GameStatsModel> GetStats(int gameId)
 		{
 			using (var context = DataContextFactory.CreateReadOnlyContext())
@@ -202,6 +204,127 @@ namespace BitPixel.Core.Game
 			}
 		}
 
+		public async Task<GamePrizeViewModel> GetPrizes(int gameId)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.Games
+				.Where(x => x.Id == gameId)
+				.Select(MapGamePrizes())
+				.FirstOrDefaultAsync();
+			}
+		}
+
+
+
+		public async Task<List<GamePrizeViewModel>> GetPrizes()
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.Games
+				.Where(x => x.Status != Enums.GameStatus.Finished && x.Status != Enums.GameStatus.Deleted)
+				.Select(MapGamePrizes())
+				.ToListAsync();
+			}
+		}
+
+		public async Task<DataTablesResponseData> GetPixelPrizes(DataTablesParam model)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.Prize
+				.Where(x => x.Game.Status != Enums.GameStatus.Finished && x.Game.Status != Enums.GameStatus.Deleted)
+				.GroupBy(x => new
+				{
+					GameId = x.GameId,
+					Game = x.Game.Name,
+					Name = x.Name,
+					Description = x.Description,
+					Type = x.Type
+				})
+				.Select(x => new
+				{
+					GameId = x.Key.GameId,
+					Game = x.Key.Game,
+					Name = x.Key.Name,
+					Description = x.Key.Description,
+					Type = x.Key.Type,
+					Count = x.Count(),
+					Remaining = x.Count(p => p.IsClaimed)
+				})
+				.GetDataTableResponseAsync(model);
+			}
+		}
+
+
+		public async Task<DataTablesResponseData> GetGamePrizes(DataTablesParam model)
+		{
+			using (var context = DataContextFactory.CreateReadOnlyContext())
+			{
+				return await context.GamePrize
+				.Where(x => x.Game.Status != Enums.GameStatus.Finished && x.Game.Status != Enums.GameStatus.Deleted)
+				.Select(x => new
+				{
+					GameId = x.GameId,
+					Game = x.Game.Name,
+					Name = x.Name,
+					Description = x.Description,
+					Type = x.Type
+				}).GetDataTableResponseAsync(model);
+			}
+		}
+
+
+		private static Expression<Func<Entity.Game, GamePrizeViewModel>> MapGamePrizes()
+		{
+			return game => new GamePrizeViewModel
+			{
+				GameId = game.Id,
+				Rank = game.Rank,
+				Name = game.Name,
+				Description = game.Description,
+				EndType = game.EndType,
+				EndTime = game.EndTime,
+				Status = game.Status,
+				GamePrizes = game.GamePrizes
+					.Select(x => new GamePrizeModel
+					{
+						Id = x.Id,
+						GameId = x.GameId,
+						Name = x.Name,
+						Description = x.Description,
+						Points = x.Points,
+						Type = x.Type,
+						Rank = x.Rank,
+						Symbol = x.Data,
+					}).ToList(),
+				PixelPrizes = game.Prizes
+					.GroupBy(x => new
+					{
+						Name = x.Name,
+						Description = x.Description,
+						Type = x.Type,
+						Game = x.Game.Name,
+						GameId = x.GameId,
+						GameRank = x.Game.Rank,
+						Symbol = x.Data,
+					})
+					.Select(x => new PrizeItemModel
+					{
+						Name = x.Key.Name,
+						Description = x.Key.Description,
+						Type = x.Key.Type,
+						Game = x.Key.Game,
+						GameId = x.Key.GameId,
+						GameRank = x.Key.GameRank,
+						Symbol = x.Key.Symbol,
+						Count = x.Count(),
+						Unclaimed = x.Count(p => !p.IsClaimed)
+					}).ToList()
+			};
+		}
+
 
 	}
 }
+

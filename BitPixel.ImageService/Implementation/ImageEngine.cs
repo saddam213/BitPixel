@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ using BitPixel.Base.Logging;
 using BitPixel.Cache;
 using BitPixel.Cache.Common;
 using BitPixel.Data.DataContext;
+using BitPixel.Entity;
 using BitPixel.Enums;
 
 namespace BitPixel.ImageService.Implementation
@@ -210,12 +212,31 @@ namespace BitPixel.ImageService.Implementation
 				}
 
 				bitmap.Save(filename, ImageFormat.Png);
-				using (var bitmapthumb = new Bitmap(bitmap, game.Width / 2, game.Height / 2))
-				{
-					bitmapthumb.Save(filenameThumb, ImageFormat.Png);
-				}
+				GenerateThumbnail(bitmap, 400,300, filenameThumb);
 			}
 			Log.Message(LogLevel.Info, $"[RenderPixels] - Rendering pixels complete, Elapsed: {DateTime.UtcNow - start}ms");
+		}
+
+		private static void GenerateThumbnail(Bitmap bitmap, double maxWidth, double maxHeight, string filename)
+		{
+			double aspectRatio = bitmap.Width / bitmap.Width;
+			double boxRatio = maxWidth / maxHeight;
+			double scaleFactor = boxRatio > aspectRatio
+				?  maxHeight / bitmap.Height
+				:  maxWidth / bitmap.Width;
+
+			var newWidth = (int)(bitmap.Width * scaleFactor);
+			var newHeight = (int)(bitmap.Height * scaleFactor);
+			using (var bitmapthumb = new Bitmap(newWidth, newHeight))
+			using (var graphics = Graphics.FromImage(bitmapthumb))
+			{
+				graphics.SmoothingMode = SmoothingMode.AntiAlias;
+				graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+				graphics.CompositingQuality = CompositingQuality.HighQuality;
+				graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+				graphics.DrawImage(bitmap, new Rectangle(0, 0, newWidth, newHeight));
+				bitmapthumb.Save(filename, ImageFormat.Png);
+			}
 		}
 	}
 

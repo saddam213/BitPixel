@@ -203,11 +203,36 @@
     <Compile Include="Identity\ApplicationUser.cs" />
     <Compile Include="Hubs\PixelHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="android-icon-144x144.png" />
+    <Content Include="android-icon-192x192.png" />
+    <Content Include="android-icon-36x36.png" />
+    <Content Include="android-icon-48x48.png" />
+    <Content Include="android-icon-72x72.png" />
+    <Content Include="android-icon-96x96.png" />
+    <Content Include="apple-icon-114x114.png" />
+    <Content Include="apple-icon-120x120.png" />
+    <Content Include="apple-icon-144x144.png" />
+    <Content Include="apple-icon-152x152.png" />
+    <Content Include="apple-icon-180x180.png" />
+    <Content Include="apple-icon-57x57.png" />
+    <Content Include="apple-icon-60x60.png" />
+    <Content Include="apple-icon-72x72.png" />
+    <Content Include="apple-icon-76x76.png" />
+    <Content Include="apple-icon-precomposed.png" />
+    <Content Include="apple-icon.png" />
+    <Content Include="browserconfig.xml" />
     <Content Include="Content\Bundles\bitPixel_bundle.css" />
     <Content Include="Content\Bundles\bitPixel_bundle.min.css">
       <DependentUpon>bitPixel_bundle.css</DependentUpon>
     </Content>
     <Content Include="Content\Images\Avatar.png" />
+    <Content Include="favicon-16x16.png" />
+    <Content Include="favicon-32x32.png" />
+    <Content Include="favicon-96x96.png" />
+    <Content Include="ms-icon-144x144.png" />
+    <Content Include="ms-icon-150x150.png" />
+    <Content Include="ms-icon-310x310.png" />
+    <Content Include="ms-icon-70x70.png" />
     <Content Include="Scripts\Bundles\bitPixel_bundle.js" />
     <Content Include="Scripts\Bundles\validation_bundle.js" />
     <Content Include="Scripts\enums.js" />
@@ -259,6 +284,7 @@
     <Content Include="App_Browsers\firefox.browser" />
     <None Include="app_offline.htm.off" />
     <None Include="bundleconfig.json" />
+    <Content Include="manifest.json" />
     <None Include="Properties\PublishProfiles\CompileTest.pubxml" />
     <None Include="Properties\PublishProfiles\Production_DEV.pubxml" />
     <None Include="Properties\PublishProfiles\Production_PROD.pubxml" />
@@ -357,6 +383,8 @@
     <Content Include="Views\Admin\UpdateTeamModal.cshtml" />
     <Content Include="Views\Admin\Teams.cshtml" />
     <Content Include="Views\Game\ChangeTeamModal.cshtml" />
+    <Content Include="Views\Admin\PixelPrize.cshtml" />
+    <Content Include="Views\Admin\GamePrize.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

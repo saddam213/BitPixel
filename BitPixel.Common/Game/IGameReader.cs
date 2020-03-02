@@ -20,5 +20,9 @@ namespace BitPixel.Common.Game
 		Task<TeamModel> GetUserTeam(int userId, int gameId);
 
 		Task<GameStatsModel> GetStats(int gameId);
+		Task<GamePrizeViewModel> GetPrizes(int gameId);
+		Task<List<GamePrizeViewModel>> GetPrizes();
+		Task<DataTablesResponseData> GetPixelPrizes(DataTablesParam model);
+		Task<DataTablesResponseData> GetGamePrizes(DataTablesParam model);
 	}
 }

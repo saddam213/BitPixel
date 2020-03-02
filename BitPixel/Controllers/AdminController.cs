@@ -37,7 +37,7 @@ namespace BitPixel.Controllers
 		[HttpGet]
 		public Task<ActionResult> Index()
 		{
-			return Task.FromResult<ActionResult>(View(new AdminViewModel()));
+			return Task.FromResult<ActionResult>(View());
 		}
 
 
@@ -46,11 +46,37 @@ namespace BitPixel.Controllers
 		{
 			return View(new AdminGameViewModel
 			{
-				Games = await GameReader.GetGames(),
-				Prizes = await PrizeReader.GetPrizes(),
-
+				Games = await GameReader.GetGames()
 			});
 		}
+
+
+		[HttpGet]
+		public Task<ActionResult> PixelPrize()
+		{
+			return Task.FromResult<ActionResult>(View());
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> GetPixelPrizes(DataTablesParam model)
+		{
+			return DataTable(await GameReader.GetPixelPrizes(model));
+		}
+
+
+
+		[HttpGet]
+		public Task<ActionResult> GamePrize()
+		{
+			return Task.FromResult<ActionResult>(View());
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> GetGamePrizes(DataTablesParam model)
+		{
+			return DataTable(await GameReader.GetGamePrizes(model));
+		}
+
 
 
 		[HttpGet]
@@ -221,8 +247,8 @@ namespace BitPixel.Controllers
 		[HttpGet]
 		public async Task<ActionResult> UpdatePrizePoolModal(int gameId, string name)
 		{
-			var prizes = await PrizeReader.GetPrizes(gameId);
-			var prize = prizes.FirstOrDefault(x => x.Name == name);
+			var prizes = await GameReader.GetPrizes(gameId);
+			var prize = prizes.PixelPrizes.FirstOrDefault(x => x.Name == name);
 			return View(new UpdatePrizePoolModel
 			{
 				GameId = gameId,

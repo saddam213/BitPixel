@@ -23,23 +23,18 @@ namespace BitPixel.Controllers
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
-			var prizes = await PrizeReader.GetPrizes();
 			return View(new PrizesViewModel
 			{
-				Prizes = prizes
-					.Where(x => x.GameStatus != GameStatus.Finished)
-					.ToList()
+					Prizes = await GameReader.GetPrizes()
 			});
 		}
 
 		[HttpGet]
 		public async Task<ActionResult> ViewPrizesModal(int gameId)
 		{
-			var game = await GameReader.GetGame(gameId);
 			return View(new ViewPrizesModalModel
 			{
-				Game = game,
-				Prizes = await PrizeReader.GetPrizes(game.Id)
+				Prizes = await GameReader.GetPrizes(gameId)
 			});
 		}
 
@@ -108,7 +103,7 @@ namespace BitPixel.Controllers
 		{
 			if (!ModelState.IsValid)
 				return View(model);
-		
+
 			var userId = User.Identity.GetUserId<int>();
 			var prize = await PrizeReader.GetUserPrize(userId, model.Id);
 			if (prize.Status != PrizeStatus.Unclaimed)

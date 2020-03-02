@@ -244,3 +244,11 @@ String.prototype.paddingLeft = function (paddingValue) {
 
 
 
+const formatDuration = (duration) => {
+	let output = '';
+	const days = Math.floor(duration.asDays());
+	if (days > 0) {
+		output = `${days.toString().paddingLeft(days > 99 ? "000" : "00")}:`;
+	}
+	return `${output}${duration.hours().toString().paddingLeft("00")}:${duration.minutes().toString().paddingLeft("00")}:${duration.seconds().toString().paddingLeft("00")}`;
+}

@@ -16,7 +16,7 @@
 @Html.AntiForgeryToken()
 
 <style>
-	
+
 	.canvas-scroll-wrapper {
 		padding-left: 5px;
 		padding-right: 5px;
@@ -30,9 +30,11 @@
 	}
 
 	.game-link {
-		margin-left: 5px;
-		margin-right: 5px;
-		color: #839496 !important;
+	
+		border-radius: 0;
+		margin: 1px;
+		width: 32px;
+		height: 32px;
 	}
 
 	.noselect {
@@ -61,16 +63,19 @@
 	<div class="game-container">
 		<div class="d-flex flex-column w-100 h-100">
 
-			<div class="d-flex justify-content-between noselect" style="padding-left:5px;padding-right:5px;">
-				<h4 class="mb-0 text-primary">@Model.Game.Name</h4>
-				<div class="d-flex flex-wrap justify-content-center" style="font-size: 20px ">
-					<a id="prizes-modal" href="#" class="game-link">
+			<div class="d-flex justify-content-between align-items-center noselect" style="padding-left:5px;padding-right:5px;">
+				<div class="d-flex flex-column cell-elipsis">
+					<div>	<h4 class="mb-0 text-primary cell-elipsis">@Model.Game.Name</h4></div>
+					<small class="cell-elipsis">@Model.Game.Description fasufghoasifpoasiyufp9oas9yuf</small>
+				</div>
+				<div class="d-flex" style="font-size: 20px">
+					<a id="prizes-modal" href="#" class="game-link btn btn-sm btn-outline-secondary text-primary">
 						<i class="fa fa-gift"></i>
 					</a>
-					<a href="/Prizes/GameHistory?gameId=@Model.Game.Id" class="game-link">
+					<a href="/Prizes/GameHistory?gameId=@Model.Game.Id" class="game-link btn btn-sm btn-outline-secondary text-primary">
 						<i class="fa fa-award"></i>
 					</a>
-					<a href="/Scores/Game?gameId=@Model.Game.Id" class="game-link">
+					<a href="/Scores/Game?gameId=@Model.Game.Id" class="game-link btn btn-sm btn-outline-secondary text-primary">
 						<i class="fa fa-list-ol"></i>
 					</a>
 					@*<a href="/Explore?gameId=@Model.Game.Id" class="game-link">
@@ -100,7 +105,7 @@
 
 							<div>
 								<a data-toggle="collapse" data-target="#collapseMenu" aria-expanded="false" aria-controls="collapseMenu">
-									<i style="font-size:28px;margin-top:6px" class="fa fa-caret-circle-down"></i>
+									<i style="font-size:28px;margin-top:6px" class="fa fa-caret-circle-down text-primary"></i>
 								</a>
 							</div>
 
@@ -174,14 +179,14 @@
 										@if (Model.Team == null)
 										{
 											<span class="change-team form-control border-1 border-secondary" style="border-radius:0">
-												<i style="font-size:22px;color:red" class="fad fa-ban"></i>
+												<i style="font-size:20px;color:red" class="fad fa-ban"></i>
 											</span>
 										}
 										else
 										{
 											<div class="form-control border-1 border-secondary" style="border-radius:0">
 												<div class="d-flex align-items-center">
-													<i style="font-size:22px;color:@Model.Team.Color" class="@(string.IsNullOrEmpty( Model.Team.Icon) ? "fa fa-square-full" : Model.Team.Icon)"></i>
+													<i style="font-size:20px;color:@Model.Team.Color" class="@(string.IsNullOrEmpty( Model.Team.Icon) ? "fa fa-square-full" : Model.Team.Icon)"></i>
 												</div>
 											</div>
 										}
@@ -897,13 +902,7 @@
 				let duration = moment.duration(diffTime, 'milliseconds');
 				setInterval(() => {
 					duration = moment.duration(duration - interval, 'milliseconds');
-					let output = '';
-					const days = Math.floor(duration.asDays());
-					if (days > 0) {
-						output += `${days.toString().paddingLeft(days > 99 ? "000" : "00")}:`;
-					}
-					output += `${duration.hours().toString().paddingLeft("00")}:${duration.minutes().toString().paddingLeft("00")}:${duration.seconds().toString().paddingLeft("00")}`;
-					$('.countdown').text(output);
+					$('.countdown').text(formatDuration(duration));
 				}, interval);
 			}
 

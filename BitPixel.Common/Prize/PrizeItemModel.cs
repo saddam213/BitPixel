@@ -14,6 +14,5 @@ namespace BitPixel.Common.Prize
 		public int GameId { get; set; }
 		public int GameRank { get; set; }
 		public string Symbol { get; set; }
-		public GameStatus GameStatus { get; set; }
 	}
 }

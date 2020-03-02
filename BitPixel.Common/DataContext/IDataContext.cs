@@ -18,6 +18,7 @@ namespace BitPixel.Common.DataContext
 		DbSet<EmailOutbox> EmailOutbox { get; set; }
 
 		DbSet<Entity.Game> Games { get; set; }
+		DbSet<GamePrize> GamePrize { get; set; }
 		DbSet<Entity.Team> Team { get; set; }
 		DbSet<TeamMember> TeamMember { get; set; }
 

@@ -80,17 +80,18 @@ namespace BitPixel.AwardService.Implementation
 			var maxY = game.Height - 1;
 			var version = $"Game:{game.Id}";
 
+			var userPixels = pixels.Where(x => x.Type == PixelType.User).ToList();
 			// top left
-			if (!pixels.Any(x => x.X == 0 && x.Y == 0))
+			if (!userPixels.Any(x =>  x.X == 0 && x.Y == 0))
 				return;
 			// top right
-			if (!pixels.Any(x => x.X == maxX && x.Y == 0))
+			if (!userPixels.Any(x => x.X == maxX && x.Y == 0))
 				return;
 			// bottom left
-			if (!pixels.Any(x => x.X == 0 && x.Y == maxY))
+			if (!userPixels.Any(x => x.X == 0 && x.Y == maxY))
 				return;
 			// bottom right
-			if (!pixels.Any(x => x.X == maxX && x.Y == maxY))
+			if (!userPixels.Any(x => x.X == maxX && x.Y == maxY))
 				return;
 
 			await AwardEngine.InsertAward(AwardType.PixelFourCorners, userId, game.Id, version, null);

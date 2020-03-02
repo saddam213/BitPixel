@@ -8,12 +8,7 @@ namespace BitPixel.Common.Prize
 	public interface IPrizeReader
 	{
 		Task<PrizeHistoryItemModel> GetPrize(int prizeId);
-		Task<List<PrizeItemModel>> GetPrizes();
-		Task<List<PrizeItemModel>> GetPrizes(int gameId);
-
 		Task<PrizeUserHistoryItemModel> GetUserPrize(int userId, int prizeId);
-
-
 
 		Task<PrizeUserHistoryItemModel> GetPrizePayment(int prizeId);
 		Task<List<PrizeUserHistoryItemModel>> GetPrizePayments();

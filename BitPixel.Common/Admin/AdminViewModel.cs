@@ -7,14 +7,9 @@ using BitPixel.Common.Users;
 
 namespace BitPixel.Common.Admin
 {
-	public class AdminViewModel
-	{
-	}
-
 	public class AdminGameViewModel
 	{
 		public List<GameModel> Games { get; set; }
-		public List<PrizeItemModel> Prizes { get; set; }
 	}
 
 	public class AdminUserViewModel

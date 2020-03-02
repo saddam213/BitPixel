@@ -63,6 +63,7 @@
     <Compile Include="AwardHistory.cs" />
     <Compile Include="EmailOutbox.cs" />
     <Compile Include="EmailTemplate.cs" />
+    <Compile Include="GamePrize.cs" />
     <Compile Include="TeamMember.cs" />
     <Compile Include="PaymentAddress.cs" />
     <Compile Include="PaymentMethod.cs" />

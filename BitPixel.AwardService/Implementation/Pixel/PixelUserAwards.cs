@@ -13,20 +13,21 @@ namespace BitPixel.AwardService.Implementation
 
 		public static async Task PixelCount(int userId, List<PixelModel> pixels, List<AwardHistoryModel> awards)
 		{
+			var userPixels = pixels.Where(x => x.Type == PixelType.User).ToList();
 			var version = $"User:{userId}";
-			if (pixels.Count >= 100 && !awards.Any(x => x.AwardType == AwardType.Pixel100))
+			if (userPixels.Count >= 100 && !awards.Any(x => x.AwardType == AwardType.Pixel100))
 				await AwardEngine.InsertAward(AwardType.Pixel100, userId, null, version, null);
 
-			if (pixels.Count >= 1000 && !awards.Any(x => x.AwardType == AwardType.Pixel1000))
+			if (userPixels.Count >= 1000 && !awards.Any(x => x.AwardType == AwardType.Pixel1000))
 				await AwardEngine.InsertAward(AwardType.Pixel1000, userId, null, version, null);
 
-			if (pixels.Count >= 10000 && !awards.Any(x => x.AwardType == AwardType.Pixel10000))
+			if (userPixels.Count >= 10000 && !awards.Any(x => x.AwardType == AwardType.Pixel10000))
 				await AwardEngine.InsertAward(AwardType.Pixel10000, userId, null, version, null);
 
-			if (pixels.Count >= 100000 && !awards.Any(x => x.AwardType == AwardType.Pixel100000))
+			if (userPixels.Count >= 100000 && !awards.Any(x => x.AwardType == AwardType.Pixel100000))
 				await AwardEngine.InsertAward(AwardType.Pixel100000, userId, null, version, null);
 
-			if (pixels.Count >= 1000000 && !awards.Any(x => x.AwardType == AwardType.Pixel1000000))
+			if (userPixels.Count >= 1000000 && !awards.Any(x => x.AwardType == AwardType.Pixel1000000))
 				await AwardEngine.InsertAward(AwardType.Pixel1000000, userId, null, version, null);
 		}
 
@@ -58,7 +59,7 @@ namespace BitPixel.AwardService.Implementation
 		public static async Task OverwriteCount(int userId, List<PixelModel> pixels, List<AwardHistoryModel> awards)
 		{
 			var version = $"User:{userId}";
-			var overwritePixels = pixels.Where(x => x.Points > 1).ToList();
+			var overwritePixels = pixels.Where(x => x.Type == PixelType.User && x.Points > 1).ToList();
 			if (overwritePixels.Count >= 1 && !awards.Any(x => x.AwardType == AwardType.PixelOverwrite))
 				await AwardEngine.InsertAward(AwardType.PixelOverwrite, userId, null, version, null);
 

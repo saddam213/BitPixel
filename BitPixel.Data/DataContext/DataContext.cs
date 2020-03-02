@@ -21,6 +21,7 @@ namespace BitPixel.Data.DataContext
 		public DbSet<EmailOutbox> EmailOutbox { get; set; }
 
 		public DbSet<Game> Games { get; set; }
+		public DbSet<GamePrize> GamePrize { get; set; }
 		public DbSet<Team> Team { get; set; }
 		public DbSet<TeamMember> TeamMember { get; set; }
 
