@@ -286,6 +286,7 @@
     <None Include="bundleconfig.json" />
     <Content Include="manifest.json" />
     <None Include="Properties\PublishProfiles\CompileTest.pubxml" />
+    <None Include="Properties\PublishProfiles\Production.pubxml" />
     <None Include="Properties\PublishProfiles\Production_DEV.pubxml" />
     <None Include="Properties\PublishProfiles\Production_PROD.pubxml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
