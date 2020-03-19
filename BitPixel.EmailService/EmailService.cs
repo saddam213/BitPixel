@@ -14,6 +14,7 @@ namespace BitPixel.EmailService
 		public EmailService()
 		{
 			InitializeComponent();
+			ServiceName = Program.ServiceName;
 		}
 
 		protected override void OnStart(string[] args)

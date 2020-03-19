@@ -11,9 +11,8 @@ namespace BitPixel.EmailService
 {
 	static class Program
 	{
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
+		public const string ServiceName = "BitPixel.EmailService";
+
 		static void Main()
 		{
 			var level = LoggingManager.LogLevelFromString(ConfigurationManager.AppSettings["LogLevel"]);

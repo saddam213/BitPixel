@@ -13,22 +13,16 @@ namespace BitPixel.EmailService
 		/// </summary>
 		public WindowsServiceInstaller()
 		{
-		
 			var serviceProcessInstaller = new ServiceProcessInstaller();
 			var serviceInstaller = new ServiceInstaller();
 
 			//# Service Account Information
-			serviceProcessInstaller.Account = ServiceAccount.LocalService;
-
-			//# Service Information
-			var serviceName = $"BitPixel.EmailService";
-			serviceInstaller.DisplayName = serviceName;
-			serviceInstaller.ServiceName = serviceName;
-			serviceInstaller.Description = serviceName;
+			serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
 			serviceInstaller.StartType = ServiceStartMode.Automatic;
-			serviceInstaller.DelayedAutoStart = true;
-			//# This must be identical to the WindowsService.ServiceBase name
-			//# set in the constructor of WindowsService.cs
+
+			serviceInstaller.DisplayName = Program.ServiceName;
+			serviceInstaller.Description = Program.ServiceName;
+			serviceInstaller.ServiceName = Program.ServiceName;
 
 			Installers.Add(serviceProcessInstaller);
 			Installers.Add(serviceInstaller);

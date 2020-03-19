@@ -119,6 +119,10 @@
       <Project>{0748a30e-4cf8-4f2e-8369-76f8cb4f3467}</Project>
       <Name>BitPixel.Enums</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BitPixel.WalletService\BitPixel.WalletService.csproj">
+      <Project>{5e2b5c17-a1fb-4f56-852a-3c9e4dc8f5fb}</Project>
+      <Name>BitPixel.WalletService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

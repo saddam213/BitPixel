@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Configuration.Install;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BitPixel.QueueService
 {
@@ -22,17 +17,15 @@ namespace BitPixel.QueueService
 			var serviceInstaller = new ServiceInstaller();
 
 			//# Service Account Information
-			serviceProcessInstaller.Account = ServiceAccount.LocalService;
+			serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
+			serviceInstaller.StartType = ServiceStartMode.Automatic;
 
-			//# Service Information
-			serviceInstaller.DisplayName = "BitPixel.QueueService";
-			serviceInstaller.StartType = ServiceStartMode.Manual;
-			serviceInstaller.Description = "BitPixel.QueueService";
-			//# This must be identical to the WindowsService.ServiceBase name
-			//# set in the constructor of WindowsService.cs
-			serviceInstaller.ServiceName = "BitPixel.QueueService";
-			this.Installers.Add(serviceProcessInstaller);
-			this.Installers.Add(serviceInstaller);
+			serviceInstaller.DisplayName = Program.ServiceName;
+			serviceInstaller.Description = Program.ServiceName;
+			serviceInstaller.ServiceName = Program.ServiceName;
+
+			Installers.Add(serviceProcessInstaller);
+			Installers.Add(serviceInstaller);
 		}
 	}
 }

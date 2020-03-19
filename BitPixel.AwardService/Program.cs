@@ -11,9 +11,8 @@ namespace BitPixel.AwardService
 {
 	static class Program
 	{
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
+		public const string ServiceName = "BitPixel.AwardService";
+
 		static void Main()
 		{
 			var level = LoggingManager.LogLevelFromString(ConfigurationManager.AppSettings["LogLevel"]);

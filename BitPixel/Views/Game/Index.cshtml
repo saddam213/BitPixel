@@ -12,15 +12,22 @@
 	var dateTimeNowUnix = DateTime.UtcNow.ToUnixMs();
 }
 
+@section metatags
+{
+	<meta name="keywords" content="bitcoin, litecoin, dogecoin, crypto, faucet, win, freecoins, election, trump, republicans, democrats, vote, freecoins">
+	<meta property="og:title" content="@Model.Game.Name">
+	<meta property="og:description" content="@Model.Game.Description">
+	<meta property="og:image" content="https://www.bitpixel.win/Content/Images/Games/@gameId/background.png">
+	<meta property="og:url" content="https://www.bitpixel.win/Game?gameId=@gameId">
+}
 
 @Html.AntiForgeryToken()
-
 <style>
 
-		#canvas-scroll-container::-webkit-scrollbar {
-			width: 12px !important;
-			height: 12px !important;
-		}
+	#canvas-scroll-container::-webkit-scrollbar {
+		width: 12px !important;
+		height: 12px !important;
+	}
 
 
 	#toolbar-window {

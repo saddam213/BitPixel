@@ -23,6 +23,7 @@ namespace BitPixel.ImageService
 		public ImageService()
 		{
 			InitializeComponent();
+			ServiceName = Program.ServiceName;
 		}
 
 		protected override void OnStart(string[] args)

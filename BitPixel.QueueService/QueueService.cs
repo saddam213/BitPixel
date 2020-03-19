@@ -14,6 +14,7 @@ namespace BitPixel.QueueService
 		public QueueService()
 		{
 			InitializeComponent();
+			ServiceName = Program.ServiceName;
 		}
 
 		protected override void OnStart(string[] args)

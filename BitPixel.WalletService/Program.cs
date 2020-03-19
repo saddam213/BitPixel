@@ -11,9 +11,8 @@ namespace BitPixel.WalletService
 {
 	static class Program
 	{
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
+		public const string ServiceName = "BitPixel.WalletService";
+
 		static void Main()
 		{
 			var level = LoggingManager.LogLevelFromString(ConfigurationManager.AppSettings["LogLevel"]);
@@ -31,7 +30,7 @@ namespace BitPixel.WalletService
 			}
 #else
 
-			LoggingManager.AddLog(new FileLogger(location, "DepositService", level));
+			LoggingManager.AddLog(new FileLogger(location, "WalletService", level));
 			ServiceBase[] ServicesToRun;
 			ServicesToRun = new ServiceBase[]
 			{

@@ -17,12 +17,12 @@ namespace BitPixel.AwardService
 	public partial class AwardService : ServiceBase
 	{
 		private readonly Log Log = LoggingManager.GetLog(typeof(AwardService));
-		private CancellationTokenSource _cancellationTokenSource;
 		private AwardEngine _awardEngine;
 
 		public AwardService()
 		{
 			InitializeComponent();
+			ServiceName = Program.ServiceName;
 		}
 
 		protected override void OnStart(string[] args)

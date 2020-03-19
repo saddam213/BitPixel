@@ -16,6 +16,7 @@ namespace BitPixel.WalletService
 		public DepositService()
 		{
 			InitializeComponent();
+			ServiceName = Program.ServiceName;
 		}
 
 		protected override void OnStart(string[] args)
